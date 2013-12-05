@@ -1,0 +1,15 @@
+<f:layout name="Default" />
+
+<f:section name="iconButtons">
+    <f:render partial="Adminbuttons" />
+</f:section>
+
+<f:section name="content">
+    <p>Convert FCEs</p>
+
+    <f:form action="convertFce">
+        <f:form.select id="fce" name="fce" options="{allFce}" optionValueField="uid" optionLabelField="title" />
+        <f:form.select id="ge" name="ge" options="{allGe}" optionValueField="uid" optionLabelField="title" />
+        <f:form.submit value="Convert"></f:form.submit>
+    </f:form>
+</f:section>

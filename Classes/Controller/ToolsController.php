@@ -30,28 +30,76 @@
 class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_ActionController {
 
 	/**
-	 * @var Tx_SfTvtools_Service_UnreferencedElementService
+	 * @var Tx_SfTvtools_Service_UnreferencedElementHelper
 	 */
-	protected $UnreferencedElementService;
+	protected $unreferencedElementHelper;
 
 	/**
-	 * DI for UnreferencedElementService
+	 * DI for UnreferencedElementHelper
 	 *
-	 * @param Tx_SfTvtools_Service_UnreferencedElementService $unreferencedElementService
+	 * @param Tx_SfTvtools_Service_UnreferencedElementHelper $unreferencedElementHelper
 	 * @return void
 	 */
-	public function injectFsrFacilityRepository(Tx_SfTvtools_Service_UnreferencedElementService $unreferencedElementService) {
-		$this->UnreferencedElementService = $unreferencedElementService;
+	public function injectUnreferencedElementHelper(Tx_SfTvtools_Service_UnreferencedElementHelper $unreferencedElementHelper) {
+		$this->unreferencedElementHelper = $unreferencedElementHelper;
 	}
 
+	/**
+	 * @var Tx_SfTvtools_Service_UpdateFceHelper
+	 */
+	protected $UpdateFceHelper;
+
+	/**
+	 * DI for UnreferencedElementHelper
+	 *
+	 * @param Tx_SfTvtools_Service_UpdateFceHelper $unreferencedElementHelper
+	 * @return void
+	 */
+	public function injectUpdateFceHelper(Tx_SfTvtools_Service_UpdateFceHelper $unreferencedElementHelper) {
+		$this->UpdateFceHelper = $unreferencedElementHelper;
+	}
 
 	public function indexAction() {
 
 	}
 
+	/**
+	 * Sets all unreferenced Elements to deleted
+	 *
+	 * @return void
+	 */
 	public function deleteUnreferencedElementsAction() {
-		$numRecords = $this->UnreferencedElementService->markDeletedUnreferencedElementsRecords();
+		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords();
 		$this->view->assign('numRecords', $numRecords);
+	}
+
+	public function indexConvertFCEAction() {
+		$allFce = $this->UpdateFceHelper->getAllFce();
+		$allGe = $this->UpdateFceHelper->getAllGe();
+
+		$this->view->assign('allFce', $allFce);
+		$this->view->assign('allGe', $allGe);
+		//t3lib_utility_Debug::debug($this->UpdateFceHelper->getAllGe());
+		//$contentElements = $this->UpdateFceHelper->getContentElementsByFce(10);
+		//t3lib_utility_Debug::debug('Count:' . count($contentElements));
+		//t3lib_utility_Debug::debug($contentElements[0]);
+		//$contentElement = $this->UpdateFceHelper->getContentElementByUid(300);
+		//t3lib_utility_Debug::debug($contentElement);
+		//$this->UpdateFceHelper->convertFceToGe($contentElement, 0, 1);
+	}
+
+	/**
+	 * @param int $fce
+	 * @param int $ge
+	 * @return void
+	 */
+	public function convertFceAction($fce, $ge) {
+		if ($fce > 0 && $ge > 0) {
+			$contentElements = $this->UpdateFceHelper->getContentElementsByFce($fce);
+			foreach($contentElements as $contentElement) {
+				$this->UpdateFceHelper->convertFceToGe($contentElement, $ge);
+			}
+		}
 	}
 }
 ?>

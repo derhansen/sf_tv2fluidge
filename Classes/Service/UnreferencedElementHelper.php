@@ -28,8 +28,11 @@ require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php'
 /**
  * Description
  */
-class Tx_SfTvtools_Service_UnreferencedElementService implements t3lib_Singleton {
+class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton {
 
+	/**
+	 * @var tx_templavoila_api
+	 */
 	protected $templavoilaAPIObj;
 
 	/**
