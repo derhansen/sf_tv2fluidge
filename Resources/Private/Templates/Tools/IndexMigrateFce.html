@@ -1,0 +1,27 @@
+<f:layout name="Default" />
+
+<f:section name="iconButtons">
+    <f:render partial="Adminbuttons" />
+</f:section>
+
+<f:section name="content">
+    <h2><f:translate key="mod_migratefce_title" /></h2>
+
+    <h3><f:translate key="label_what_does_it_do" /></h3>
+    <p><f:translate key="mod_migratefce_description" /></p>
+
+    <h4><f:translate key="label_warning" /></h4>
+    <p><f:translate key="desc_backup_warning" /></p>
+
+    <f:form action="migrateFce">
+        <label for="fce"><f:translate key="label_fce"/></label>
+        <f:form.select id="fce" name="fce" options="{allFce}" optionValueField="uid" optionLabelField="title" />
+        <label for="ge"><f:translate key="label_ge"/></label>
+        <f:form.select id="ge" name="ge" options="{allGe}" optionValueField="uid" optionLabelField="title" />
+        <label for="markdeleted"><f:translate key="label_mark_deleted"/></label>
+        <f:form.checkbox id="markdeleted" name="markdeleted" value="1" checked="false"/>
+
+        <br/>
+        <f:form.submit value="{f:translate(key: 'label_start')}"/>
+    </f:form>
+</f:section>

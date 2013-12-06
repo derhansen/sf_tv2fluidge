@@ -14,13 +14,18 @@
             <label index="label_result">Result</label>
             <label index="label_what_does_it_do">What does it do?</label>
             <label index="label_warning">Warning?</label>
+            <label index="label_fce">Flexible Content Element</label>
+            <label index="label_ge">Grid Element</label>
+            <label index="label_mark_deleted">Flag original FCE as deleted</label>
 
             <label index="desc_backup_warning">Before executing this action make sure you create a full backup of your TYPO3 database!</label>
 
-            <label index="mod_deleteunref_description">Searches recursive on all pages for unreferenced elements and sets all found elements as deleted in the TYPO3 database.</label>
-
             <label index="mod_deleteunref_title">Delete unreferenced elements</label>
             <label index="mod_deleteunref_result_deleted">records has been marked as deleted.</label>
+            <label index="mod_deleteunref_description">Searches recursive on all pages for unreferenced elements and sets all found elements as deleted in the TYPO3 database.</label>
+
+            <label index="mod_migratefce_title">Migrate TV FCE content to GridElement</label>
+            <label index="mod_migratefce_description">Migrates the content from the selected FCE to the selected Grid Element and changed the content element type to Grid Element</label>
 
 		</languageKey>
 	</data>

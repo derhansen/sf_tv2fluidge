@@ -45,18 +45,18 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
-	 * @var Tx_SfTvtools_Service_UpdateFceHelper
+	 * @var Tx_SfTvtools_Service_MigrateFceHelper
 	 */
-	protected $UpdateFceHelper;
+	protected $migrateFceHelper;
 
 	/**
 	 * DI for UnreferencedElementHelper
 	 *
-	 * @param Tx_SfTvtools_Service_UpdateFceHelper $unreferencedElementHelper
+	 * @param Tx_SfTvtools_Service_MigrateFceHelper $unreferencedElementHelper
 	 * @return void
 	 */
-	public function injectUpdateFceHelper(Tx_SfTvtools_Service_UpdateFceHelper $unreferencedElementHelper) {
-		$this->UpdateFceHelper = $unreferencedElementHelper;
+	public function injectUpdateFceHelper(Tx_SfTvtools_Service_MigrateFceHelper $unreferencedElementHelper) {
+		$this->migrateFceHelper = $unreferencedElementHelper;
 	}
 
 	public function indexAction() {
@@ -73,31 +73,32 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		$this->view->assign('numRecords', $numRecords);
 	}
 
-	public function indexConvertFCEAction() {
-		$allFce = $this->UpdateFceHelper->getAllFce();
-		$allGe = $this->UpdateFceHelper->getAllGe();
+	public function indexMigrateFceAction() {
+		$allFce = $this->migrateFceHelper->getAllFce();
+		$allGe = $this->migrateFceHelper->getAllGe();
 
 		$this->view->assign('allFce', $allFce);
 		$this->view->assign('allGe', $allGe);
-		//t3lib_utility_Debug::debug($this->UpdateFceHelper->getAllGe());
-		//$contentElements = $this->UpdateFceHelper->getContentElementsByFce(10);
-		//t3lib_utility_Debug::debug('Count:' . count($contentElements));
-		//t3lib_utility_Debug::debug($contentElements[0]);
-		//$contentElement = $this->UpdateFceHelper->getContentElementByUid(300);
-		//t3lib_utility_Debug::debug($contentElement);
-		//$this->UpdateFceHelper->convertFceToGe($contentElement, 0, 1);
 	}
 
+
 	/**
+	 * Migrates content from FCE to Grid Element
+	 *
 	 * @param int $fce
 	 * @param int $ge
-	 * @return void
+	 * @param bool $markdeleted
 	 */
-	public function convertFceAction($fce, $ge) {
+	public function migrateFceAction($fce, $ge, $markdeleted = FALSE) {
+		t3lib_utility_Debug::debug((bool)$markdeleted);
+
 		if ($fce > 0 && $ge > 0) {
-			$contentElements = $this->UpdateFceHelper->getContentElementsByFce($fce);
+			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
-				$this->UpdateFceHelper->convertFceToGe($contentElement, $ge);
+				$this->migrateFceHelper->convertFceToGe($contentElement, $ge);
+			}
+			if ($markdeleted) {
+				$this->migrateFceHelper->markFceDeleted($fce);
 			}
 		}
 	}

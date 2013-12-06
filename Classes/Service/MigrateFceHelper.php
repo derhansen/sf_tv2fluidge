@@ -27,7 +27,7 @@
 /**
  * Description
  */
-class Tx_SfTvtools_Service_UpdateFceHelper implements t3lib_Singleton {
+class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 
 	public function getAllFce() {
 		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
@@ -89,6 +89,12 @@ class Tx_SfTvtools_Service_UpdateFceHelper implements t3lib_Singleton {
 				'pi_flexform' => $contentElement['tx_templavoila_flex'],
 				'tx_gridelements_backend_layout' => $uidGe
 			)
+		);
+	}
+
+	public function markFceDeleted($uidFce) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidFce),
+			array('deleted' => 1)
 		);
 	}
 }

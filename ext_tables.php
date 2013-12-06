@@ -16,7 +16,7 @@ if (TYPO3_MODE === 'BE') {
 		'sf_tvtools', // Submodule key
 		'', // Position
 		array(
-			'Tools' => 'index,deleteUnreferencedElements,indexConvertFCE,convertFce',
+			'Tools' => 'index,deleteUnreferencedElements,indexMigrateFce,migrateFce',
 		),
 		array(
 			'access' => 'user,group',
