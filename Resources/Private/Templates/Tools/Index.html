@@ -5,9 +5,17 @@
 </f:section>
 
 <f:section name="content">
-    <p>Index Action</p>
+    <h2><f:translate key="mod_deleteunref_title" /></h2>
 
-    <f:link.action action="deleteUnreferencedElements">Delete elements recursive</f:link.action>
+    <h3><f:translate key="label_what_does_it_do" /></h3>
+    <p><f:translate key="mod_deleteunref_description" /></p>
+
+    <h4><f:translate key="label_warning" /></h4>
+    <p><f:translate key="desc_backup_warning" /></p>
+
+    <f:form action="deleteUnreferencedElements">
+        <f:form.submit value="{f:translate(key: 'label_start')}"></f:form.submit>
+    </f:form>
 
 </f:section>
 

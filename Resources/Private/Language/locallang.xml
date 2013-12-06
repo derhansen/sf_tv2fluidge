@@ -9,6 +9,19 @@
             <label index="mlang_tabs_tab">TemplaVoila Tools</label>
             <label index="mlang_labels_tabdescr">TemplaVoila Tools</label>
             <label index="mlang_labels_tablabel">TemplaVoila Tools</label>
+
+            <label index="label_start">Do it!</label>
+            <label index="label_result">Result</label>
+            <label index="label_what_does_it_do">What does it do?</label>
+            <label index="label_warning">Warning?</label>
+
+            <label index="desc_backup_warning">Before executing this action make sure you create a full backup of your TYPO3 database!</label>
+
+            <label index="mod_deleteunref_description">Searches recursive on all pages for unreferenced elements and sets all found elements as deleted in the TYPO3 database.</label>
+
+            <label index="mod_deleteunref_title">Delete unreferenced elements</label>
+            <label index="mod_deleteunref_result_deleted">records has been marked as deleted.</label>
+
 		</languageKey>
 	</data>
 </T3locallang>
