@@ -30,6 +30,8 @@
 class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_ActionController {
 
 	/**
+	 * UnreferencedElementHelper
+	 *
 	 * @var Tx_SfTvtools_Service_UnreferencedElementHelper
 	 */
 	protected $unreferencedElementHelper;
@@ -45,12 +47,14 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
+	 * MigrateFceHelper
+	 *
 	 * @var Tx_SfTvtools_Service_MigrateFceHelper
 	 */
 	protected $migrateFceHelper;
 
 	/**
-	 * DI for UnreferencedElementHelper
+	 * DI for MigrateFceHelper
 	 *
 	 * @param Tx_SfTvtools_Service_MigrateFceHelper $unreferencedElementHelper
 	 * @return void
@@ -59,6 +63,11 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		$this->migrateFceHelper = $unreferencedElementHelper;
 	}
 
+	/**
+	 * Default index action for module
+	 *
+	 * @return void
+	 */
 	public function indexAction() {
 
 	}
@@ -73,6 +82,11 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		$this->view->assign('numRecords', $numRecords);
 	}
 
+	/**
+	 * Index action for migrateFce
+	 *
+	 * @return void
+	 */
 	public function indexMigrateFceAction() {
 		$allFce = $this->migrateFceHelper->getAllFce();
 		$allGe = $this->migrateFceHelper->getAllGe();
@@ -88,14 +102,13 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	 * @param int $fce
 	 * @param int $ge
 	 * @param bool $markdeleted
+	 * @return void
 	 */
 	public function migrateFceAction($fce, $ge, $markdeleted = FALSE) {
-		t3lib_utility_Debug::debug((bool)$markdeleted);
-
 		if ($fce > 0 && $ge > 0) {
 			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
-				$this->migrateFceHelper->convertFceToGe($contentElement, $ge);
+				$this->migrateFceHelper->migrateFceContentToGe($contentElement, $ge);
 			}
 			if ($markdeleted) {
 				$this->migrateFceHelper->markFceDeleted($fce);

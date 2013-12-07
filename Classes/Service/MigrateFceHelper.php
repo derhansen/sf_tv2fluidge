@@ -23,12 +23,16 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-
 /**
- * Description
+ * Helper class for handling TV FCE to Grid Element content migration
  */
 class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 
+	/**
+	 * Returns an array of all TemplaVoila flexible content elements
+	 *
+	 * @return array
+	 */
 	public function getAllFce() {
 		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
 		$table = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
@@ -45,7 +49,11 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 		return $fces;
 	}
 
-
+	/**
+	 * Returns an array of all Grid Elements
+	 *
+	 * @return array
+	 */
 	public function getAllGe() {
 		$fields = 'uid, title';
 		$table = 'tx_gridelements_backend_layout';
@@ -61,6 +69,12 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 		return $gridElements;
 	}
 
+	/**
+	 * Returns the tt_content record by uid
+	 *
+	 * @param int $uid
+	 * @return mixed
+	 */
 	public function getContentElementByUid($uid) {
 		$fields = '*';
 		$table = 'tt_content';
@@ -71,7 +85,12 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 		return $res;
 	}
 
-
+	/**
+	 * Returns all tt_content elements which contains a TemplaVoila FCE with the given uid
+	 *
+	 * @param int $uidFce
+	 * @return mixed
+	 */
 	public function getContentElementsByFce($uidFce) {
 		$fields = '*';
 		$table = 'tt_content';
@@ -82,7 +101,14 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 		return $res;
 	}
 
-	public function convertFceToGe($contentElement, $uidGe) {
+	/**
+	 * Migrated the content from a TemplaVoila FCE to the given Grid Element
+	 *
+	 * @param array $contentElement
+	 * @param int $uidGe
+	 * @return void
+	 */
+	public function migrateFceContentToGe($contentElement, $uidGe) {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
 			array(
 				'CType' => 'gridelements_pi1',
@@ -92,6 +118,12 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 		);
 	}
 
+	/**
+	 * Marks the TemplaVoila FCE with the given uid as deleted
+	 *
+	 * @param int $uidFce
+	 * @return void
+	 */
 	public function markFceDeleted($uidFce) {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidFce),
 			array('deleted' => 1)
