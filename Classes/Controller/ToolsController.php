@@ -115,5 +115,18 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 			}
 		}
 	}
+
+	/**
+	 * Index action for migrateContent
+	 *
+	 * @return void
+	 */
+	public function indexMigrateContentAction() {
+
+	}
+
+	public function migrateContentAction() {
+
+	}
 }
 ?>

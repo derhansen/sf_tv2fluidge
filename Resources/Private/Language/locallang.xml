@@ -27,6 +27,9 @@
             <label index="mod_migratefce_title">Migrate TV FCE content to GridElement</label>
             <label index="mod_migratefce_description">Migrates the content from the selected FCE to the selected Grid Element and changed the content element type to Grid Element</label>
 
+            <label index="mod_migratecontent_title">Migrate content from TemplaVoila to Fluid</label>
+            <label index="mod_migratecontent_description">Migrate content from TemplaVoila content columns to Fluid backend layout columns</label>
+
 		</languageKey>
 	</data>
 </T3locallang>

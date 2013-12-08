@@ -1,0 +1,21 @@
+<f:layout name="Default" />
+
+<f:section name="iconButtons">
+    <f:render partial="Adminbuttons" />
+</f:section>
+
+<f:section name="content">
+    <h2><f:translate key="mod_migratecontent_title" /></h2>
+
+    <h3><f:translate key="label_what_does_it_do" /></h3>
+    <p><f:translate key="mod_migratecontent_description" /></p>
+
+    <h4><f:translate key="label_warning" /></h4>
+    <p><f:translate key="desc_backup_warning" /></p>
+
+    <f:form action="migrateContent">
+
+        <br/>
+        <f:form.submit value="{f:translate(key: 'label_start')}"/>
+    </f:form>
+</f:section>
