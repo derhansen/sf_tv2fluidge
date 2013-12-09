@@ -28,6 +28,47 @@
  */
 class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 
+	/**
+	 * Returns an array of all TemplaVoila page templates
+	 *
+	 * @return array
+	 */
+	public function getAllTvTemplates() {
+		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
+		$table = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
+		$where = 'tx_templavoila_datastructure.scope=1 AND tx_templavoila_datastructure.uid = tx_templavoila_tmplobj.datastructure
+			AND tx_templavoila_datastructure.deleted=0 AND tx_templavoila_tmplobj.deleted=0';
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+
+		$templates = array();
+		foreach($res as $fce) {
+			$templates[$fce['uid']] = $fce['title'];
+		}
+
+		return $templates;
+	}
+
+	/**
+	 * Returns an array of all Grid Elements
+	 *
+	 * @return array
+	 */
+	public function getAllBeLayouts() {
+		$fields = 'uid, title';
+		$table = 'backend_layout';
+		$where = 'deleted=0';
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+
+		$beLayouts = array();
+		foreach($res as $ge) {
+			$beLayouts[$ge['uid']] = $ge['title'];
+		}
+
+		return $beLayouts;
+	}
+
 }
 
 ?>

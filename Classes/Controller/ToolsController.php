@@ -56,11 +56,28 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	/**
 	 * DI for MigrateFceHelper
 	 *
-	 * @param Tx_SfTvtools_Service_MigrateFceHelper $unreferencedElementHelper
+	 * @param Tx_SfTvtools_Service_MigrateFceHelper $migrateFceHelper
 	 * @return void
 	 */
-	public function injectUpdateFceHelper(Tx_SfTvtools_Service_MigrateFceHelper $unreferencedElementHelper) {
-		$this->migrateFceHelper = $unreferencedElementHelper;
+	public function injectUpdateFceHelper(Tx_SfTvtools_Service_MigrateFceHelper $migrateFceHelper) {
+		$this->migrateFceHelper = $migrateFceHelper;
+	}
+
+	/**
+	 * MigrateContentHelper
+	 *
+	 * @var Tx_SfTvtools_Service_MigrateContentHelper
+	 */
+	protected $migrateContentHelper;
+
+	/**
+	 * DI for MigrateContentHelper
+	 *
+	 * @param Tx_SfTvtools_Service_MigrateContentHelper $migrateContentHelper
+	 * @return void
+	 */
+	public function injectContentFceHelper(Tx_SfTvtools_Service_MigrateContentHelper $migrateContentHelper) {
+		$this->migrateContentHelper = $migrateContentHelper;
 	}
 
 	/**
@@ -122,7 +139,10 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	 * @return void
 	 */
 	public function indexMigrateContentAction() {
-
+		$templates = $this->migrateContentHelper->getAllTvTemplates();
+		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
+		t3lib_utility_Debug::debug($templates);
+		t3lib_utility_Debug::debug($beLayouts);
 	}
 
 	public function migrateContentAction() {
