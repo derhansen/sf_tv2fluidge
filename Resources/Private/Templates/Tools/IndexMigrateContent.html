@@ -13,9 +13,35 @@
     <h4><f:translate key="label_warning" /></h4>
     <p><f:translate key="desc_backup_warning" /></p>
 
-    <f:form action="migrateContent">
+    <f:form action="indexMigrateContent" name="formdata" object="{formdata}">
 
-        <br/>
-        <f:form.submit value="{f:translate(key: 'label_start')}"/>
+        <table>
+            <tr>
+                <td>
+                    <label for="template"><f:translate key="label_template"/></label>
+                    <f:form.select name="template" property="template" options="{templates}" value="{formdata.template}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
+                </td>
+                <td>
+                    <label for="belayout"><f:translate key="label_belayout"/></label>
+                    <f:form.select name="belayout" property="belayout" options="{belayouts}" value="{formdata.belayout}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
+                </td>
+            </tr>
+
+            <f:if condition="{tvContentCols}">
+                <f:for each="{tvContentCols}" as="tvContentCol" iteration="iterator">
+                    <tr>
+                        <td>
+                            <f:form.select name="tv_col_{iterator.index}" property="tv_col_{iterator.index}" options="{tvContentCols}" />
+                        </td>
+                        <td>
+                            <f:form.select name="be_col_{iterator.index}" property="be_col_{iterator.index}" options="{beContentCols}" />
+                        </td>
+                    </tr>
+                </f:for>
+            </f:if>
+        </table>
+
+        <f:form.submit value="" property="dummySubmit" style="display: none; "/>
+        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" />
     </f:form>
 </f:section>

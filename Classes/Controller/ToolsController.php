@@ -134,15 +134,26 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
-	 * Index action for migrateContent
-	 *
-	 * @return void
+	 * @param array $formdata
 	 */
-	public function indexMigrateContentAction() {
+	public function indexMigrateContentAction($formdata = NULL) {
 		$templates = $this->migrateContentHelper->getAllTvTemplates();
 		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
-		t3lib_utility_Debug::debug($templates);
-		t3lib_utility_Debug::debug($beLayouts);
+
+		// @todo - fetch content columns from TV and BE layouts depending on selection (first extry if empty)
+		$tvContentCols = array(0 => 'TV content1', 1 => 'TV content2', 2 => 'TV content3');
+		$beContentCols = array(0 => 'BE content1', 1 => 'BE content2', 2 => 'BE content3');
+
+		$this->view->assign('tvContentCols', $tvContentCols);
+		$this->view->assign('beContentCols', $beContentCols);
+
+		$this->view->assign('templates', $templates);
+		$this->view->assign('belayouts', $beLayouts);
+		$this->view->assign('formdata', $formdata);
+
+		t3lib_utility_Debug::debug($formdata);
+
+		// @todo - Redirect if submitted
 	}
 
 	public function migrateContentAction() {
