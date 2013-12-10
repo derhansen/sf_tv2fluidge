@@ -29,6 +29,21 @@
 class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 
 	/**
+	 * @var Tx_SfTvtools_Service_SharedHelper
+	 */
+	protected $sharedHelper;
+
+	/**
+	 * DI for shared helper
+	 *
+	 * @param Tx_SfTvtools_Service_SharedHelper $sharedHelper
+	 * @return void
+	 */
+	public function injectSharedHelper(Tx_SfTvtools_Service_SharedHelper $sharedHelper) {
+		$this->sharedHelper = $sharedHelper;
+	}
+
+	/**
 	 * Returns an array of all TemplaVoila page templates
 	 *
 	 * @return array
@@ -69,6 +84,117 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		return $beLayouts;
 	}
 
+	/**
+	 * Returns an array with names of content columns for the given TemplaVoila DataStructure
+	 *
+	 * @param int $uidTvDs
+	 * @return array
+	 */
+	public function getTvContentCols($uidTvDs) {
+		$dsRecord = $this->getTvDatastructure($uidTvDs);
+		$flexform = simplexml_load_string($dsRecord['dataprot']);
+		$elements = $flexform->xpath("ROOT/el/*");
+
+		$contentCols = array();
+		foreach ($elements as $element) {
+			if ($element->tx_templavoila->eType == 'ce') {
+				$contentCols[$element->getName()] = (string)$element->tx_templavoila->title;
+			}
+		}
+		return $contentCols;
+	}
+
+	/**
+	 * Returns an array with names of content columns for the given backend layout
+	 *
+	 * @param int $uidBeLayout
+	 * @return array
+	 */
+	public function getBeLayoutContentCols($uidBeLayout) {
+		$beLayoutRecord = $this->getBeLayout($uidBeLayout);
+		$parser = t3lib_div::makeInstance('t3lib_TSparser');
+		$parser->parse($beLayoutRecord['config']);
+		$data = $parser->setup['backend_layout.'];
+
+		$contentCols = array();
+		foreach($data['rows.'] as $row) {
+			foreach($row['columns.'] as $column) {
+				$contentCols[$column['colPos']] = $column['name'];
+			}
+		}
+		return $contentCols;
+	}
+
+	/**
+	 * Returns the TemplaVoila page template fot the given page uid
+	 *
+	 * @param $pageUid
+	 * @return array|bool mixed
+	 */
+	public function getTvPageTemplateRecord($pageUid) {
+		$pageRecord = $this->getPageRecord($pageUid);
+		return $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree_fetchPageTemplateObject($pageRecord);
+	}
+
+	/**
+	 * Returns the page record for the given page uid
+	 *
+	 * @param $uid
+	 * @return array mixed
+	 */
+	public function getPageRecord($uid) {
+		$fields = '*';
+		$table = 'pages';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns the DS record for the given DS uid
+	 *
+	 * @param $uid
+	 * @return array mixed
+	 */
+	public function getTvDatastructure($uid) {
+		$fields = '*';
+		$table = 'tx_templavoila_datastructure';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns the BE Layout record for the given BE Layout uid
+	 *
+	 * @param $uid
+	 * @return array mixed
+	 */
+	public function getBeLayout($uid) {
+		$fields = '*';
+		$table = 'backend_layout';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns the uid of the DS for the given template
+	 *
+	 * @param int $uidTemplate
+	 * @return int
+	 */
+	public function getTvDsUidForTemplate($uidTemplate) {
+		$fields = 'datastructure';
+		$table = 'tx_templavoila_tmplobj';
+		$where = 'uid=' . (int)$uidTemplate;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res['datastructure'];
+	}
 }
 
 ?>

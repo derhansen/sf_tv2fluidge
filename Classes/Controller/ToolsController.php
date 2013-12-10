@@ -134,30 +134,41 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
+	 * Index action for migrate content
+	 *
 	 * @param array $formdata
 	 */
 	public function indexMigrateContentAction($formdata = NULL) {
-		$templates = $this->migrateContentHelper->getAllTvTemplates();
+		$tvtemplates = $this->migrateContentHelper->getAllTvTemplates();
 		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
 
-		// @todo - fetch content columns from TV and BE layouts depending on selection (first extry if empty)
-		$tvContentCols = array(0 => 'TV content1', 1 => 'TV content2', 2 => 'TV content3');
-		$beContentCols = array(0 => 'BE content1', 1 => 'BE content2', 2 => 'BE content3');
+		if (isset($formdata['tvtemplate'])) {
+			$uidTvTemplate = $this->migrateContentHelper->getTvDsUidForTemplate($formdata['tvtemplate']);
+		} else {
+			$uidTvTemplate = current(array_keys($tvtemplates));
+		}
+
+		if (isset($formdata['belayout'])) {
+			$uidBeLayout = $formdata['belayout'];
+		} else {
+			$uidBeLayout = current(array_keys($beLayouts));
+		}
+
+		// Fetch content columns from TV and BE layouts depending on selection (first entry if empty)
+		$tvContentCols = $this->migrateContentHelper->getTvContentCols($uidTvTemplate);
+		$beContentCols = $this->migrateContentHelper->getBeLayoutContentCols($uidBeLayout);
 
 		$this->view->assign('tvContentCols', $tvContentCols);
 		$this->view->assign('beContentCols', $beContentCols);
-
-		$this->view->assign('templates', $templates);
+		$this->view->assign('tvtemplates', $tvtemplates);
 		$this->view->assign('belayouts', $beLayouts);
 		$this->view->assign('formdata', $formdata);
-
-		t3lib_utility_Debug::debug($formdata);
 
 		// @todo - Redirect if submitted
 	}
 
 	public function migrateContentAction() {
-
+		//t3lib_utility_Debug::debug($this->migrateContentHelper->getPageTemplate(3));
 	}
 }
 ?>

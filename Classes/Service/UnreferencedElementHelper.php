@@ -23,23 +23,24 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
-
 /**
  * Description
  */
 class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton {
 
 	/**
-	 * @var tx_templavoila_api
+	 * @var Tx_SfTvtools_Service_SharedHelper
 	 */
-	protected $templavoilaAPIObj;
+	protected $sharedHelper;
 
 	/**
-	 * Constructor
+	 * DI for shared helper
+	 *
+	 * @param Tx_SfTvtools_Service_SharedHelper $sharedHelper
+	 * @return void
 	 */
-	public function __construct() {
-		$this->templavoilaAPIObj = t3lib_div::makeInstance ('tx_templavoila_api');
+	public function injectSharedHelper(Tx_SfTvtools_Service_SharedHelper $sharedHelper) {
+		$this->sharedHelper = $sharedHelper;
 	}
 
 	/**
@@ -50,7 +51,7 @@ class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton 
 	 */
 	public function markDeletedUnreferencedElementsRecords() {
 		$allRecordUids = array();
-		$pids = $this->getPageIds(99);
+		$pids = $this->sharedHelper->getPageIds(99);
 		foreach ($pids as $pid) {
 			$records = $this->getUnreferencedElementsRecords($pid);
 			$allRecordUids = array_merge($allRecordUids, $records);
@@ -74,7 +75,7 @@ class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton 
 		global $TYPO3_DB;
 
 		$elementRecordsArr = array();
-		$referencedElementsArr = $this->templavoilaAPIObj->flexform_getListOfSubElementUidsRecursively ('pages', $pid, $dummyArr=array());
+		$referencedElementsArr = $this->sharedHelper->getTemplavoilaAPIObj()->flexform_getListOfSubElementUidsRecursively ('pages', $pid, $dummyArr=array());
 
 		$res = $TYPO3_DB->exec_SELECTquery (
 			'uid',
@@ -105,18 +106,6 @@ class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton 
 	private function markDeleted($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 		$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
-	}
-
-	/**
-	 * Returns an array of page IDs up to the given amount recursionlevel
-	 *
-	 * @param int $depth
-	 * @return array
-	 */
-	private function getPageIds($depth) {
-		$tree = t3lib_div::makeInstance('t3lib_queryGenerator');
-		$pids = $tree->getTreeList(1, $depth, 0, 1);
-		return explode(',', $pids);
 	}
 
 }
