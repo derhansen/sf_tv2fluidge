@@ -8,7 +8,8 @@
     <h2><f:translate key="mod_migratecontent_title" /></h2>
 
     <h3><f:translate key="label_what_does_it_do" /></h3>
-    <p><f:translate key="mod_migratecontent_description" /></p>
+    <p><f:translate key="mod_migratecontent_description1" /></p>
+    <p><f:translate key="mod_migratecontent_description2" /></p>
 
     <h4><f:translate key="label_warning" /></h4>
     <p><f:translate key="desc_backup_warning" /></p>
@@ -29,6 +30,7 @@
 
             <f:if condition="{tvContentCols}">
                 <f:for each="{tvContentCols}" as="tvContentCol" iteration="iterator">
+                    <f:if condition="{iterator.index} > 0">
                     <tr>
                         <td>
                             <f:form.select name="tv_col_{iterator.index}" property="tv_col_{iterator.index}" options="{tvContentCols}" />
@@ -37,6 +39,7 @@
                             <f:form.select name="be_col_{iterator.index}" property="be_col_{iterator.index}" options="{beContentCols}" />
                         </td>
                     </tr>
+                    </f:if>
                 </f:for>
             </f:if>
         </table>

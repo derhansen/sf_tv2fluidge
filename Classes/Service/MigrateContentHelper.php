@@ -96,6 +96,7 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		$elements = $flexform->xpath("ROOT/el/*");
 
 		$contentCols = array();
+		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tvtools');
 		foreach ($elements as $element) {
 			if ($element->tx_templavoila->eType == 'ce') {
 				$contentCols[$element->getName()] = (string)$element->tx_templavoila->title;
@@ -117,6 +118,7 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		$data = $parser->setup['backend_layout.'];
 
 		$contentCols = array();
+		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tvtools');
 		foreach($data['rows.'] as $row) {
 			foreach($row['columns.'] as $column) {
 				$contentCols[$column['colPos']] = $column['name'];

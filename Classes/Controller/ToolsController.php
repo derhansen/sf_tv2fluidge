@@ -164,10 +164,20 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		$this->view->assign('belayouts', $beLayouts);
 		$this->view->assign('formdata', $formdata);
 
-		// @todo - Redirect if submitted
+		// Redirect to migrateContentAction when submit button pressed
+		if (isset($formdata['startAction'])) {
+			$this->redirect('migrateContent',NULL,NULL,array('formdata' => $formdata));
+		}
 	}
 
-	public function migrateContentAction() {
+	/**
+	 * Does the content migration recursive
+	 *
+	 * @param array $formdata
+	 * @return void
+	 */
+	public function migrateContentAction($formdata) {
+		t3lib_utility_Debug::debug($formdata);
 		//t3lib_utility_Debug::debug($this->migrateContentHelper->getPageTemplate(3));
 	}
 }
