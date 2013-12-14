@@ -173,11 +173,14 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	/**
 	 * Does the content migration recursive
 	 *
+	 * @todo Remove = NULL from parameter
 	 * @param array $formdata
 	 * @return void
 	 */
-	public function migrateContentAction($formdata) {
-		t3lib_utility_Debug::debug($formdata);
+	public function migrateContentAction($formdata = NULL) {
+		t3lib_utility_Debug::debug($this->migrateContentHelper->getTvPageTemplateRecord(91));
+		t3lib_utility_Debug::debug($this->migrateContentHelper->getTvContentArray(91));
+
 		//t3lib_utility_Debug::debug($this->migrateContentHelper->getPageTemplate(3));
 	}
 }

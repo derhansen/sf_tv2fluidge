@@ -197,6 +197,19 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 		return $res['datastructure'];
 	}
+
+	public function getTvContentArray($pageUid) {
+		$fields = 'tx_templavoila_flex';
+		$table = 'pages';
+		$where = 'uid=' . (int)$pageUid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+
+		$flexform = simplexml_load_string($res['tx_templavoila_flex']);
+		$elements = $flexform->xpath("data/sheet/language/*");
+		t3lib_utility_Debug::debug($elements);
+		return $res['tx_templavoila_flex'];
+	}
 }
 
 ?>
