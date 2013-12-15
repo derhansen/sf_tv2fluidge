@@ -32,6 +32,7 @@
             <label index="mod_migratecontent_title">Migrate content from TemplaVoila to Fluid</label>
             <label index="mod_migratecontent_description1">Migrate content from TemplaVoila content columns to Fluid backend layout columns. Use this module if you have several TemplaVoila content columns which do not have an oldStyleColumnNumber setting or if you want to rearrange content elements from TemplaVoila content columns to Fluid backend layout columns.</label>
             <label index="mod_migratecontent_description2">All TemplaVoila backend layout settings on pages will be replaced with the selected Fluid backend layout.</label>
+            <label index="mod_migratecontent_description3">After content migration, you should not rearrage or create new content elements on pages with a Fluid Template, when TemplaVoila is still installed. TemplaVoila uses a method named correctSortingAndColposFieldsForPage, which moves all content elements to column 0.</label>
             <label index="mod_migratecontent_ce_updated">content elements have been updated.</label>
             <label index="mod_migratecontent_templates_updated">page templates have been updated.</label>
 
