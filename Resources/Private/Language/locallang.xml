@@ -14,13 +14,17 @@
             <label index="label_select">Select</label>
             <label index="label_start">Do it!</label>
             <label index="label_result">Result</label>
+            <label index="label_index">Index</label>
             <label index="label_what_does_it_do">What does it do?</label>
-            <label index="label_warning">Warning?</label>
+            <label index="label_warning">Warning</label>
             <label index="label_fce">Flexible Content Element</label>
             <label index="label_ge">Grid Element</label>
             <label index="label_mark_deleted">Flag original FCE as deleted</label>
 
-            <label index="desc_backup_warning">Before executing this action make sure you create a full backup of your TYPO3 database!</label>
+            <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
+
+            <label index="mod_index_title">TemplaVoila tools</label>
+            <label index="mod_index_description">TemplaVoila tools is a set of tools which can be helpfull when you want to migrate an existing TYPO3 website from TemplaVoila to Fluid / GridElements</label>
 
             <label index="mod_deleteunref_title">Delete unreferenced elements</label>
             <label index="mod_deleteunref_result_deleted">records has been marked as deleted.</label>

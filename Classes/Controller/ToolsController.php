@@ -105,6 +105,15 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
+	 * Index action for unreferenced Elements module
+	 *
+	 * @return void
+	 */
+	public function IndexDeleteUnreferencedElementsAction() {
+
+	}
+
+	/**
 	 * Sets all unreferenced Elements to deleted
 	 *
 	 * @return void

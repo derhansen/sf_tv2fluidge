@@ -5,17 +5,18 @@
 </f:section>
 
 <f:section name="content">
-    <h2><f:translate key="mod_deleteunref_title" /></h2>
+    <h2><f:translate key="mod_index_title" /></h2>
+    <p><f:translate key="mod_index_description" /></>
+    <h3><f:translate key="label_index" /></h3>
+    <ul>
+        <li>- <f:link.action action="indexDeleteUnreferencedElements"><f:translate key="mod_deleteunref_title" /></f:link.action></li>
+        <li>- <f:link.action action="indexMigrateFce"><f:translate key="mod_migratefce_title" /></f:link.action></li>
+        <li>- <f:link.action action="indexMigrateContent"><f:translate key="mod_migratecontent_title" /></f:link.action></li>
+    </ul>
 
-    <h3><f:translate key="label_what_does_it_do" /></h3>
-    <p><f:translate key="mod_deleteunref_description" /></p>
-
+    <br>
     <h4><f:translate key="label_warning" /></h4>
-    <p><f:translate key="desc_backup_warning" /></p>
-
-    <f:form action="deleteUnreferencedElements">
-        <f:form.submit value="{f:translate(key: 'label_start')}"/>
-    </f:form>
+    <p class="warning"><f:translate key="desc_backup_warning" /></p>
 
 </f:section>
 
