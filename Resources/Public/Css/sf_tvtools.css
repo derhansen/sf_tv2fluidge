@@ -2,6 +2,14 @@ p {
     margin: 0 0 10px 0;
 }
 
+p.warning {
+    padding: 5px;
+    border: 1px solid #000000;
+    background: #ff0000;
+    color: #ffffff;
+    font-weight: bold;
+}
+
 a.action {
     color: #ffffff;
     margin: 0 8px 0 0;
