@@ -9,6 +9,7 @@ A TYPO3 Extension contains a backend module with tools which can be helpfull whe
 
 * Module to mark all unreferenced elements as deleted
 * Module to migrate the content of a flexible content element to a Grid Element
+* Module to migrate migrate TemplaVoila mapped content elements to Fluid backend layout columns
 
 ## Notes
 

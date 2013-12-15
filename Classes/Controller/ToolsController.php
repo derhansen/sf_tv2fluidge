@@ -81,6 +81,21 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
+	 * @var Tx_SfTvtools_Service_SharedHelper
+	 */
+	protected $sharedHelper;
+
+	/**
+	 * DI for shared helper
+	 *
+	 * @param Tx_SfTvtools_Service_SharedHelper $sharedHelper
+	 * @return void
+	 */
+	public function injectSharedHelper(Tx_SfTvtools_Service_SharedHelper $sharedHelper) {
+		$this->sharedHelper = $sharedHelper;
+	}
+
+	/**
 	 * Default index action for module
 	 *
 	 * @return void
@@ -171,17 +186,29 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	}
 
 	/**
-	 * Does the content migration recursive
+	 * Does the content migration recursive for all pages
 	 *
-	 * @todo Remove = NULL from parameter
 	 * @param array $formdata
 	 * @return void
 	 */
-	public function migrateContentAction($formdata = NULL) {
-		t3lib_utility_Debug::debug($this->migrateContentHelper->getTvPageTemplateRecord(91));
-		t3lib_utility_Debug::debug($this->migrateContentHelper->getTvContentArray(91));
+	public function migrateContentAction($formdata) {
+		$uidTvTemplate = $formdata['tvtemplate'];
+		$uidBeLayout = $formdata['belayout'];
+		$pageUids = $this->sharedHelper->getPageIds(99);
 
-		//t3lib_utility_Debug::debug($this->migrateContentHelper->getPageTemplate(3));
+		$contentElementsUpdated = 0;
+		$pageTemplatesUpdated = 0;
+		foreach($pageUids as $pageUid) {
+			if ($this->migrateContentHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
+				$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
+			}
+
+			// Update page template (must be called for every page, since to and next_to must be checked
+			$pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
+		}
+
+		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
+		$this->view->assign('pageTemplatesUpdated', $pageTemplatesUpdated);
 	}
 }
 ?>

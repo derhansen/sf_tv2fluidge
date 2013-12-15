@@ -128,7 +128,7 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns the TemplaVoila page template fot the given page uid
+	 * Returns the TemplaVoila page template for the given page uid
 	 *
 	 * @param $pageUid
 	 * @return array|bool mixed
@@ -136,6 +136,17 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	public function getTvPageTemplateRecord($pageUid) {
 		$pageRecord = $this->getPageRecord($pageUid);
 		return $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree_fetchPageTemplateObject($pageRecord);
+	}
+
+	/**
+	 * Returns the uid of the TemplaVoila page template for the given page uid
+	 *
+	 * @param $pageUid
+	 * @return array|bool mixed
+	 */
+	public function getTvPageTemplateUid($pageUid) {
+		$tvPageTemplateRecord = $this->getTvPageTemplateRecord($pageUid);
+		return $tvPageTemplateRecord['uid'];
 	}
 
 	/**
@@ -219,6 +230,97 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		}
 		return $contentArray;
 	}
+
+	/**
+	 * Migrates all content elements for the page with the given pageUid to the selected column positions
+	 *
+	 * @param array $formdata
+	 * @param int $pageUid
+	 * @return int Number of Content elements updated
+	 */
+	public function migrateContentForPage($formdata, $pageUid) {
+		$fieldMapping = $this->getFieldMappingArray($formdata);
+		$tvContentArray = $this->getTvContentArray($pageUid);
+
+		$count = 0;
+		foreach ($tvContentArray as $key => $contentUidString) {
+			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
+				$contentUids = explode(',', $contentUidString);
+				foreach ($contentUids as $contentUid) {
+					$this->updateContentElement($contentUid, $fieldMapping[$key]);
+					$count++;
+				}
+			}
+		}
+		return $count;
+	}
+
+	/**
+	 * Sets the backend layout uid for the page with the given uid if the value of the TV template matches
+	 * the uid of the given uidTvTemplate
+	 *
+	 * @param int $pageUid
+	 * @param int $UidTvTemplate
+	 * @param int $uidBeLayout
+	 * @return int Number of page templates updated
+	 */
+	public function updatePageTemplate($pageUid, $UidTvTemplate, $uidBeLayout) {
+		$pageRecord = $this->getPageRecord($pageUid);
+		$updateFields = array();
+		$count = 0;
+		if ($pageRecord['tx_templavoila_to'] > 0 && $pageRecord['tx_templavoila_to'] == $UidTvTemplate) {
+			$updateFields['backend_layout'] = $uidBeLayout;
+		}
+		if ($pageRecord['tx_templavoila_next_to'] > 0 && $pageRecord['tx_templavoila_next_to'] == $UidTvTemplate) {
+			$updateFields['backend_layout_next_level'] = $uidBeLayout;
+		}
+		if (count($updateFields) > 0) {
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid=' . intval($pageUid), $updateFields);
+			$count++;
+		}
+		return $count;
+	}
+
+	/**
+	 * Returns an array of field mappings, where the array key represents the TV field name and the value the
+	 * BE layout column
+	 *
+	 * @param array $formdata
+	 * @return array
+	 */
+	private function getFieldMappingArray($formdata) {
+		$tvIndex = array();
+		$beValue = array();
+		foreach($formdata as $key => $data) {
+			if (substr($key, 0, 7) == 'tv_col_') {
+				$tvIndex[] = $data;
+			}
+			if (substr($key, 0, 7) == 'be_col_') {
+				$beValue[] = $data;
+			}
+		}
+		$fieldMapping = array();
+		if (count($tvIndex) == count($beValue)) {
+			for ($i=0; $i<=count($tvIndex); $i++) {
+				if ($tvIndex[$i] != '' && $beValue[$i] != '') {
+					$fieldMapping[$tvIndex[$i]] = $beValue[$i];
+				}
+			}
+		}
+		return $fieldMapping;
+	}
+
+	/**
+	 * Sets the given colpos for the content element with the given uid
+	 *
+	 * @param int $uid
+	 * @param int $newColPos
+	 * @return void
+	 */
+	private function updateContentElement($uid, $newColPos) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array('colPos' => $newColPos));
+	}
+
 }
 
 ?>
