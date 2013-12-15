@@ -198,17 +198,26 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		return $res['datastructure'];
 	}
 
+	/**
+	 * Returns an array of TV FlexForm content fields. The content elements are seperated by comma
+	 *
+	 * @param int $pageUid
+	 * @return array
+	 */
 	public function getTvContentArray($pageUid) {
 		$fields = 'tx_templavoila_flex';
 		$table = 'pages';
 		$where = 'uid=' . (int)$pageUid;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-
 		$flexform = simplexml_load_string($res['tx_templavoila_flex']);
 		$elements = $flexform->xpath("data/sheet/language/*");
-		t3lib_utility_Debug::debug($elements);
-		return $res['tx_templavoila_flex'];
+
+		$contentArray = array();
+		foreach($elements as $element) {
+			$contentArray[(string)$element->attributes()->index] = (string)$element->value;
+		}
+		return $contentArray;
 	}
 }
 
