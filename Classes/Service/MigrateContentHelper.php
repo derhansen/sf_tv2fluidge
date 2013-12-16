@@ -221,12 +221,15 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 		$where = 'uid=' . (int)$pageUid;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		$flexform = simplexml_load_string($res['tx_templavoila_flex']);
-		$elements = $flexform->xpath("data/sheet/language/*");
-
 		$contentArray = array();
-		foreach($elements as $element) {
-			$contentArray[(string)$element->attributes()->index] = (string)$element->value;
+
+		if ($res['tx_templavoila_flex'] != '') {
+			$flexform = simplexml_load_string($res['tx_templavoila_flex']);
+			$elements = $flexform->xpath("data/sheet/language/*");
+
+			foreach($elements as $element) {
+				$contentArray[(string)$element->attributes()->index] = (string)$element->value;
+			}
 		}
 		return $contentArray;
 	}
