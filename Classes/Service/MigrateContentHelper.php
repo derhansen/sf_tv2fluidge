@@ -250,7 +250,12 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
 				$contentUids = explode(',', $contentUidString);
 				foreach ($contentUids as $contentUid) {
-					$this->updateContentElement($contentUid, $fieldMapping[$key]);
+					$contentElement = $this->getContentElement($contentUid);
+					if ($contentElement['pid'] == $pageUid) {
+						$this->updateContentElement($contentUid, $fieldMapping[$key]);
+					} else {
+						// @todo - Create a reference to record!
+					}
 					$count++;
 				}
 			}
@@ -322,6 +327,21 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	 */
 	private function updateContentElement($uid, $newColPos) {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array('colPos' => $newColPos));
+	}
+
+	/**
+	 * Return the tt_content element record for the given uid
+	 *
+	 * @param int $uid
+	 * @return array
+	 */
+	private function getContentElement($uid) {
+		$fields = '*';
+		$table = 'tt_content';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
 	}
 
 }
