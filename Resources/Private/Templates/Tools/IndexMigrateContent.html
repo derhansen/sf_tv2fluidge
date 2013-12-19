@@ -24,6 +24,10 @@
                     <label for="belayout"><f:translate key="label_belayout"/></label>
                     <f:form.select name="belayout" property="belayout" options="{belayouts}" value="{formdata.belayout}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
                 </td>
+                <td>
+                    <label for="createReferences"><f:translate key="label_create_reference"/></label>
+                    <f:form.checkbox name="createReferences" property="createReferences" value="1" checked="false"/>
+                </td>
             </tr>
 
             <f:if condition="{tvContentCols}">
@@ -36,6 +40,7 @@
                         <td>
                             <f:form.select name="be_col_{iterator.index}" property="be_col_{iterator.index}" options="{beContentCols}" />
                         </td>
+                        <td></td>
                     </tr>
                     </f:if>
                 </f:for>

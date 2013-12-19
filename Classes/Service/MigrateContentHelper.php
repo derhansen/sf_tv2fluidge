@@ -254,7 +254,9 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 					if ($contentElement['pid'] == $pageUid) {
 						$this->updateContentElement($contentUid, $fieldMapping[$key]);
 					} else {
-						// @todo - Create a reference to record!
+						if ($formdata['createReferences']) {
+							$this->createShortcut($pageUid, $contentUid, $fieldMapping[$key]);
+						}
 					}
 					$count++;
 				}
@@ -316,6 +318,18 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 			}
 		}
 		return $fieldMapping;
+	}
+
+	/**
+	 * Creates a shortcut tt_content record for the given contentUid
+	 *
+	 * @param int $pageUid
+	 * @param int $contentUid
+	 * @param int $colPos
+	 * @return void
+	 */
+	private function createShortcut($pageUid, $contentUid, $colPos) {
+
 	}
 
 	/**
