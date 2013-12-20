@@ -10,15 +10,45 @@
     <h3><f:translate key="label_what_does_it_do" /></h3>
     <p><f:translate key="mod_migratefce_description" /></p>
 
-    <f:form action="migrateFce">
-        <label for="fce"><f:translate key="label_fce"/></label>
-        <f:form.select id="fce" name="fce" options="{allFce}" optionValueField="uid" optionLabelField="title" />
-        <label for="ge"><f:translate key="label_ge"/></label>
-        <f:form.select id="ge" name="ge" options="{allGe}" optionValueField="uid" optionLabelField="title" />
-        <label for="markdeleted"><f:translate key="label_mark_deleted"/></label>
-        <f:form.checkbox id="markdeleted" name="markdeleted" value="1" checked="false"/>
+    <f:form action="indexMigrateFce" name="formdata" object="{formdata}">
 
+        <table>
+            <tr>
+                <td>
+                    <label for="fce"><f:translate key="label_fce"/></label>
+                    <f:form.select property="fce" name="fce" options="{allFce}" value="{formdata.fce}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}"/>
+                </td>
+                <td>
+                    <label for="ge"><f:translate key="label_ge"/></label>
+                    <f:form.select property="ge" name="ge" options="{allGe}" value="{formdata.ge}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}"/>
+                </td>
+            </tr>
+
+            <f:if condition="{fceContentCols}">
+                <f:for each="{fceContentCols}" as="tvContentCol" iteration="iterator">
+                    <f:if condition="{iterator.index} > 0">
+                        <tr>
+                            <td>
+                                <f:form.select name="tv_col_{iterator.index}" property="tv_col_{iterator.index}" options="{fceContentCols}" />
+                            </td>
+                            <td>
+                                <f:form.select name="ge_col_{iterator.index}" property="ge_col_{iterator.index}" options="{geContentCols}" />
+                            </td>
+                        </tr>
+                    </f:if>
+                </f:for>
+            </f:if>
+        </table>
+
+        <f:form.checkbox property="markdeleted" name="markdeleted" value="1" checked="false"/>
+        <label for="markdeleted"><f:translate key="label_mark_deleted"/></label>
         <br/>
-        <f:form.submit value="{f:translate(key: 'label_start')}"/>
+
+        <f:form.checkbox name="createReferences" property="createReferences" value="1" checked="false"/>
+        <label for="createReferences"><f:translate key="label_create_reference"/></label>
+        <br/>
+
+        <f:form.submit value="" property="dummySubmit" style="display: none; "/>
+        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" />
     </f:form>
 </f:section>

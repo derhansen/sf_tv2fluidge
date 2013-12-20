@@ -85,49 +85,6 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns an array with names of content columns for the given TemplaVoila DataStructure
-	 *
-	 * @param int $uidTvDs
-	 * @return array
-	 */
-	public function getTvContentCols($uidTvDs) {
-		$dsRecord = $this->getTvDatastructure($uidTvDs);
-		$flexform = simplexml_load_string($dsRecord['dataprot']);
-		$elements = $flexform->xpath("ROOT/el/*");
-
-		$contentCols = array();
-		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tvtools');
-		foreach ($elements as $element) {
-			if ($element->tx_templavoila->eType == 'ce') {
-				$contentCols[$element->getName()] = (string)$element->tx_templavoila->title;
-			}
-		}
-		return $contentCols;
-	}
-
-	/**
-	 * Returns an array with names of content columns for the given backend layout
-	 *
-	 * @param int $uidBeLayout
-	 * @return array
-	 */
-	public function getBeLayoutContentCols($uidBeLayout) {
-		$beLayoutRecord = $this->getBeLayout($uidBeLayout);
-		$parser = t3lib_div::makeInstance('t3lib_TSparser');
-		$parser->parse($beLayoutRecord['config']);
-		$data = $parser->setup['backend_layout.'];
-
-		$contentCols = array();
-		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tvtools');
-		foreach($data['rows.'] as $row) {
-			foreach($row['columns.'] as $column) {
-				$contentCols[$column['colPos']] = $column['name'];
-			}
-		}
-		return $contentCols;
-	}
-
-	/**
 	 * Returns the TemplaVoila page template for the given page uid
 	 *
 	 * @param $pageUid
@@ -165,36 +122,6 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns the DS record for the given DS uid
-	 *
-	 * @param $uid
-	 * @return array mixed
-	 */
-	public function getTvDatastructure($uid) {
-		$fields = '*';
-		$table = 'tx_templavoila_datastructure';
-		$where = 'uid=' . (int)$uid;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		return $res;
-	}
-
-	/**
-	 * Returns the BE Layout record for the given BE Layout uid
-	 *
-	 * @param $uid
-	 * @return array mixed
-	 */
-	public function getBeLayout($uid) {
-		$fields = '*';
-		$table = 'backend_layout';
-		$where = 'uid=' . (int)$uid;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		return $res;
-	}
-
-	/**
 	 * Returns the uid of the DS for the given template
 	 *
 	 * @param int $uidTemplate
@@ -210,31 +137,6 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns an array of TV FlexForm content fields. The content elements are seperated by comma
-	 *
-	 * @param int $pageUid
-	 * @return array
-	 */
-	public function getTvContentArray($pageUid) {
-		$fields = 'tx_templavoila_flex';
-		$table = 'pages';
-		$where = 'uid=' . (int)$pageUid;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		$contentArray = array();
-
-		if ($res['tx_templavoila_flex'] != '') {
-			$flexform = simplexml_load_string($res['tx_templavoila_flex']);
-			$elements = $flexform->xpath("data/sheet/language/*");
-
-			foreach($elements as $element) {
-				$contentArray[(string)$element->attributes()->index] = (string)$element->value;
-			}
-		}
-		return $contentArray;
-	}
-
-	/**
 	 * Migrates all content elements for the page with the given pageUid to the selected column positions
 	 *
 	 * @param array $formdata
@@ -242,20 +144,20 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	 * @return int Number of Content elements updated
 	 */
 	public function migrateContentForPage($formdata, $pageUid) {
-		$fieldMapping = $this->getFieldMappingArray($formdata);
-		$tvContentArray = $this->getTvContentArray($pageUid);
+		$fieldMapping = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'be_col_');
+		$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pageUid);
 
 		$count = 0;
 		foreach ($tvContentArray as $key => $contentUidString) {
 			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
 				$contentUids = explode(',', $contentUidString);
 				foreach ($contentUids as $contentUid) {
-					$contentElement = $this->getContentElement($contentUid);
+					$contentElement = $this->sharedHelper->getContentElement($contentUid);
 					if ($contentElement['pid'] == $pageUid) {
-						$this->updateContentElement($contentUid, $fieldMapping[$key]);
+						$this->sharedHelper->updateContentElementColPos($contentUid, $fieldMapping[$key]);
 					} else {
 						if ($formdata['createReferences']) {
-							$this->createShortcutToContent($pageUid, $contentUid, $fieldMapping[$key]);
+							$this->sharedHelper->createShortcutToContent($pageUid, $contentUid, $fieldMapping[$key]);
 						}
 					}
 					$count++;
@@ -289,80 +191,6 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 			$count++;
 		}
 		return $count;
-	}
-
-	/**
-	 * Returns an array of field mappings, where the array key represents the TV field name and the value the
-	 * BE layout column
-	 *
-	 * @param array $formdata
-	 * @return array
-	 */
-	private function getFieldMappingArray($formdata) {
-		$tvIndex = array();
-		$beValue = array();
-		foreach($formdata as $key => $data) {
-			if (substr($key, 0, 7) == 'tv_col_') {
-				$tvIndex[] = $data;
-			}
-			if (substr($key, 0, 7) == 'be_col_') {
-				$beValue[] = $data;
-			}
-		}
-		$fieldMapping = array();
-		if (count($tvIndex) == count($beValue)) {
-			for ($i=0; $i<=count($tvIndex); $i++) {
-				if ($tvIndex[$i] != '' && $beValue[$i] != '') {
-					$fieldMapping[$tvIndex[$i]] = $beValue[$i];
-				}
-			}
-		}
-		return $fieldMapping;
-	}
-
-	/**
-	 * Creates a shortcut tt_content record for the given contentUid
-	 *
-	 * @param int $pageUid
-	 * @param int $contentUid
-	 * @param int $colPos
-	 * @return void
-	 */
-	private function createShortcutToContent($pageUid, $contentUid, $colPos) {
-		$fields = array();
-		$fields['pid'] = $pageUid;
-		$fields['tstamp'] = time();
-		$fields['CType'] = 'shortcut';
-		$fields['records'] = $contentUid;
-		$fields['colPos'] = $colPos;
-
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
-	}
-
-	/**
-	 * Sets the given colpos for the content element with the given uid
-	 *
-	 * @param int $uid
-	 * @param int $newColPos
-	 * @return void
-	 */
-	private function updateContentElement($uid, $newColPos) {
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array('colPos' => $newColPos));
-	}
-
-	/**
-	 * Return the tt_content element record for the given uid
-	 *
-	 * @param int $uid
-	 * @return array
-	 */
-	private function getContentElement($uid) {
-		$fields = '*';
-		$table = 'tt_content';
-		$where = 'uid=' . (int)$uid;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		return $res;
 	}
 
 }

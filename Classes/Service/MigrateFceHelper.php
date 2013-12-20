@@ -29,6 +29,21 @@
 class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 
 	/**
+	 * @var Tx_SfTvtools_Service_SharedHelper
+	 */
+	protected $sharedHelper;
+
+	/**
+	 * DI for shared helper
+	 *
+	 * @param Tx_SfTvtools_Service_SharedHelper $sharedHelper
+	 * @return void
+	 */
+	public function injectSharedHelper(Tx_SfTvtools_Service_SharedHelper $sharedHelper) {
+		$this->sharedHelper = $sharedHelper;
+	}
+
+	/**
 	 * Returns an array of all TemplaVoila flexible content elements
 	 *
 	 * @return array
@@ -108,7 +123,7 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param int $uidGe
 	 * @return void
 	 */
-	public function migrateFceContentToGe($contentElement, $uidGe) {
+	public function migrateFceFlexformContentToGe($contentElement, $uidGe) {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
 			array(
 				'CType' => 'gridelements_pi1',
@@ -128,6 +143,36 @@ class Tx_SfTvtools_Service_MigrateFceHelper implements t3lib_Singleton {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidFce),
 			array('deleted' => 1)
 		);
+	}
+
+	/**
+	 * Migrates all content elements for the FCE with the given uid to the selected column positions
+	 *
+	 * @param array $contentElement
+	 * @param array $formdata
+	 * @return int Number of Content elements updated
+	 */
+	public function migrateContentElementsForFce($contentElement, $formdata) {
+		$fieldMapping = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'ge_col_');
+		$tvContentArray = $this->sharedHelper->getTvContentArrayForContent($contentElement['uid']);
+		$pageUid = $contentElement['pid'];
+
+		$count = 0;
+		foreach ($tvContentArray as $key => $contentUidString) {
+			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
+				$contentUids = explode(',', $contentUidString);
+				foreach ($contentUids as $contentUid) {
+					$myContentElement = $this->sharedHelper->getContentElement($contentUid);
+					$this->sharedHelper->updateContentElementForGe($contentUid, $contentElement['uid'], $fieldMapping[$key]);
+					if ($formdata['createReferences'] && $myContentElement['pid'] != $pageUid) {
+						$this->sharedHelper->createShortcutToContentForGe($pageUid, $myContentElement['uid'], $contentElement['uid'], $fieldMapping[$key]);
+					}
+					$count++;
+				}
+			}
+		}
+
+		return $count;
 	}
 }
 

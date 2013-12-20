@@ -126,32 +126,61 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	/**
 	 * Index action for migrateFce
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function indexMigrateFceAction() {
+	public function indexMigrateFceAction($formdata = NULL) {
 		$allFce = $this->migrateFceHelper->getAllFce();
 		$allGe = $this->migrateFceHelper->getAllGe();
 
+		if (isset($formdata['fce'])) {
+			$uidFce = $this->migrateContentHelper->getTvDsUidForTemplate($formdata['fce']);
+		} else {
+			$uidFce = current(array_keys($allFce));
+		}
+
+		if (isset($formdata['ge'])) {
+			$uidGe = $formdata['ge'];
+		} else {
+			$uidGe = current(array_keys($allGe));
+		}
+
+		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
+		$fceContentCols = $this->sharedHelper->getTvContentCols($uidFce);
+		$geContentCols = $this->sharedHelper->getGeContentCols($uidGe);
+
+		$this->view->assign('fceContentCols', $fceContentCols);
+		$this->view->assign('geContentCols', $geContentCols);
 		$this->view->assign('allFce', $allFce);
 		$this->view->assign('allGe', $allGe);
+		$this->view->assign('formdata', $formdata);
+
+		// Redirect to migrateContentAction when submit button pressed
+		if (isset($formdata['startAction'])) {
+			$this->redirect('migrateFce',NULL,NULL,array('formdata' => $formdata));
+		}
+
 	}
 
 
 	/**
 	 * Migrates content from FCE to Grid Element
 	 *
-	 * @param int $fce
-	 * @param int $ge
-	 * @param bool $markdeleted
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function migrateFceAction($fce, $ge, $markdeleted = FALSE) {
+	public function migrateFceAction($formdata) {
+		$fce = $formdata['fce'];
+		$ge = $formdata['ge'];
 		if ($fce > 0 && $ge > 0) {
 			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
-				$this->migrateFceHelper->migrateFceContentToGe($contentElement, $ge);
+				$this->migrateFceHelper->migrateFceFlexformContentToGe($contentElement, $ge);
+
+				// Migrate content to columns (if available)
+				$this->migrateFceHelper->migrateContentElementsForFce($contentElement, $formdata);
 			}
-			if ($markdeleted) {
+			if ($formdata['markdeleted']) {
 				$this->migrateFceHelper->markFceDeleted($fce);
 			}
 		}
@@ -161,6 +190,7 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	 * Index action for migrate content
 	 *
 	 * @param array $formdata
+	 * @return void
 	 */
 	public function indexMigrateContentAction($formdata = NULL) {
 		$tvtemplates = $this->migrateContentHelper->getAllTvTemplates();
@@ -179,8 +209,8 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		}
 
 		// Fetch content columns from TV and BE layouts depending on selection (first entry if empty)
-		$tvContentCols = $this->migrateContentHelper->getTvContentCols($uidTvTemplate);
-		$beContentCols = $this->migrateContentHelper->getBeLayoutContentCols($uidBeLayout);
+		$tvContentCols = $this->sharedHelper->getTvContentCols($uidTvTemplate);
+		$beContentCols = $this->sharedHelper->getBeLayoutContentCols($uidBeLayout);
 
 		$this->view->assign('tvContentCols', $tvContentCols);
 		$this->view->assign('beContentCols', $beContentCols);

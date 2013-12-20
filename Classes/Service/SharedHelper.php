@@ -63,6 +63,282 @@ class Tx_SfTvtools_Service_SharedHelper implements t3lib_Singleton {
 		return explode(',', $pids);
 	}
 
+	/**
+	 * Returns an array with names of content columns for the given TemplaVoila DataStructure
+	 *
+	 * @param int $uidTvDs
+	 * @return array
+	 */
+	public function getTvContentCols($uidTvDs) {
+		$dsRecord = $this->getTvDatastructure($uidTvDs);
+		$flexform = simplexml_load_string($dsRecord['dataprot']);
+		$elements = $flexform->xpath("ROOT/el/*");
+
+		$contentCols = array();
+		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tvtools');
+		foreach ($elements as $element) {
+			if ($element->tx_templavoila->eType == 'ce') {
+				$contentCols[$element->getName()] = (string)$element->tx_templavoila->title;
+			}
+		}
+		return $contentCols;
+	}
+
+	/**
+	 * Returns an array with names of content columns for the given backend layout
+	 *
+	 * @param int $uidBeLayout
+	 * @return array
+	 */
+	public function getBeLayoutContentCols($uidBeLayout) {
+		$beLayoutRecord = $this->getBeLayout($uidBeLayout);
+		return $this->getContentColsFromTs($beLayoutRecord['config']);
+	}
+
+	/**
+	 * Returns an array with names of content columns for the given gridelement
+	 *
+	 * @param int $uidGe
+	 * @return array
+	 */
+	public function getGeContentCols($uidGe) {
+		$geRecord = $this->getGridElement($uidGe);
+		return $this->getContentColsFromTs($geRecord['config']);
+	}
+
+	/**
+	 * Returns an array of field mappings, where the array key represents the TV field name and the value the
+	 * BE layout column
+	 *
+	 * @param array $formdata
+	 * @param string $from
+	 * @param string $to
+	 * @return array
+	 */
+	public function getFieldMappingArray($formdata, $from, $to) {
+		$tvIndex = array();
+		$beValue = array();
+		foreach($formdata as $key => $data) {
+			if (substr($key, 0, 7) == $from) {
+				$tvIndex[] = $data;
+			}
+			if (substr($key, 0, 7) == $to) {
+				$beValue[] = $data;
+			}
+		}
+		$fieldMapping = array();
+		if (count($tvIndex) == count($beValue)) {
+			for ($i=0; $i<=count($tvIndex); $i++) {
+				if ($tvIndex[$i] != '' && $beValue[$i] != '') {
+					$fieldMapping[$tvIndex[$i]] = $beValue[$i];
+				}
+			}
+		}
+		return $fieldMapping;
+	}
+
+	/**
+	 * Returns an array of TV FlexForm content fields for the page with the given UID.
+	 * The content elements are seperated by comma
+	 *
+	 * @param int $pageUid
+	 * @return array
+	 */
+	public function getTvContentArrayForPage($pageUid) {
+		$fields = 'tx_templavoila_flex';
+		$table = 'pages';
+		$where = 'uid=' . (int)$pageUid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $this->getContentArrayFromFlexform($res);
+	}
+
+	/**
+	 * Returns an array of TV FlexForm content fields for the tt_content element with the given uid.
+	 * The content elements are seperated by comma
+	 *
+	 * @param int $contentUid
+	 * @return array
+	 */
+	public function getTvContentArrayForContent($contentUid) {
+		$fields = 'tx_templavoila_flex';
+		$table = 'tt_content';
+		$where = 'uid=' . (int)$contentUid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $this->getContentArrayFromFlexform($res);
+	}
+
+	/**
+	 * Creates a shortcut tt_content record for the given contentUid
+	 *
+	 * @param int $pageUid
+	 * @param int $contentUid
+	 * @param int $colPos
+	 * @return void
+	 */
+	public function createShortcutToContent($pageUid, $contentUid, $colPos) {
+		$fields = array();
+		$fields['pid'] = $pageUid;
+		$fields['tstamp'] = time();
+		$fields['CType'] = 'shortcut';
+		$fields['records'] = $contentUid;
+		$fields['colPos'] = $colPos;
+
+		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
+	}
+
+	/**
+	 * Creates a shortcut tt_content record for the given contentUid
+	 *
+	 * @param int $pageUid
+	 * @param int $contentUid
+	 * @param int $geContainer
+	 * @param int $colPos
+	 * @return void
+	 */
+	public function createShortcutToContentForGe($pageUid, $contentUid, $geContainer, $colPos) {
+		$fields = array();
+		$fields['pid'] = $pageUid;
+		$fields['tstamp'] = time();
+		$fields['CType'] = 'shortcut';
+		$fields['records'] = $contentUid;
+		$fields['colPos'] = -1;
+		$fields['tx_gridelements_container'] = $geContainer;
+		$fields['tx_gridelements_columns'] = $colPos;
+
+		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
+	}
+
+	/**
+	 * Sets the given colpos for the content element with the given uid
+	 *
+	 * @param int $uid
+	 * @param int $newColPos
+	 * @return void
+	 */
+	public function updateContentElementColPos($uid, $newColPos) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array('colPos' => $newColPos));
+	}
+
+	/**
+	 * Sets the given GE Container and Column for the content element with the given uid
+	 *
+	 * @param int $uid
+	 * @param int $geContainerUid
+	 * @param int $geColPos
+	 * @return void
+	 */
+	public function updateContentElementForGe($uid, $geContainerUid, $geColPos) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array(
+				'tx_gridelements_container' => $geContainerUid,
+				'tx_gridelements_columns' => $geColPos,
+				'colPos' => -1
+			)
+		);
+	}
+
+	/**
+	 * Return the tt_content element record for the given uid
+	 *
+	 * @param int $uid
+	 * @return array
+	 */
+	public function getContentElement($uid) {
+		$fields = '*';
+		$table = 'tt_content';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns an array of TV FlexForm content fields for the given flexform
+	 *
+	 * @param $result
+	 * @return array
+	 */
+	private function getContentArrayFromFlexform($result) {
+		$contentArray = array();
+
+		if ($result['tx_templavoila_flex'] != '') {
+			$localFlexform = simplexml_load_string($result['tx_templavoila_flex']);
+			$elements = $localFlexform->xpath("data/sheet/language/*");
+
+			foreach($elements as $element) {
+				$contentArray[(string)$element->attributes()->index] = (string)$element->value;
+			}
+		}
+		return $contentArray;
+	}
+
+
+	/**
+	 * Returns an array with names of content columns for the given TypoScript
+	 *
+	 * @param string $typoScript
+	 * @return array
+	 */
+	private function getContentColsFromTs($typoScript) {
+		$parser = t3lib_div::makeInstance('t3lib_TSparser');
+		$parser->parse($typoScript);
+		$data = $parser->setup['backend_layout.'];
+
+		$contentCols = array();
+		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tvtools');
+		foreach($data['rows.'] as $row) {
+			foreach($row['columns.'] as $column) {
+				$contentCols[$column['colPos']] = $column['name'];
+			}
+		}
+		return $contentCols;
+	}
+
+	/**
+	 * Returns the BE Layout record for the given BE Layout uid
+	 *
+	 * @param int $uid
+	 * @return array mixed
+	 */
+	private function getBeLayout($uid) {
+		$fields = '*';
+		$table = 'backend_layout';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns the GridElement record for the given GE uid
+	 *
+	 * @param int $uid
+	 * @return array mixed
+	 */
+	private function getGridElement($uid) {
+		$fields = '*';
+		$table = 'tx_gridelements_backend_layout';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns the DS record for the given DS uid
+	 *
+	 * @param $uid
+	 * @return array mixed
+	 */
+	private function getTvDatastructure($uid) {
+		$fields = '*';
+		$table = 'tx_templavoila_datastructure';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
 }
 
 ?>
