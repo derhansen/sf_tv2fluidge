@@ -255,7 +255,7 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 						$this->updateContentElement($contentUid, $fieldMapping[$key]);
 					} else {
 						if ($formdata['createReferences']) {
-							$this->createShortcut($pageUid, $contentUid, $fieldMapping[$key]);
+							$this->createShortcutToContent($pageUid, $contentUid, $fieldMapping[$key]);
 						}
 					}
 					$count++;
@@ -328,8 +328,15 @@ class Tx_SfTvtools_Service_MigrateContentHelper implements t3lib_Singleton {
 	 * @param int $colPos
 	 * @return void
 	 */
-	private function createShortcut($pageUid, $contentUid, $colPos) {
+	private function createShortcutToContent($pageUid, $contentUid, $colPos) {
+		$fields = array();
+		$fields['pid'] = $pageUid;
+		$fields['tstamp'] = time();
+		$fields['CType'] = 'shortcut';
+		$fields['records'] = $contentUid;
+		$fields['colPos'] = $colPos;
 
+		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
 	}
 
 	/**
