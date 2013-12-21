@@ -41,6 +41,9 @@
             <label index="mod_migratecontent_ce_updated">content elements have been updated.</label>
             <label index="mod_migratecontent_templates_updated">page templates have been updated.</label>
 
+            <label index="mod_migratefce_ce_updated">content elements have been updated.</label>
+            <label index="mod_migratefce_fces_converted">flexible content elements have been migrated.</label>
+
 		</languageKey>
 	</data>
 </T3locallang>
