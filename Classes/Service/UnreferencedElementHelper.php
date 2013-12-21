@@ -24,7 +24,7 @@
  ***************************************************************/
 
 /**
- * Description
+ * Helper class for handling unreferenced elements
  */
 class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton {
 
@@ -46,7 +46,6 @@ class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton 
 	/**
 	 * Marks all unreferenced element records as deleted with a recursion level of 99
 	 *
-	 * @todo: make level configurable in Module
 	 * @return int Number of records deleted
 	 */
 	public function markDeletedUnreferencedElementsRecords() {
