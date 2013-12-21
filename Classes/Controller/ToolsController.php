@@ -146,8 +146,16 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		}
 
 		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
-		$fceContentCols = $this->sharedHelper->getTvContentCols($uidFce);
-		$geContentCols = $this->sharedHelper->getGeContentCols($uidGe);
+		if ($uidFce > 0) {
+			$fceContentCols = $this->sharedHelper->getTvContentCols($uidFce);
+		} else {
+			$fceContentCols = NULL;
+		}
+		if ($uidGe > 0) {
+			$geContentCols = $this->sharedHelper->getGeContentCols($uidGe);
+		} else {
+			$geContentCols = NULL;
+		}
 
 		$this->view->assign('fceContentCols', $fceContentCols);
 		$this->view->assign('geContentCols', $geContentCols);
@@ -159,7 +167,6 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 		if (isset($formdata['startAction'])) {
 			$this->redirect('migrateFce',NULL,NULL,array('formdata' => $formdata));
 		}
-
 	}
 
 
@@ -172,18 +179,26 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	public function migrateFceAction($formdata) {
 		$fce = $formdata['fce'];
 		$ge = $formdata['ge'];
+
+		$fcesConverted = 0;
+		$contentElementsUpdated = 0;
+
 		if ($fce > 0 && $ge > 0) {
 			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
+				$fcesConverted++;
 				$this->migrateFceHelper->migrateFceFlexformContentToGe($contentElement, $ge);
 
-				// Migrate content to columns (if available)
-				$this->migrateFceHelper->migrateContentElementsForFce($contentElement, $formdata);
+				// Migrate content to GridElement columns (if available)
+				$contentElementsUpdated += $this->migrateFceHelper->migrateContentElementsForFce($contentElement, $formdata);
 			}
 			if ($formdata['markdeleted']) {
 				$this->migrateFceHelper->markFceDeleted($fce);
 			}
 		}
+
+		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
+		$this->view->assign('fcesConverted', $fcesConverted);
 	}
 
 	/**
@@ -233,17 +248,21 @@ class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_
 	public function migrateContentAction($formdata) {
 		$uidTvTemplate = $formdata['tvtemplate'];
 		$uidBeLayout = $formdata['belayout'];
-		$pageUids = $this->sharedHelper->getPageIds(99);
 
 		$contentElementsUpdated = 0;
 		$pageTemplatesUpdated = 0;
-		foreach($pageUids as $pageUid) {
-			if ($this->migrateContentHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
-				$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
-			}
 
-			// Update page template (must be called for every page, since to and next_to must be checked
-			$pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
+		if ($uidTvTemplate > 0 && $uidBeLayout > 0) {
+			$pageUids = $this->sharedHelper->getPageIds(99);
+
+			foreach($pageUids as $pageUid) {
+				if ($this->migrateContentHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
+					$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
+				}
+
+				// Update page template (must be called for every page, since to and next_to must be checked
+				$pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
+			}
 		}
 
 		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
