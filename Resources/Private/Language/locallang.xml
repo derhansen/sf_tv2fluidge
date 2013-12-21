@@ -2,13 +2,13 @@
 <T3locallang>
 	<meta type="array">
 		<type>module</type>
-		<description>Language labels for the TemplaVoila Toolbox extension in the FRONTEND</description>
+		<description>Language labels for the extension in the FRONTEND</description>
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
-            <label index="mlang_tabs_tab">TemplaVoila Tools</label>
-            <label index="mlang_labels_tabdescr">TemplaVoila Tools</label>
-            <label index="mlang_labels_tablabel">TemplaVoila Tools</label>
+            <label index="mlang_tabs_tab">TemplaVoila to Fluid/GE</label>
+            <label index="mlang_labels_tabdescr">TemplaVoila to Fluid/GE</label>
+            <label index="mlang_labels_tablabel">TemplaVoila to Fluid/GE</label>
 
             <label index="label_result">Result</label>
             <label index="label_select">Select</label>
@@ -24,14 +24,14 @@
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
 
-            <label index="mod_index_title">TemplaVoila tools</label>
-            <label index="mod_index_description">TemplaVoila tools is a set of tools which can be helpfull when you want to migrate an existing TYPO3 website from TemplaVoila to Fluid / GridElements</label>
+            <label index="mod_index_title">TemplaVoila to Fluid/GE</label>
+            <label index="mod_index_description">TemplaVoila to Fluid/GE is a set of tools which can be helpful when you want to migrate an existing TYPO3 website from TemplaVoila to Fluid / GridElements</label>
 
             <label index="mod_deleteunref_title">Delete unreferenced elements</label>
             <label index="mod_deleteunref_result_deleted">records has been marked as deleted.</label>
             <label index="mod_deleteunref_description">Searches recursive on all pages for unreferenced elements and sets all found elements as deleted in the TYPO3 database.</label>
 
-            <label index="mod_migratefce_title">Migrate TV FCE content to GridElement</label>
+            <label index="mod_migratefce_title">Migrate TV FCE content to Grid Element</label>
             <label index="mod_migratefce_description">Migrates the content from the selected FCE to the selected Grid Element and changed the content element type to Grid Element</label>
 
             <label index="mod_migratecontent_title">Migrate content from TemplaVoila to Fluid</label>

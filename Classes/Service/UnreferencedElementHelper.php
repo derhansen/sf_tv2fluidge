@@ -26,20 +26,20 @@
 /**
  * Helper class for handling unreferenced elements
  */
-class Tx_SfTvtools_Service_UnreferencedElementHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singleton {
 
 	/**
-	 * @var Tx_SfTvtools_Service_SharedHelper
+	 * @var Tx_SfTv2fluidge_Service_SharedHelper
 	 */
 	protected $sharedHelper;
 
 	/**
 	 * DI for shared helper
 	 *
-	 * @param Tx_SfTvtools_Service_SharedHelper $sharedHelper
+	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
 	 * @return void
 	 */
-	public function injectSharedHelper(Tx_SfTvtools_Service_SharedHelper $sharedHelper) {
+	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
 		$this->sharedHelper = $sharedHelper;
 	}
 

@@ -13,10 +13,10 @@ if (TYPO3_MODE === 'BE') {
 	Tx_Extbase_Utility_Extension::registerModule(
 		$_EXTKEY,
 		'web', // Make module a submodule of 'web'
-		'sf_tvtools', // Submodule key
+		'sf_tv2fluidge', // Submodule key
 		'', // Position
 		array(
-			'Tools' => 'index,indexDeleteUnreferencedElements,deleteUnreferencedElements,indexMigrateFce,migrateFce,indexMigrateContent,migrateContent',
+			'Tv2fluidge' => 'index,indexDeleteUnreferencedElements,deleteUnreferencedElements,indexMigrateFce,migrateFce,indexMigrateContent,migrateContent',
 		),
 		array(
 			'access' => 'user,group',

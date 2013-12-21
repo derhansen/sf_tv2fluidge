@@ -25,73 +25,73 @@
  ***************************************************************/
 
 /**
- * TV Tools Backend Controller
+ * TV Tv2fluidge Backend Controller
  */
-class Tx_SfTvtools_Controller_ToolsController extends Tx_Extbase_MVC_Controller_ActionController {
+class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Controller_ActionController {
 
 	/**
 	 * UnreferencedElementHelper
 	 *
-	 * @var Tx_SfTvtools_Service_UnreferencedElementHelper
+	 * @var Tx_SfTv2fluidge_Service_UnreferencedElementHelper
 	 */
 	protected $unreferencedElementHelper;
 
 	/**
 	 * DI for UnreferencedElementHelper
 	 *
-	 * @param Tx_SfTvtools_Service_UnreferencedElementHelper $unreferencedElementHelper
+	 * @param Tx_SfTv2fluidge_Service_UnreferencedElementHelper $unreferencedElementHelper
 	 * @return void
 	 */
-	public function injectUnreferencedElementHelper(Tx_SfTvtools_Service_UnreferencedElementHelper $unreferencedElementHelper) {
+	public function injectUnreferencedElementHelper(Tx_SfTv2fluidge_Service_UnreferencedElementHelper $unreferencedElementHelper) {
 		$this->unreferencedElementHelper = $unreferencedElementHelper;
 	}
 
 	/**
 	 * MigrateFceHelper
 	 *
-	 * @var Tx_SfTvtools_Service_MigrateFceHelper
+	 * @var Tx_SfTv2fluidge_Service_MigrateFceHelper
 	 */
 	protected $migrateFceHelper;
 
 	/**
 	 * DI for MigrateFceHelper
 	 *
-	 * @param Tx_SfTvtools_Service_MigrateFceHelper $migrateFceHelper
+	 * @param Tx_SfTv2fluidge_Service_MigrateFceHelper $migrateFceHelper
 	 * @return void
 	 */
-	public function injectUpdateFceHelper(Tx_SfTvtools_Service_MigrateFceHelper $migrateFceHelper) {
+	public function injectUpdateFceHelper(Tx_SfTv2fluidge_Service_MigrateFceHelper $migrateFceHelper) {
 		$this->migrateFceHelper = $migrateFceHelper;
 	}
 
 	/**
 	 * MigrateContentHelper
 	 *
-	 * @var Tx_SfTvtools_Service_MigrateContentHelper
+	 * @var Tx_SfTv2fluidge_Service_MigrateContentHelper
 	 */
 	protected $migrateContentHelper;
 
 	/**
 	 * DI for MigrateContentHelper
 	 *
-	 * @param Tx_SfTvtools_Service_MigrateContentHelper $migrateContentHelper
+	 * @param Tx_SfTv2fluidge_Service_MigrateContentHelper $migrateContentHelper
 	 * @return void
 	 */
-	public function injectContentFceHelper(Tx_SfTvtools_Service_MigrateContentHelper $migrateContentHelper) {
+	public function injectContentFceHelper(Tx_SfTv2fluidge_Service_MigrateContentHelper $migrateContentHelper) {
 		$this->migrateContentHelper = $migrateContentHelper;
 	}
 
 	/**
-	 * @var Tx_SfTvtools_Service_SharedHelper
+	 * @var Tx_SfTv2fluidge_Service_SharedHelper
 	 */
 	protected $sharedHelper;
 
 	/**
 	 * DI for shared helper
 	 *
-	 * @param Tx_SfTvtools_Service_SharedHelper $sharedHelper
+	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
 	 * @return void
 	 */
-	public function injectSharedHelper(Tx_SfTvtools_Service_SharedHelper $sharedHelper) {
+	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
 		$this->sharedHelper = $sharedHelper;
 	}
 

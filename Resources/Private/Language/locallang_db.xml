@@ -2,7 +2,7 @@
 <T3locallang>
 	<meta type="array">
 		<type>database</type>
-		<description>Language labels for database tables/fields belonging to extension 'sf_tvtools'</description>
+		<description>Language labels for database tables/fields belonging to extension 'sf_tv2fluidge'</description>
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
