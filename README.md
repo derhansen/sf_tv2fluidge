@@ -30,7 +30,7 @@ and TypoScript.
 2. Create backend layouts and Fluidtemplates for all TemplaVoila page templates you wish to migrate
 3. Delete all unreferenced elements
 4. Migrate all Flexible Content Elements to Grid Elements
-5. Migrate all TemplaVoila page temlpates to Fluidtemplate
+5. Migrate all TemplaVoila page templates to Fluidtemplate
 6. Remove TemplaVoila
 
 ## Delete unreferenced elements
