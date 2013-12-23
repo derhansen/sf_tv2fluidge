@@ -6,7 +6,7 @@ TemplaVoila migration to Fluidtemplate and Grid Element
 A TYPO3 Extension with tools that can be helpful when migrating an existing website
 from TemplaVoila to Fluidtemplate and Grid Elements
 
-## Included tools
+## Included modules
 
 * Module to mark all unreferenced elements as deleted
 * Module to migrate the content of a flexible content element to a Grid Element
