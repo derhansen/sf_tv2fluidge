@@ -37,7 +37,8 @@
             <label index="mod_deleteunref_description">Searches recursive on all pages for unreferenced elements and sets all found elements as deleted in the TYPO3 database.</label>
 
             <label index="mod_migratefce_title">Migrate TV FCE content to Grid Element</label>
-            <label index="mod_migratefce_description">Migrates the content from the selected FCE to the selected Grid Element and changes the content element type to Grid Element. If the FCE contains content columns, you can remap them to Grid Element columns.</label>
+            <label index="mod_migratefce_description1">Migrates the content from the selected FCE to the selected Grid Element and changes the content element type to Grid Element. If the FCE contains content columns, you can remap them to Grid Element columns.</label>
+            <label index="mod_migratefce_description2">Note: After migration all Grid Elements with shortcut-records will not be shown on the output page if TemplaVoila is still installed.</label>
 
             <label index="mod_migratecontent_title">Migrate content from TemplaVoila to Fluid</label>
             <label index="mod_migratecontent_description1">Migrate content from TemplaVoila content columns to Fluid backend layout columns. Use this module if you have several TemplaVoila content columns which do not have an oldStyleColumnNumber setting or if you want to rearrange content elements from TemplaVoila content columns to Fluid backend layout columns.</label>
