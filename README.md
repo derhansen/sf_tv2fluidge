@@ -20,9 +20,18 @@ and TypoScript.
 ## Prerequisites
 
 * A full backup of your TYPO3 website (database and files)!
-* TemplaVoila version 1.8 installed
+* TemplaVoila version 1.8 installed and with old page module enabled
 * ExtBase and Fluid installed
 * Grid Elements installed (please ignore conflict with TemplaVoila!)
+
+## Migration steps in short
+
+1. Create Grid Elements for all Flexible Content Elements you wish to migrate
+2. Create backend layouts and Fluidtemplates for all TemplaVoila page templates you wish to migrate
+3. Delete all unreferenced elements
+4. Migrate all Flexible Content Elements to Grid Elements
+5. Migrate all TemplaVoila page temlpates to Fluidtemplate
+6. Remove TemplaVoila
 
 ## Delete unreferenced elements
 
