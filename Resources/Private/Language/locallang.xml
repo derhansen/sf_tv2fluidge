@@ -21,6 +21,9 @@
             <label index="label_ge">Grid Element</label>
             <label index="label_mark_deleted">Flag original FCE as deleted</label>
             <label index="label_create_reference">Create shortcut content element for TV references</label>
+            <label index="label_delete_unref">Delete unused Elements</label>
+            <label index="label_migrate_fce">Migrate FCE</label>
+            <label index="label_migrate_content">Migrate content</label>
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
 

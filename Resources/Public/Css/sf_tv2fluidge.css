@@ -1,20 +1,34 @@
 p {
-    margin: 0 0 10px 0;
+	margin: 0 0 10px 0;
 }
 
 p.warning {
-    padding: 5px;
-    border: 1px solid #000000;
-    background: #ff0000;
-    color: #ffffff;
-    font-weight: bold;
+	padding: 5px;
+	border: 1px solid #000000;
+	background: #ff0000;
+	color: #ffffff;
+	font-weight: bold;
 }
 
 li {
-    margin: 0 0 5px 0;
+	margin: 0 0 5px 0;
 }
 
 a.action {
-    color: #ffffff;
-    margin: 0 8px 0 0;
+	color: #ffffff;
+	margin: 0 8px 0 0;
+	line-height: 20px;
+	padding: 0 0 0 20px;
+}
+
+a.btn_delete_unref {
+	background: url(../Icons/unlink.png) no-repeat;
+}
+
+a.btn_migrate_fce {
+	background: url(../Icons/tv-fce.png) no-repeat;
+}
+
+a.btn_migrate_content {
+	background: url(../Icons/tv-template.gif) no-repeat;
 }
