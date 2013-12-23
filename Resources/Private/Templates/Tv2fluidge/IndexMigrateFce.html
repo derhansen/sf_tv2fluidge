@@ -12,14 +12,15 @@
 
     <f:form action="indexMigrateFce" name="formdata" object="{formdata}">
 
-        <table>
+        <table class="migration">
             <tr>
                 <td>
-                    <label for="fce"><f:translate key="label_fce"/></label>
+                    <label for="fce"><f:translate key="label_fce"/></label><br/>
                     <f:form.select property="fce" name="fce" options="{allFce}" value="{formdata.fce}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}"/>
                 </td>
+                <td></td>
                 <td>
-                    <label for="ge"><f:translate key="label_ge"/></label>
+                    <label for="ge"><f:translate key="label_ge"/></label><br/>
                     <f:form.select property="ge" name="ge" options="{allGe}" value="{formdata.ge}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}"/>
                 </td>
             </tr>
@@ -31,6 +32,7 @@
                             <td>
                                 <f:form.select name="tv_col_{iterator.index}" property="tv_col_{iterator.index}" options="{fceContentCols}" />
                             </td>
+                            <td class="arrow">&#8594;</td>
                             <td>
                                 <f:form.select name="ge_col_{iterator.index}" property="ge_col_{iterator.index}" options="{geContentCols}" />
                             </td>
@@ -40,15 +42,15 @@
             </f:if>
         </table>
 
-        <f:form.checkbox property="markdeleted" name="markdeleted" value="1" checked="false"/>
+        <f:form.checkbox id="markdeleted" name="markdeleted" property="markdeleted" value="1" checked="false"/>
         <label for="markdeleted"><f:translate key="label_mark_deleted"/></label>
         <br/>
 
-        <f:form.checkbox name="createReferences" property="createReferences" value="1" checked="false"/>
+        <f:form.checkbox id="createReferences" name="createReferences" property="createReferences" value="1" checked="false"/>
         <label for="createReferences"><f:translate key="label_create_reference"/></label>
         <br/>
 
         <f:form.submit value="" property="dummySubmit" style="display: none; "/>
-        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" />
+        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" class="start"/>
     </f:form>
 </f:section>

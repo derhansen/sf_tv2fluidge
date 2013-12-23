@@ -14,19 +14,16 @@
 
     <f:form action="indexMigrateContent" name="formdata" object="{formdata}">
 
-        <table>
+        <table class="migration">
             <tr>
                 <td>
                     <label for="tvtemplate"><f:translate key="label_template"/></label>
                     <f:form.select name="tvtemplate" property="tvtemplate" options="{tvtemplates}" value="{formdata.tvtemplate}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
                 </td>
+                <td></td>
                 <td>
                     <label for="belayout"><f:translate key="label_belayout"/></label>
                     <f:form.select name="belayout" property="belayout" options="{belayouts}" value="{formdata.belayout}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
-                </td>
-                <td>
-                    <label for="createReferences"><f:translate key="label_create_reference"/></label>
-                    <f:form.checkbox name="createReferences" property="createReferences" value="1" checked="false"/>
                 </td>
             </tr>
 
@@ -37,6 +34,7 @@
                         <td>
                             <f:form.select name="tv_col_{iterator.index}" property="tv_col_{iterator.index}" options="{tvContentCols}" />
                         </td>
+                        <td class="arrow">&#8594;</td>
                         <td>
                             <f:form.select name="be_col_{iterator.index}" property="be_col_{iterator.index}" options="{beContentCols}" />
                         </td>
@@ -47,7 +45,11 @@
             </f:if>
         </table>
 
+        <f:form.checkbox id="createReferences" name="createReferences" property="createReferences" value="1" checked="false"/>
+        <label for="createReferences"><f:translate key="label_create_reference"/></label>
+        <br/>
+
         <f:form.submit value="" property="dummySubmit" style="display: none; "/>
-        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" />
+        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" class="start"/>
     </f:form>
 </f:section>

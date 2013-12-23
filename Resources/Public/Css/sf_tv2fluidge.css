@@ -16,9 +16,10 @@ li {
 
 a.action {
 	color: #ffffff;
-	margin: 0 8px 0 0;
-	line-height: 20px;
+	margin: 2px 8px 0 0;
+	line-height: 16px;
 	padding: 0 0 0 20px;
+	display: inline-block;
 }
 
 a.btn_delete_unref {
@@ -31,4 +32,22 @@ a.btn_migrate_fce {
 
 a.btn_migrate_content {
 	background: url(../Icons/tv-template.gif) no-repeat;
+}
+
+a.ext-link {
+	text-decoration: underline;
+}
+
+td.arrow {
+	width: 40px;
+	text-align: center;
+	font-size: 30px;
+}
+
+input.start {
+	margin: 10px 0 0 0;
+}
+
+table.migration {
+	margin: 0 0 10px 0;
 }
