@@ -11,7 +11,7 @@
 ########################################################################
 
 $EM_CONF[$_EXTKEY] = array(
-	'title' => 'TemplaVoila migration to Fluidtemplate and Grid Element',
+	'title' => 'TemplaVoila to Fluid/Grid Elements',
 	'description' => 'Backend module with tools that can be helpful when migration from Templavoila to Fluidtemplate and Grid Elements',
 	'category' => 'module',
 	'author' => 'Torben Hansen',
