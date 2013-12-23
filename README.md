@@ -94,11 +94,11 @@ Example:
 
 ### How does the migration work?
 
-The FCE migration module finds all Flexible Content Elements of the selected type and changes the content type
-to GridElement and sets the selected backend layout for the Grid Element. Then it copies the value from
+The FCE migration module finds all Flexible Content Elements of the selected type, changes the content type
+to GridElement and sets the selected backend layout for the Grid Element. Then it copies the content from
 `tx_templavoila_flex` to `pi_flexform`. If the selected Flexible Content Element has content columns, then all
 content elements will be mapped to the selected content columns of the target Grid Element.
 
-If you selected to create shortcuts for content elements that are TemplaVoila references, then each content
-element that is a TemplaVoila reference will be insered as a shortcut in the given content column.
+If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
+element will be insered as a shortcut in the given content column.
 
