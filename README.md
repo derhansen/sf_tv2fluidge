@@ -49,12 +49,12 @@ The action can safely be used, since it only flags all unreferenced elements as 
 
 ![FCE migration module](Documentation/Images/fce-migration.png)
 
-This module can migrate content from a Flexible Content Element to an existing Grid Element. If the Flexible
+This module migrates content from a Flexible Content Element to an existing Grid Element. If the Flexible
 Content Element contains content columns, they can be remapped to content columns of the target Grid Element.
 
 ### Prerequisites
 
-Before you can start with the migration, you must create a GridElement for each Flexible Content Element you want
+Before you can start with the migration, you must create a GridElement for each Flexible Content Element you wish
 to migrate.
 
 **Flexible Content Elements with content columns only**
