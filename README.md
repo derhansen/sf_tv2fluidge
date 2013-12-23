@@ -64,7 +64,7 @@ create a new Grid Element with number of content columns from your Flexible Cont
 
 **Flexible Content Elements with flexform only**
 
-If your lexible Content Element only constists of flexform fields (Input, Images, ...), you should
+If your Flexible Content Element only constists of flexform fields (input, images, TypoScript...), you should
 create a new Grid Element and insert the flexform XML from the Flexible Content Element in the Grid Element.
 
 When creating the TypoScript for the new Grid Element, you can use `field:flexform_` to get the flexform values.
@@ -111,3 +111,14 @@ content elements will be mapped to the selected content columns of the target Gr
 If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
 element will be insered as a shortcut in the given content column.
 
+## Migrate content
+
+@todo - Insert image
+
+This module migrates content from TemplaVoila content columns to backend layout content columns based on
+Fluidtemplate.
+
+### Prerequisites
+
+Before you can start with the migration, you must create a backend layout and Fluidtemplate for each TemplaVoila
+page template you wish to migrate.
