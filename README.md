@@ -55,7 +55,8 @@ Content Element contains content columns, they can be remapped to content column
 ### Prerequisites
 
 Before you can start with the migration, you must create a GridElement for each Flexible Content Element you wish
-to migrate.
+to migrate. If your Flexible Content Element contains JavaScript, you should include this somewhere in you page
+TypoScript or Grid Element TypoScript.
 
 **Flexible Content Elements with content columns only**
 
