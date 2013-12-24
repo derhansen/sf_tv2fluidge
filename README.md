@@ -102,6 +102,14 @@ Example:
   }
 ```
 
+### Migrating a Flexible Content Element
+
+To migrate a Flexible Content Element, just select it from the "Flexible Content Element" select box in the module.
+Next you must select a target Grid Element in the "Grid Element" select box.
+
+If your Flexible Content Element contains content columns, then you can remap them to content columns in the target
+Grid Element.
+
 ### How does the migration work?
 
 The FCE migration module finds all Flexible Content Elements of the selected type, changes the content type
@@ -114,12 +122,35 @@ element will be insered as a shortcut in the given content column.
 
 ## Migrate content
 
-@todo - Insert image
+![Content migration module](Documentation/Images/content-migration.png)
 
 This module migrates content from TemplaVoila content columns to backend layout content columns based on
-Fluidtemplate.
+Fluidtemplate. After the content migration, the selected backend layout gets assigned to the "Backend Layout"
+select boxes.
 
 ### Prerequisites
 
 Before you can start with the migration, you must create a backend layout and Fluidtemplate for each TemplaVoila
 page template you wish to migrate.
+
+For TemplaVoila templates with only content columns, you should just create backend layouts and Fluidtemplates
+with the same amount of content columns. Be sure to set a decent name to each content column, so you later can
+identify them when remapping from TemplaVoila content columns to backend layout content columns.
+
+If your TemplaVoila template contains FlexForm fields (e.g. input, images, ...), then you should consider to
+resturcture your template.
+
+### Migrating content from TemplaVoila
+
+To migrate content from TemplaVoila, just select the TemplaVoila Page Template the "TV Page Template" select box
+in the module. Next you must select a target backend layout in the "Backend Layout" select box. Finally remap all
+content columns from the TemplaVoila Page Template to the target content columns of the backend layout.
+
+### How does the migration work?
+
+The content migration module finds all pages with the selected TemplaVoila Page Template and remaps all content
+elements to the selected target content columns of the backend layout. After the content migration, the selected
+backend layout gets assigned to the "Backend Layout" select boxes.
+
+If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
+element will be insered as a shortcut in the given content column.
