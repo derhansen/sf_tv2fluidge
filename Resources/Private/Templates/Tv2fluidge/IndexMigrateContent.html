@@ -17,12 +17,12 @@
         <table class="migration">
             <tr>
                 <td>
-                    <label for="tvtemplate"><f:translate key="label_template"/></label>
+                    <label for="tvtemplate"><f:translate key="label_tv_template"/></label><br/>
                     <f:form.select name="tvtemplate" property="tvtemplate" options="{tvtemplates}" value="{formdata.tvtemplate}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
                 </td>
                 <td></td>
                 <td>
-                    <label for="belayout"><f:translate key="label_belayout"/></label>
+                    <label for="belayout"><f:translate key="label_be_layout"/></label><br/>
                     <f:form.select name="belayout" property="belayout" options="{belayouts}" value="{formdata.belayout}" optionValueField="uid" optionLabelField="title" additionalAttributes="{onChange : 'document.formdata.submit();'}" />
                 </td>
             </tr>
