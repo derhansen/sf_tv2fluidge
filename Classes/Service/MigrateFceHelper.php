@@ -158,17 +158,19 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 		$pageUid = $contentElement['pid'];
 
 		$count = 0;
+		$sorting = 0;
 		foreach ($tvContentArray as $key => $contentUidString) {
 			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
 				$contentUids = explode(',', $contentUidString);
 				foreach ($contentUids as $contentUid) {
 					$myContentElement = $this->sharedHelper->getContentElement($contentUid);
 					if ($myContentElement['pid'] == $pageUid) {
-						$this->sharedHelper->updateContentElementForGe($contentUid, $contentElement['uid'], $fieldMapping[$key]);
+						$this->sharedHelper->updateContentElementForGe($contentUid, $contentElement['uid'], $fieldMapping[$key], $sorting);
 					}
 					if ($formdata['createReferences'] && $myContentElement['pid'] != $pageUid) {
-						$this->sharedHelper->createShortcutToContentForGe($pageUid, $myContentElement['uid'], $contentElement['uid'], $fieldMapping[$key]);
+						$this->sharedHelper->createShortcutToContentForGe($pageUid, $myContentElement['uid'], $contentElement['uid'], $fieldMapping[$key], $sorting);
 					}
+					$sorting = $sorting + 25;
 					$count++;
 				}
 			}

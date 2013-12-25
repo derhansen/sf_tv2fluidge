@@ -195,15 +195,17 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @param int $contentUid
 	 * @param int $geContainer
 	 * @param int $colPos
+	 * @param int $sorting
 	 * @return void
 	 */
-	public function createShortcutToContentForGe($pageUid, $contentUid, $geContainer, $colPos) {
+	public function createShortcutToContentForGe($pageUid, $contentUid, $geContainer, $colPos, $sorting = 0) {
 		$fields = array();
 		$fields['pid'] = $pageUid;
 		$fields['tstamp'] = time();
 		$fields['CType'] = 'shortcut';
 		$fields['records'] = 'tt_content_' . $contentUid;
 		$fields['colPos'] = -1;
+		$fields['sorting'] = $sorting;
 		$fields['tx_gridelements_container'] = $geContainer;
 		$fields['tx_gridelements_columns'] = $colPos;
 
@@ -227,12 +229,14 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @param int $uid
 	 * @param int $geContainerUid
 	 * @param int $geColPos
+	 * @param int $sorting
 	 * @return void
 	 */
-	public function updateContentElementForGe($uid, $geContainerUid, $geColPos) {
+	public function updateContentElementForGe($uid, $geContainerUid, $geColPos, $sorting = 0) {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array(
 				'tx_gridelements_container' => $geContainerUid,
 				'tx_gridelements_columns' => $geColPos,
+				'sorting' => $sorting,
 				'colPos' => -1
 			)
 		);
