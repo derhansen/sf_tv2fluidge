@@ -154,6 +154,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 		$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pageUid);
 
 		$count = 0;
+		$lastSorting = 0;
 		foreach ($tvContentArray as $key => $contentUidString) {
 			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
 				$contentUids = explode(',', $contentUidString);
@@ -163,9 +164,15 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 						$this->sharedHelper->updateContentElementColPos($contentUid, $fieldMapping[$key]);
 					} else {
 						if ($formdata['createReferences']) {
-							$this->sharedHelper->createShortcutToContent($pageUid, $contentUid, $fieldMapping[$key]);
+							// Check if sorting need to be respected / increased
+							if ($lastSorting > 0) {
+								$lastSorting += 5;
+							}
+							$this->sharedHelper->createShortcutToContent($pageUid, $contentUid,
+								$fieldMapping[$key], $lastSorting);
 						}
 					}
+					$lastSorting = $contentElement['sorting'];
 					$count++;
 				}
 			}

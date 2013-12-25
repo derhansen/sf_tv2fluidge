@@ -175,12 +175,14 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @param int $pageUid
 	 * @param int $contentUid
 	 * @param int $colPos
+	 * @param int $sorting
 	 * @return void
 	 */
-	public function createShortcutToContent($pageUid, $contentUid, $colPos) {
+	public function createShortcutToContent($pageUid, $contentUid, $colPos, $sorting = 0) {
 		$fields = array();
 		$fields['pid'] = $pageUid;
 		$fields['tstamp'] = time();
+		$fields['sorting'] = $sorting;
 		$fields['CType'] = 'shortcut';
 		$fields['records'] = 'tt_content_' . $contentUid;
 		$fields['colPos'] = $colPos;
