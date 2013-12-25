@@ -85,31 +85,27 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns the TemplaVoila page template for the given page uid. If no template object is set, we use
-	 * TemplaVoila API to fetch it from parent pages.
-	 *
-	 * @param $pageUid
-	 * @return array|bool mixed
-	 */
-	public function getTvPageTemplateRecord($pageUid) {
-		$pageRecord = $this->getPageRecord($pageUid);
-		if ($pageRecord['tx_templavoila_to'] != '') {
-			$tvPageTemplateRecord['uid'] = $pageRecord['tx_templavoila_to'];
-		} else {
-			$tvPageTemplateRecord = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree_fetchPageTemplateObject($pageRecord);
-		}
-		return $tvPageTemplateRecord;
-	}
-
-	/**
 	 * Returns the uid of the TemplaVoila page template for the given page uid
 	 *
 	 * @param $pageUid
-	 * @return array|bool mixed
+	 * @return int
 	 */
 	public function getTvPageTemplateUid($pageUid) {
-		$tvPageTemplateRecord = $this->getTvPageTemplateRecord($pageUid);
-		return $tvPageTemplateRecord['uid'];
+		$pageRecord = $this->getPageRecord($pageUid);
+		$tvTemplateObjectUid = 0;
+		if ($pageRecord['tx_templavoila_to'] != '' && $pageRecord['tx_templavoila_to'] != 0) {
+			$tvTemplateObjectUid = $pageRecord['tx_templavoila_to'];
+		} else {
+			$rootLine = t3lib_beFunc::BEgetRootLine($pageRecord['uid'],'', TRUE);
+			foreach($rootLine as $rootLineRecord) {
+				$myPageRecord = t3lib_beFunc::getRecordWSOL('pages', $rootLineRecord['uid']);
+				if ($myPageRecord['tx_templavoila_next_to']) {
+					$tvTemplateObjectUid = $myPageRecord['tx_templavoila_next_to'];
+					break;
+				}
+			}
+		}
+		return $tvTemplateObjectUid;
 	}
 
 	/**
