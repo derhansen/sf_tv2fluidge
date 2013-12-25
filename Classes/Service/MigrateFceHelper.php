@@ -163,7 +163,9 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 				$contentUids = explode(',', $contentUidString);
 				foreach ($contentUids as $contentUid) {
 					$myContentElement = $this->sharedHelper->getContentElement($contentUid);
-					$this->sharedHelper->updateContentElementForGe($contentUid, $contentElement['uid'], $fieldMapping[$key]);
+					if ($myContentElement['pid'] == $pageUid) {
+						$this->sharedHelper->updateContentElementForGe($contentUid, $contentElement['uid'], $fieldMapping[$key]);
+					}
 					if ($formdata['createReferences'] && $myContentElement['pid'] != $pageUid) {
 						$this->sharedHelper->createShortcutToContentForGe($pageUid, $myContentElement['uid'], $contentElement['uid'], $fieldMapping[$key]);
 					}
