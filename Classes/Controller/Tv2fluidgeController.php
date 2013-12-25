@@ -246,8 +246,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function migrateContentAction($formdata) {
-		$uidTvTemplate = $formdata['tvtemplate'];
-		$uidBeLayout = $formdata['belayout'];
+		$uidTvTemplate = (int)$formdata['tvtemplate'];
+		$uidBeLayout = (int)$formdata['belayout'];
 
 		$contentElementsUpdated = 0;
 		$pageTemplatesUpdated = 0;

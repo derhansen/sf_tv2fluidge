@@ -85,14 +85,20 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns the TemplaVoila page template for the given page uid
+	 * Returns the TemplaVoila page template for the given page uid. If no template object is set, we use
+	 * TemplaVoila API to fetch it from parent pages.
 	 *
 	 * @param $pageUid
 	 * @return array|bool mixed
 	 */
 	public function getTvPageTemplateRecord($pageUid) {
 		$pageRecord = $this->getPageRecord($pageUid);
-		return $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree_fetchPageTemplateObject($pageRecord);
+		if ($pageRecord['tx_templavoila_to'] != '') {
+			$tvPageTemplateRecord['uid'] = $pageRecord['tx_templavoila_to'];
+		} else {
+			$tvPageTemplateRecord = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree_fetchPageTemplateObject($pageRecord);
+		}
+		return $tvPageTemplateRecord;
 	}
 
 	/**
