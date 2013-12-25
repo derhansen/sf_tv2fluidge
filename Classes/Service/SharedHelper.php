@@ -182,7 +182,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$fields['pid'] = $pageUid;
 		$fields['tstamp'] = time();
 		$fields['CType'] = 'shortcut';
-		$fields['records'] = $contentUid;
+		$fields['records'] = 'tt_content_' . $contentUid;
 		$fields['colPos'] = $colPos;
 
 		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
@@ -202,7 +202,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$fields['pid'] = $pageUid;
 		$fields['tstamp'] = time();
 		$fields['CType'] = 'shortcut';
-		$fields['records'] = $contentUid;
+		$fields['records'] = 'tt_content_' . $contentUid;
 		$fields['colPos'] = -1;
 		$fields['tx_gridelements_container'] = $geContainer;
 		$fields['tx_gridelements_columns'] = $colPos;
