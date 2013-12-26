@@ -31,7 +31,8 @@ and TypoScript.
 3. Delete all unreferenced elements
 4. Migrate all Flexible Content Elements to Grid Elements
 5. Migrate all TemplaVoila page templates to Fluidtemplate
-6. Remove TemplaVoila
+6. Delete TemplaVoila-Folder General Record Storage Page from root page
+7. Remove TemplaVoila
 
 ## Delete unreferenced elements
 
