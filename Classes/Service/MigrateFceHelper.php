@@ -170,7 +170,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 					if ($formdata['createReferences'] && $myContentElement['pid'] != $pageUid) {
 						$this->sharedHelper->createShortcutToContentForGe($pageUid, $myContentElement['uid'], $contentElement['uid'], $fieldMapping[$key], $sorting);
 					}
-					$sorting = $sorting + 25;
+					$sorting += 25;
 					$count++;
 				}
 			}

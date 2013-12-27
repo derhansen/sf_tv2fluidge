@@ -219,10 +219,14 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 *
 	 * @param int $uid
 	 * @param int $newColPos
+	 * @param int $sorting
 	 * @return void
 	 */
-	public function updateContentElementColPos($uid, $newColPos) {
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array('colPos' => $newColPos));
+	public function updateContentElementColPos($uid, $newColPos, $sorting = 0) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($uid), array(
+			'colPos' => $newColPos,
+			'sorting' => $sorting
+		));
 	}
 
 	/**
