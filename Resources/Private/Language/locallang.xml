@@ -26,7 +26,7 @@
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
             <label index="label_tv_template">TV Page Template</label>
-            <label index="label_be_layout">TV Page Template</label>
+            <label index="label_be_layout">Backend Layout</label>
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
             <label index="desc_docs_and_help">This extension is hosted on GitHub. Feel free to submit feedback, bugs and changerequest directly at</label>
