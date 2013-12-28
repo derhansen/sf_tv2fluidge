@@ -155,3 +155,8 @@ backend layout gets assigned to the "Backend Layout" select boxes.
 
 If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
 element will be insered as a shortcut in the given content column.
+
+## What does not work?
+
+I did not test the migration of a multilingual website and also I did not test Flexible Content Elements with
+containers for elements. Feel free to contribute if you like.
