@@ -3,8 +3,8 @@ TemplaVoila migration to Fluidtemplate and Grid Element
 
 ## What is it?
 
-A TYPO3 Extension with tools that can be helpful when migrating an existing website
-from TemplaVoila to Fluidtemplate and Grid Elements
+A TYPO3 Extension with tools that can be helpful when migrating an existing TYPO3 website
+made with TemplaVoila to Fluidtemplate and Grid Elements
 
 ## Included modules
 
@@ -55,7 +55,7 @@ Content Element contains content columns, they can be remapped to content column
 
 ### Prerequisites
 
-Before you can start with the migration, you must create a GridElement for each Flexible Content Element you wish
+Before you can start with the migration, you must create a Grid Element for each Flexible Content Element you wish
 to migrate. If your Flexible Content Element contains JavaScript, you should include this somewhere in you page
 TypoScript or Grid Element TypoScript.
 
@@ -66,7 +66,7 @@ create a new Grid Element with number of content columns from your Flexible Cont
 
 **Flexible Content Elements with flexform only**
 
-If your Flexible Content Element only constists of flexform fields (input, images, TypoScript...), you should
+If your Flexible Content Element only constists of flexform fields (input, images, TypoScript, ...), you should
 create a new Grid Element and insert the flexform XML from the Flexible Content Element in the Grid Element.
 
 When creating the TypoScript for the new Grid Element, you can use `field:flexform_` to get the flexform values.
@@ -75,7 +75,7 @@ Example:
 
 ```
 20 = TEXT
-20.data = field:flexform_field_text
+20.data = field:flexform_myfieldname
 ```
 
 **Flexible Content Elements with mixed flexform and content columns**
@@ -83,7 +83,7 @@ Example:
 If your Flexible Content Element contains a mix of content columns and flexform, you should create a new Grid
 Element and and insert the flexform XML from the Flexible Content Element in the Grid Element.
 
-Then setup the gridelement like shown in the below.
+Then setup the Grid Element like shown in the below.
 
 Example:
 
@@ -98,7 +98,7 @@ Example:
     wrap.stdWrap.cObject = COA
     wrap.stdWrap.cObject {
       10 = TEXT
-      10.data = field:flexform_field_text
+      10.data = field:flexform_myfieldname
     }
   }
 ```
@@ -159,4 +159,9 @@ element will be insered as a shortcut in the given content column.
 ## What does not work?
 
 I did not test the migration of a multilingual website and also I did not test Flexible Content Elements with
-containers for elements. Feel free to contribute if you like.
+containers for elements.
+
+## Support and updates
+
+The extension is hosted on GitHub. Please report feedback, bugs and changerequest directly at
+https://github.com/derhansen/sf_tv2fluidge
