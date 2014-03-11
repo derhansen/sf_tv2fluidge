@@ -344,7 +344,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	private function getTvDatastructure($uid) {
 		$fields = 'tx_templavoila_datastructure.*';
 		$table = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
-		$where = 'uid=' . (int)$uid . ' AND tx_templavoila_tmplobj.datastructure = tx_templavoila_datastructure.uid';
+		$where = 'tx_templavoila_tmplobj.uid=' . (int)$uid . ' AND tx_templavoila_tmplobj.datastructure = tx_templavoila_datastructure.uid';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 		return $res;
