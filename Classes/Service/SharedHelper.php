@@ -336,15 +336,15 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns the DS record for the given DS uid
+	 * Returns the DS record for the given TemplateObject uid
 	 *
 	 * @param $uid
 	 * @return array mixed
 	 */
 	private function getTvDatastructure($uid) {
-		$fields = '*';
-		$table = 'tx_templavoila_datastructure';
-		$where = 'uid=' . (int)$uid;
+		$fields = 'tx_templavoila_datastructure.*';
+		$table = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
+		$where = 'uid=' . (int)$uid . ' AND tx_templavoila_tmplobj.datastructure = tx_templavoila_datastructure.uid';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 		return $res;
