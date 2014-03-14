@@ -80,7 +80,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 			'uid',
 			'tt_content',
 			'pid='.intval($pid).
-			(count($referencedElementsArr) ? ' AND uid NOT IN ('.implode(',',$referencedElementsArr).')' : '').
+			(count($referencedElementsArr) ? ' AND uid NOT IN ('.implode(',',$referencedElementsArr).') AND l18n_parent NOT IN ('.implode(',',$referencedElementsArr).')' : '').
 			' AND t3ver_wsid='.intval($BE_USER->workspace).
 			t3lib_BEfunc::deleteClause('tt_content').
 			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),
