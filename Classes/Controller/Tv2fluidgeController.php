@@ -134,7 +134,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$allGe = $this->migrateFceHelper->getAllGe();
 
 		if (isset($formdata['fce'])) {
-			$uidFce = $this->migrateContentHelper->getTvDsUidForTemplate($formdata['fce']);
+			$uidFce = intval($formdata['fce']);
 		} else {
 			$uidFce = current(array_keys($allFce));
 		}
@@ -212,7 +212,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
 
 		if (isset($formdata['tvtemplate'])) {
-			$uidTvTemplate = $this->migrateContentHelper->getTvDsUidForTemplate($formdata['tvtemplate']);
+			$uidTvTemplate = intval($formdata['tvtemplate']);
 		} else {
 			$uidTvTemplate = current(array_keys($tvtemplates));
 		}

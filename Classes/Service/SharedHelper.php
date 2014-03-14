@@ -64,7 +64,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns an array with names of content columns for the given TemplaVoila DataStructure
+	 * Returns an array with names of content columns for the given TemplaVoila Templateobject
 	 *
 	 * @param int $uidTvDs
 	 * @return array
