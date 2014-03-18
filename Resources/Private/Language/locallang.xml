@@ -25,6 +25,7 @@
             <label index="label_delete_unref">Delete unused Elements</label>
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
+            <label index="label_convertmultilang_content">Convert multilingual content</label>
             <label index="label_tv_template">TV Page Template</label>
             <label index="label_be_layout">Backend Layout</label>
 
@@ -48,6 +49,10 @@
             <label index="mod_migratecontent_description3">After content migration, you should not rearrage or create new content elements on pages with a Fluid Template, when TemplaVoila is still installed. TemplaVoila uses a method named correctSortingAndColposFieldsForPage, which may move all content elements to column 0.</label>
             <label index="mod_migratecontent_ce_updated">content elements have been updated.</label>
             <label index="mod_migratecontent_templates_updated">page templates have been updated.</label>
+
+            <label index="mod_convertmultilangcontent_title">Convert GridElements where the language is set to "all languages"</label>
+            <label index="mod_convertmultilangcontent_description1">@todo - Add Description</label>
+            <label index="mod_convertmultilangcontent_description2">@todo - Add illustration</label>
 
             <label index="mod_migratefce_ce_updated">content elements have been updated.</label>
             <label index="mod_migratefce_fces_converted">flexible content elements have been migrated.</label>

@@ -268,5 +268,25 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
 		$this->view->assign('pageTemplatesUpdated', $pageTemplatesUpdated);
 	}
+
+	/**
+	 * Index action for convert multilingual content
+	 *
+	 * @param array $formdata
+	 * @return void
+	 */
+	public function indexConvertMultilangContentAction($formdata = NULL) {
+
+	}
+
+	/**
+	 * Does the content conversion for all GridElements on all pages
+	 *
+	 * @param array $formdata
+	 * @return void
+	 */
+	public function convertMultilangContentAction($formdata) {
+
+	}
 }
 ?>

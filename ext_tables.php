@@ -16,7 +16,7 @@ if (TYPO3_MODE === 'BE') {
 		'sf_tv2fluidge', // Submodule key
 		'', // Position
 		array(
-			'Tv2fluidge' => 'index,indexDeleteUnreferencedElements,deleteUnreferencedElements,indexMigrateFce,migrateFce,indexMigrateContent,migrateContent',
+			'Tv2fluidge' => 'index,indexDeleteUnreferencedElements,deleteUnreferencedElements,indexMigrateFce,migrateFce,indexMigrateContent,migrateContent,indexConvertMultilangContent,convertMultilangContent',
 		),
 		array(
 			'access' => 'user,group',
