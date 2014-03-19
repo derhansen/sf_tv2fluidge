@@ -96,6 +96,21 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	}
 
 	/**
+	 * @var Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper
+	 */
+	protected $convertMultilangContentHelper;
+
+	/**
+	 * DI for shared helper
+	 *
+	 * @param Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper
+	 * @return void
+	 */
+	public function injectconvertMultilangContentHelper(Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper) {
+		$this->convertMultilangContentHelper = $convertMultilangContentHelper;
+	}
+
+	/**
 	 * Default index action for module
 	 *
 	 * @return void
@@ -276,7 +291,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function indexConvertMultilangContentAction($formdata = NULL) {
-
+		//$this->convertMultilangContentHelper->cloneLangAllGEs(26);
 	}
 
 	/**
