@@ -11,6 +11,7 @@ made with TemplaVoila to Fluidtemplate and Grid Elements
 * Module to mark all unreferenced elements as deleted
 * Module to migrate the content of a flexible content element to a Grid Element
 * Module to migrate content from TemplaVoila columns to Fluidtemplate columns
+* Module to convert GridElements where the language is set to "all languages"
 
 ## Who should use it?
 
@@ -33,6 +34,7 @@ and TypoScript.
 5. Migrate all TemplaVoila page templates to Fluidtemplate
 6. Delete TemplaVoila-Folder General Record Storage Page from root page
 7. Remove TemplaVoila
+8. Optionally convert GridElements with "all languages"
 
 ## Delete unreferenced elements
 
@@ -147,6 +149,10 @@ To migrate content from TemplaVoila, just select the TemplaVoila Page Template t
 in the module. Next you must select a target backend layout in the "Backend Layout" select box. Finally remap all
 content columns from the TemplaVoila Page Template to the target content columns of the backend layout.
 
+After content migration, you should not rearrage or create new content elements on pages with a Fluid Template, when
+TemplaVoila is still installed. TemplaVoila uses a method named correctSortingAndColposFieldsForPage, which may move
+all content elements to column 0.
+
 ### How does the migration work?
 
 The content migration module finds all pages with the selected TemplaVoila Page Template and remaps all content
@@ -156,10 +162,38 @@ backend layout gets assigned to the "Backend Layout" select boxes.
 If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
 element will be insered as a shortcut in the given content column.
 
+## Convert GridElements with language set to "all languages"
+
+On multilingual sites made with TemplaVoila you can set the language FCEs to "all languages" and translate multilingual
+content directly inside the FCE container. Using backend layouts and GridElements this can cause some problems after
+migrating of a TemplaVoila site with this extension and I would recommend to use a translated Grid Element for each
+page language.
+
+This converter clones Grid Elements with "all languages" so you have individually translated Grid Elements for each
+page translation. The conversion process also reassigns all child content elements of the original Grid element to the
+now translated Grid Element.
+
+### Prerequisites
+
+This module should only be used when the following steps are processed:
+
+* Migration of TemplaVoila Flexible Content Elements to GridElements
+* Migration of content from TemplaVoila to Fluid Template
+* It is recommended to create a backup of your TYPO3 database, so you can easily roll back if the conversion fails
+
+### Post-process steps
+
+After the conversion of the GridElements, you manually have to reorder the GridElements for all translated pages.
+
+If the original Flexible Content Elements used flexform fields (e.g. textfields or imagefields), you must manually
+copy the content of all translated fields to the corresponding fields in the GridElement. Afterwards, you must add
+`<langDisable>1</langDisable>` to the flexform of your GridElement
+
 ## What does not work?
 
-I did not test the migration of a multilingual website and also I did not test Flexible Content Elements with
-containers for elements.
+I did not test the migration Flexible Content Elements with containers for elements. Also the migration does not
+respect TemplaVoila page templates with flexform fields (e.g. textfields or images, which are used in your frontend
+output).
 
 ## Support and updates
 
