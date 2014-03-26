@@ -162,6 +162,11 @@ backend layout gets assigned to the "Backend Layout" select boxes.
 If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
 element will be insered as a shortcut in the given content column.
 
+### Post-process steps
+
+After the content migration, you should check in the TYPO3 backend, that content elements in the page module have
+the correct ordering. If this is not the case, you have to manually reorder all translated content elements.
+
 ## Convert GridElements with language set to "all languages"
 
 On multilingual sites made with TemplaVoila you can set the language FCEs to "all languages" and translate multilingual
