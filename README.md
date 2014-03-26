@@ -185,6 +185,8 @@ This module should only be used when the following steps are processed:
 
 After the conversion of the GridElements, you manually have to reorder the GridElements for all translated pages.
 
+The same applies for translated content elements on translated pages.
+
 If the original Flexible Content Elements used flexform fields (e.g. textfields or imagefields), you must manually
 copy the content of all translated fields to the corresponding fields in the GridElement. Afterwards, you must add
 `<langDisable>1</langDisable>` to the flexform of your GridElement
