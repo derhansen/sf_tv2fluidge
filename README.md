@@ -196,6 +196,9 @@ If the original Flexible Content Elements used flexform fields (e.g. textfields 
 copy the content of all translated fields to the corresponding fields in the GridElement. Afterwards, you must add
 `<langDisable>1</langDisable>` to the flexform of your GridElement
 
+Also check, if you have content, which does not have a default language. In this case, your TypoScript Setup
+ should **not** contain `sys_language_overlay = hideNonTranslated`
+
 ## What does not work?
 
 I did not test the migration Flexible Content Elements with containers for elements. Also the migration does not
