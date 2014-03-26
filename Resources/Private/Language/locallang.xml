@@ -25,7 +25,7 @@
             <label index="label_delete_unref">Delete unused Elements</label>
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
-            <label index="label_convertmultilang_content">Convert multilingual content</label>
+            <label index="label_convertmultilang_content">Convert multilingual Grid Elements</label>
             <label index="label_tv_template">TV Page Template</label>
             <label index="label_be_layout">Backend Layout</label>
 
