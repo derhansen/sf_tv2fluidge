@@ -222,7 +222,7 @@ I did not test the migration Flexible Content Elements with containers for eleme
 respect TemplaVoila page templates with flexform fields (e.g. textfields or images, which are used in your frontend
 output).
 
-## Support and updates
+## Feedback and updates
 
-The extension is hosted on GitHub. Please report feedback, bugs and changerequest directly at
+The extension is hosted on GitHub. Please report feedback, bugs and changerequests directly at
 https://github.com/derhansen/sf_tv2fluidge
