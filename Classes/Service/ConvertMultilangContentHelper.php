@@ -86,7 +86,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		foreach ($gridElements as $contentElementUid) {
 			$contentElements = $this->getChildContentElements($contentElementUid);
 			foreach ($contentElements as $contentElement) {
-				$translations = $this->getTranslationsForContentElement($contentElement['uid']);
+				$translations = $this->sharedHelper->getTranslationsForContentElement($contentElement['uid']);
 				if (!empty($translations)) {
 					foreach($translations as $translatedContentElement) {
 						$localizedGridElement = $this->getLocalizedGridElement($contentElementUid,
@@ -192,17 +192,4 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 	}
 
-	/**
-	 * Returns an array with translations for the given content element uid
-	 *
-	 * @param int $uidContent
-	 * @return array
-	 */
-	public function getTranslationsForContentElement($uidContent) {
-		$fields = '*';
-		$table = 'tt_content';
-		$where = 'l18n_parent=' . (int)$uidContent;
-
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
-	}
 }

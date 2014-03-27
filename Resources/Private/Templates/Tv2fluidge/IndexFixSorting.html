@@ -1,0 +1,43 @@
+<f:layout name="Default" />
+
+<f:section name="iconButtons">
+    <f:render partial="Adminbuttons" />
+</f:section>
+
+<f:section name="content">
+    <h2><f:translate key="mod_fixsorting_title" /></h2>
+
+    <h3><f:translate key="label_what_does_it_do" /></h3>
+    <p><f:translate key="mod_fixsorting_description1" /></p>
+    <p><f:translate key="mod_fixsorting_description2" /></p>
+
+    <f:form action="indexFixSorting" name="formdata" object="{formdata}">
+
+        <table class="migration">
+            <tr>
+                <td>
+                    <label for="fixOptions"><f:translate key="label_fix_options"/></label><br/>
+                    <f:form.select name="fixOptions" property="fixOptions" options="{singlePage: 'Single page', allPages: 'All pages'}" value="{formdata.fixOptions}" additionalAttributes="{onChange : 'document.formdata.submit();'}"/>
+                </td>
+                <f:if condition="{0:formdata.fixOptions} != {0:'allPages'}">
+                    <td>
+                        <label for="pageUid"><f:translate key="label_page_uid"/></label><br/>
+                        <f:form.textfield name="pageUid" property="pageUid" />
+                        <f:if condition="{pageUidMissing}">
+                            <br/>
+                            <div class="error">
+                                <f:translate key="mod_fixsorting_page_uid_missing"/></label>
+                            </div>
+                        </f:if>
+                    </td>
+                </f:if>
+            </tr>
+        </table>
+
+        <br>
+        <h4><f:translate key="label_warning" /></h4>
+        <p class="warning"><f:translate key="mod_fixsorting_warning" /></p>
+
+        <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" class="start"/>
+    </f:form>
+</f:section>

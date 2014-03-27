@@ -38,6 +38,10 @@ a.btn_convertmultilang_content {
 	background: url(../Icons/multilang.png) no-repeat;
 }
 
+a.btn_fix_sorting {
+	background: url(../Icons/multilang.png) no-repeat;
+}
+
 a.ext-link {
 	text-decoration: underline;
 }
@@ -54,4 +58,8 @@ input.start {
 
 table.migration {
 	margin: 0 0 10px 0;
+}
+
+.error {
+	color: #ff0000;
 }

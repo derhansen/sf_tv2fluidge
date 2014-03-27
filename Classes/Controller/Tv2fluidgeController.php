@@ -81,6 +81,21 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	}
 
 	/**
+	 * @var Tx_SfTv2fluidge_Service_FixSortingHelper
+	 */
+	protected $fixSortingHelper;
+
+	/**
+	 * DI for fix sorting helper
+	 *
+	 * @param Tx_SfTv2fluidge_Service_FixSortingHelper $fixSortingHelper
+	 * @return void
+	 */
+	public function injectFixSortingHelper(Tx_SfTv2fluidge_Service_FixSortingHelper $fixSortingHelper) {
+		$this->fixSortingHelper = $fixSortingHelper;
+	}
+
+	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
 	 */
 	protected $sharedHelper;
@@ -312,5 +327,47 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('numGEs', $numGEs);
 		$this->view->assign('numCEs', $numCEs);
 	}
+
+	/**
+	 * Index action for fix sorting
+	 *
+	 * @param array $formdata
+	 * @return void
+	 */
+	public function indexFixSortingAction($formdata = NULL) {
+		$cancel = FALSE;
+
+		if ($formdata['fixOptions'] == 'singlePage' && $formdata['pageUid'] == '' && isset($formdata['startAction'])) {
+			$cancel = TRUE;
+			$this->view->assign('pageUidMissing', TRUE);
+		}
+
+		$this->view->assign('formdata', $formdata);
+
+		// Redirect to fixSortingAction when submit button pressed
+		if (isset($formdata['startAction']) && $cancel == FALSE) {
+			$this->redirect('fixSorting',NULL,NULL,array('formdata' => $formdata));
+		}
+	}
+
+	/**
+	 * Action for fix sorting
+	 *
+	 * @param array $formdata
+	 * @return void
+	 */
+	public function fixSortingAction($formdata) {
+		$numUpdated = 0;
+		if ($formdata['fixOptions'] == 'singlePage') {
+			$numUpdated = $this->fixSortingHelper->fixSortingForPage($formdata['pageUid']);
+		} else {
+			$pageUids = $this->sharedHelper->getPageIds(99);
+			foreach($pageUids as $pageUid) {
+				$numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUid);
+			}
+		}
+		$this->view->assign('numUpdated', $numUpdated);
+	}
+
 }
 ?>

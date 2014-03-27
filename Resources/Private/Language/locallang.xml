@@ -25,9 +25,12 @@
             <label index="label_delete_unref">Delete unused Elements</label>
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
-            <label index="label_convertmultilang_content">Convert multilingual Grid Elements</label>
+            <label index="label_convertmultilang_content">Convert Grid Elements</label>
+            <label index="label_fix_sorting">Fix sorting</label>
             <label index="label_tv_template">TV Page Template</label>
             <label index="label_be_layout">Backend Layout</label>
+            <label index="label_fix_options">Options</label>
+            <label index="label_page_uid">Page UID</label>
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
             <label index="desc_docs_and_help">This extension is hosted on GitHub. Feel free to submit feedback, bugs and changerequest directly at</label>
@@ -53,10 +56,17 @@
             <label index="mod_convertmultilangcontent_title">Convert GridElements where the language is set to "all languages"</label>
             <label index="mod_convertmultilangcontent_description1">On multilingual sites you can set the language of TemplaVoila FCEs to "all languages" and translate multilingual content directly inside the FCE container. Using backend layouts and GridElements this can cause some problems after migrating of a TemplaVoila site with this extension and I would recommend to use a translated Grid Element for each page language.</label>
             <label index="mod_convertmultilangcontent_description2">This converter clones Grid Elements with "all languages" so you have individually translated Grid Elements for each page translation. The conversion process also reassigns all child content elements of the original Grid element to the now translated Grid Element.</label>
-            <label index="mod_convertmultilangcontent_description3">Be sure to read the manual on GitHub regarding this conversion step, since in some cases a little bit of manual work is necessary after the conversion is finished.</label>
+            <label index="mod_convertmultilangcontent_description3">After using this converter, you should use the "Fix sorting" module to correct the sorting of translated content elements.</label>
             <label index="mod_convertmultilangcontent_warning">Use this converter after you have migrated your TV FCEs and the page content. Also make sure you create another SQL dump of the migrated TYPO3 database so you quickly can do a rollback if the conversion does not work as expected.</label>
             <label index="mod_convertmultilangcontent_ge_cloned">Grid Elements clones have been created.</label>
             <label index="mod_convertmultilangcontent_ce_updated">content elements have been updated.</label>
+
+            <label index="mod_fixsorting_title">Fix sorting of translated content elements</label>
+            <label index="mod_fixsorting_description1">Fixes the sorting of all translated content elements for the given page UID or for all pages. You should use this action after FCE / content migration and when the sorting of translated content elements is not as expected in TYPO3 page module.</label>
+            <label index="mod_fixsorting_description2">As a result of this action, the sorting of all translated content elements will be the same as the sorting of the original content elements.</label>
+            <label index="mod_fixsorting_warning">Use this module after you have migrated your TV FCEs and the page content. Also make sure you create another SQL dump of the migrated TYPO3 database so you quickly can do a rollback if the result does'nt look as expected.</label>
+            <label index="mod_fixsorting_page_uid_missing">You must enter a page UID</label>
+            <label index="mod_fixsorting_updated">translated content elements have been updated</label>
 
             <label index="mod_migratefce_ce_updated">content elements have been updated.</label>
             <label index="mod_migratefce_fces_converted">flexible content elements have been migrated.</label>

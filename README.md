@@ -12,6 +12,7 @@ made with TemplaVoila to Fluidtemplate and Grid Elements
 * Module to migrate the content of a flexible content element to a Grid Element
 * Module to migrate content from TemplaVoila columns to Fluidtemplate columns
 * Module to convert GridElements where the language is set to "all languages"
+* Module to correct sorting translated content elements
 
 ## Who should use it?
 
@@ -35,6 +36,7 @@ and TypoScript.
 6. Delete TemplaVoila-Folder General Record Storage Page from root page
 7. Remove TemplaVoila
 8. Optionally convert GridElements with "all languages"
+9. Optionally correct sorting of translated content elements
 
 ## Delete unreferenced elements
 
