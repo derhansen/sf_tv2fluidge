@@ -12,7 +12,7 @@ made with TemplaVoila to Fluidtemplate and Grid Elements
 * Module to migrate the content of a flexible content element to a Grid Element
 * Module to migrate content from TemplaVoila columns to Fluidtemplate columns
 * Module to convert GridElements where the language is set to "all languages"
-* Module to correct sorting translated content elements
+* Module to fix the sorting of translated content elements
 
 ## Who should use it?
 
@@ -36,7 +36,7 @@ and TypoScript.
 6. Delete TemplaVoila-Folder General Record Storage Page from root page
 7. Remove TemplaVoila
 8. Optionally convert GridElements with "all languages"
-9. Optionally correct sorting of translated content elements
+9. Optionally fix the sorting of translated content elements
 
 ## Delete unreferenced elements
 
@@ -190,16 +190,31 @@ This module should only be used when the following steps are processed:
 
 ### Post-process steps
 
-After the conversion of the GridElements, you manually have to reorder the GridElements for all translated pages.
-
-The same applies for translated content elements on translated pages.
+Atfer the conversion, you should use the module "Fix sorting" to apply the sorting of the original content elements
+to the translated content elements.
 
 If the original Flexible Content Elements used flexform fields (e.g. textfields or imagefields), you must manually
 copy the content of all translated fields to the corresponding fields in the GridElement. Afterwards, you must add
 `<langDisable>1</langDisable>` to the flexform of your GridElement
 
 Also check, if you have content, which does not have a default language. In this case, your TypoScript Setup
- should **not** contain `sys_language_overlay = hideNonTranslated`
+should **not** contain `sys_language_overlay = hideNonTranslated`
+
+## Fix sorting of translated content elements
+
+![Fix sorting module](Documentation/Images/fix-sorting.png)
+
+This module sets the sorting to all translated content elements, so it will be the same as for the original content
+element.
+
+### Prerequisites
+
+This module should only be used when the following steps are processed:
+
+* Migration of TemplaVoila Flexible Content Elements to GridElements
+* Migration of content from TemplaVoila to Fluid Template
+* Conversion of Grid Elements with language set to "all languages"
+* It is recommended to create a backup of your TYPO3 database, so you can easily roll back if the result is not as expected
 
 ## What does not work?
 
