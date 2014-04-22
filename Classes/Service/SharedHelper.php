@@ -59,8 +59,25 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 */
 	public function getPageIds($depth) {
 		$tree = t3lib_div::makeInstance('t3lib_queryGenerator');
-		$pids = $tree->getTreeList(1, $depth, 0, 1);
-		return explode(',', $pids);
+		$rootPages = $this->getRootPages();
+
+		$allPids = '';
+		foreach($rootPages as $rootPage) {
+			$pids = $tree->getTreeList($rootPage['uid'], $depth, 0, 1);
+			if ($allPids == '') {
+				$allPids = $pids;
+			} else {
+				$allPids .= ',' . $pids;
+			}
+		}
+
+		// Fallback: If no RootPage is set, then assume page 1 is the root page
+		if ($allPids == '') {
+			$allPids = $tree->getTreeList(1, $depth, 0, 1);
+		}
+
+		$result = array_unique(explode(',', $allPids));
+		return $result;
 	}
 
 	/**
@@ -362,6 +379,20 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$where = 'l18n_parent=' . (int)$uidContent;
 
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+	}
+
+	/**
+	 * Returns an array with UIDs of root pages
+	 *
+	 * @return array
+	 */
+	private function getRootPages() {
+		$fields = 'uid';
+		$table = 'pages';
+		$where = 'is_siteroot=1';
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+		return $res;
 	}
 }
 
