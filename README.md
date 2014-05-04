@@ -142,6 +142,9 @@ For TemplaVoila templates with only content columns, you should just create back
 with the same amount of content columns. Be sure to set a decent name to each content column, so you later can
 identify them when remapping from TemplaVoila content columns to backend layout content columns.
 
+It is important to check, that both dropdown boxes for the TemplaVoila Template Design contains a template.
+So make sure "Use Template Design" and "Subpages - Use Template Design" contains a valid template.
+
 If your TemplaVoila template contains FlexForm fields (e.g. input, images, ...), then you should consider to
 resturcture your template.
 
