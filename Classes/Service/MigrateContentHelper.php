@@ -44,11 +44,42 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns an array of all TemplaVoila page templates
+	 * Returns an array of all TemplaVoila page templates stored as file
 	 *
 	 * @return array
 	 */
-	public function getAllTvTemplates() {
+	public function getAllFileTvTemplates() {
+		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['templavoila']);
+		tx_templavoila_staticds_tools::readStaticDsFilesIntoArray($extConf);
+		$staticDsFiles = array();
+		foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['templavoila']['staticDataStructures'] as $staticDataStructure) {
+			if ($staticDataStructure['scope'] == tx_templavoila_datastructure::SCOPE_PAGE) {
+				$staticDsFiles[] = $staticDataStructure['path'];
+			}
+		}
+		$quotedStaticDsFiles = $GLOBALS['TYPO3_DB']->fullQuoteArray($staticDsFiles, 'tx_templavoila_tmplobj');
+
+		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
+		$table = 'tx_templavoila_tmplobj';
+		$where = 'tx_templavoila_tmplobj.datastructure IN(' . implode(',', $quotedStaticDsFiles) . ')
+			AND tx_templavoila_tmplobj.deleted=0';
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+
+		$templates = array();
+		foreach($res as $fce) {
+			$templates[$fce['uid']] = $fce['title'];
+		}
+
+		return $templates;
+	}
+
+	/**
+	 * Returns an array of all TemplaVoila page templates stored in database
+	 *
+	 * @return array
+	 */
+	public function getAllDbTvTemplates() {
 		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
 		$table = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
 		$where = 'tx_templavoila_datastructure.scope=1 AND tx_templavoila_datastructure.uid = tx_templavoila_tmplobj.datastructure
