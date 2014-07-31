@@ -238,7 +238,12 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function indexMigrateContentAction($formdata = NULL) {
-		$tvtemplates = $this->migrateContentHelper->getAllTvTemplates();
+		if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
+			$tvtemplates = $this->migrateContentHelper->getAllFileTvTemplates();
+		}
+		else {
+			$tvtemplates = $this->migrateContentHelper->getAllDbTvTemplates();
+		}
 		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
 
 		if (isset($formdata['tvtemplate'])) {
