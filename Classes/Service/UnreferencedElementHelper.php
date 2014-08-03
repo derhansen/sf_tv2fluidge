@@ -49,12 +49,14 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @return int Number of records deleted
 	 */
 	public function markDeletedUnreferencedElementsRecords() {
-		$allRecordUids = array();
 		$pids = $this->sharedHelper->getPageIds(99);
+		$allReferencedElementsArr = array();
 		foreach ($pids as $pid) {
-			$records = $this->getUnreferencedElementsRecords($pid);
-			$allRecordUids = array_merge($allRecordUids, $records);
+			$referencedElementsArr = $this->sharedHelper->getTemplavoilaAPIObj()->flexform_getListOfSubElementUidsRecursively ('pages', $pid, $dummyArr=array());
+			$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
 		}
+		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
+		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
 		$countRecords = count($allRecordUids);
 
 		$this->markDeleted($allRecordUids);
@@ -66,21 +68,19 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * Returns an array of UIDs which are not referenced on
 	 * the page with the given uid (= parent id).
 	 *
-	 * @param	integer		$pid: Parent id of the content elements (= uid of the page)
+	 * @param	array		$allReferencedElementsArr: Array with UIDs of referenced elements
 	 * @return	array		Array with UIDs of tt_content records
 	 * @access	protected
 	 */
-	function getUnreferencedElementsRecords($pid) {
+	function getUnreferencedElementsRecords($allReferencedElementsArr) {
 		global $TYPO3_DB;
 
 		$elementRecordsArr = array();
-		$referencedElementsArr = $this->sharedHelper->getTemplavoilaAPIObj()->flexform_getListOfSubElementUidsRecursively ('pages', $pid, $dummyArr=array());
 
 		$res = $TYPO3_DB->exec_SELECTquery (
 			'uid',
 			'tt_content',
-			'pid='.intval($pid).
-			(count($referencedElementsArr) ? ' AND uid NOT IN ('.implode(',',$referencedElementsArr).') AND l18n_parent NOT IN ('.implode(',',$referencedElementsArr).')' : '').
+			'uid NOT IN ('.implode(',',$allReferencedElementsArr).') AND l18n_parent NOT IN ('.implode(',',$allReferencedElementsArr).')'.
 			' AND t3ver_wsid='.intval($BE_USER->workspace).
 			t3lib_BEfunc::deleteClause('tt_content').
 			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),

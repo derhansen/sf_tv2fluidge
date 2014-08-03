@@ -52,6 +52,17 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Returns if static data structure is enabled
+	 *
+	 * @return boolean
+	 */
+	public function getTemplavoilaStaticDsIsEnabled() {
+		$conf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['templavoila']);
+
+		return $conf['staticDS.']['enable'];
+	}
+
+	/**
 	 * Returns an array of page uids up to the given amount recursionlevel
 	 *
 	 * @param int $depth
@@ -87,8 +98,15 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @return array
 	 */
 	public function getTvContentCols($uidTvDs) {
-		$dsRecord = $this->getTvDatastructure($uidTvDs);
-		$flexform = simplexml_load_string($dsRecord['dataprot']);
+		if ($this->getTemplavoilaStaticDsIsEnabled()) {
+			$toRecord = $this->getTvTemplateObject($uidTvDs);
+			$path = t3lib_div::getFileAbsFileName($toRecord['datastructure']);
+			$flexform = simplexml_load_file($path);
+		}
+		else {
+			$dsRecord = $this->getTvDatastructure($uidTvDs);
+			$flexform = simplexml_load_string($dsRecord['dataprot']);
+		}
 		$elements = $flexform->xpath("ROOT/el/*");
 
 		$contentCols = array();
@@ -347,6 +365,21 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$fields = '*';
 		$table = 'tx_gridelements_backend_layout';
 		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * Returns the TO record for the given uid
+	 *
+	 * @param $uid
+	 * @return array mixed
+	 */
+	private function getTvTemplateObject($uid) {
+		$fields = 'tx_templavoila_tmplobj.*';
+		$table = 'tx_templavoila_tmplobj';
+		$where = 'tx_templavoila_tmplobj.uid=' . (int)$uid;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 		return $res;
