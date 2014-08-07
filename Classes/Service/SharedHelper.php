@@ -214,15 +214,17 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function createShortcutToContent($pageUid, $contentUid, $colPos, $sorting = 0) {
-		$fields = array();
-		$fields['pid'] = $pageUid;
-		$fields['tstamp'] = time();
-		$fields['sorting'] = $sorting;
-		$fields['CType'] = 'shortcut';
-		$fields['records'] = 'tt_content_' . $contentUid;
-		$fields['colPos'] = $colPos;
+		if ($this->isContentElementAvailable($contentUid)) {
+			$fields = array();
+			$fields['pid'] = $pageUid;
+			$fields['tstamp'] = time();
+			$fields['sorting'] = $sorting;
+			$fields['CType'] = 'shortcut';
+			$fields['records'] = 'tt_content_' . $contentUid;
+			$fields['colPos'] = $colPos;
 
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
+		}
 	}
 
 	/**
@@ -236,17 +238,32 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function createShortcutToContentForGe($pageUid, $contentUid, $geContainer, $colPos, $sorting = 0) {
-		$fields = array();
-		$fields['pid'] = $pageUid;
-		$fields['tstamp'] = time();
-		$fields['CType'] = 'shortcut';
-		$fields['records'] = 'tt_content_' . $contentUid;
-		$fields['colPos'] = -1;
-		$fields['sorting'] = $sorting;
-		$fields['tx_gridelements_container'] = $geContainer;
-		$fields['tx_gridelements_columns'] = $colPos;
+		if ($this->isContentElementAvailable($contentUid)) {
+			$fields = array();
+			$fields['pid'] = $pageUid;
+			$fields['tstamp'] = time();
+			$fields['CType'] = 'shortcut';
+			$fields['records'] = 'tt_content_' . $contentUid;
+			$fields['colPos'] = -1;
+			$fields['sorting'] = $sorting;
+			$fields['tx_gridelements_container'] = $geContainer;
+			$fields['tx_gridelements_columns'] = $colPos;
 
-		$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
+		}
+	}
+
+	/**
+	 * Checks if content element is still available (not deleted)
+	 *
+	 * @param int $contentUid
+	 * @return boolean
+	 */
+	public function isContentElementAvailable($contentUid) {
+		$where = 'uid=' . (int)$contentUid . t3lib_BEfunc::deleteClause('tt_content');
+
+		$count = $GLOBALS['TYPO3_DB']->exec_SELECTcountRows('1', 'tt_content', $where);
+		return $count ? TRUE : FALSE;
 	}
 
 	/**
