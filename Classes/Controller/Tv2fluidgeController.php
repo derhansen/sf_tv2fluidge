@@ -160,7 +160,12 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function indexMigrateFceAction($formdata = NULL) {
-		$allFce = $this->migrateFceHelper->getAllFce();
+		if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
+			$allFce = $this->migrateFceHelper->getAllFileFce();
+		}
+		else {
+			$allFce = $this->migrateFceHelper->getAllDbFce();
+		}
 		$allGe = $this->migrateFceHelper->getAllGe();
 
 		if (isset($formdata['fce'])) {
