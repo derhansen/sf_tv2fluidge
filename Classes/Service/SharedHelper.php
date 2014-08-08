@@ -230,6 +230,10 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			'colPos' => $newColPos,
 			'sorting' => $sorting
 		));
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'l18n_parent=' . intval($uid), array(
+			'colPos' => $newColPos,
+			'sorting' => $sorting
+		));
 	}
 
 	/**
