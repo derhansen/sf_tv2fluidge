@@ -22,7 +22,8 @@
             <label index="label_ge">Grid Element</label>
             <label index="label_mark_deleted">Flag original FCE as deleted</label>
             <label index="label_create_reference">Create shortcut content element for TV references</label>
-            <label index="label_delete_unref">Delete unused Elements</label>
+			<label index="label_delete_unref">Delete unused Elements</label>
+            <label index="label_convert_ref">Convert references</label>
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
             <label index="label_convertmultilang_content">Convert Grid Elements</label>
@@ -41,6 +42,10 @@
             <label index="mod_deleteunref_title">Delete unreferenced elements</label>
             <label index="mod_deleteunref_result_deleted">records has been marked as deleted.</label>
             <label index="mod_deleteunref_description">Searches recursive on all pages for unreferenced elements and sets all found elements as deleted in the TYPO3 database.</label>
+
+			<label index="mod_convertref_title">Convert reference elements to 'insert records' elements</label>
+			<label index="mod_convertref_result_converted">records has been converted.</label>
+			<label index="mod_convertref_description">Searches recursive on all pages for TemplaVoila reference elements and converts them to 'insert records' elements.</label>
 
             <label index="mod_migratefce_title">Migrate TV FCE content to Grid Element</label>
             <label index="mod_migratefce_description1">Migrates the content from the selected FCE to the selected Grid Element and changes the content element type to Grid Element. If the FCE contains content columns, you can remap them to Grid Element columns.</label>

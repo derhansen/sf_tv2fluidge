@@ -47,6 +47,23 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	}
 
 	/**
+	 * ReferenceElementHelper
+	 *
+	 * @var Tx_SfTv2fluidge_Service_ReferenceElementHelper
+	 */
+	protected $referenceElementHelper;
+
+	/**
+	 * DI for ReferenceElementHelper
+	 *
+	 * @param Tx_SfTv2fluidge_Service_ReferenceElementHelper $referenceElementHelper
+	 * @return void
+	 */
+	public function injectReferenceElementHelper(Tx_SfTv2fluidge_Service_ReferenceElementHelper $referenceElementHelper) {
+		$this->referenceElementHelper = $referenceElementHelper;
+	}
+
+	/**
 	 * MigrateFceHelper
 	 *
 	 * @var Tx_SfTv2fluidge_Service_MigrateFceHelper
@@ -150,6 +167,25 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 */
 	public function deleteUnreferencedElementsAction() {
 		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords();
+		$this->view->assign('numRecords', $numRecords);
+	}
+
+	/**
+	 * Index action for migrate reference elements
+	 *
+	 * @return void
+	 */
+	public function indexConvertReferenceElementsAction() {
+
+	}
+
+	/**
+	 * Migrates all reference elements to 'insert records' elements
+	 *
+	 * @return void
+	 */
+	public function convertReferenceElementsAction() {
+		$numRecords = $this->referenceElementHelper->convertReferenceElements();
 		$this->view->assign('numRecords', $numRecords);
 	}
 
