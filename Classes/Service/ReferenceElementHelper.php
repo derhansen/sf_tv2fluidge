@@ -58,13 +58,17 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);
 			foreach ($tvContentArray as $field => $contentUidString) {
 				$contentUids = t3lib_div::trimExplode(',', $contentUidString);
-				foreach ($contentUids as $key => $contentUid) {
+				$position = 1;
+				foreach ($contentUids as $contentUid) {
 					$contentElement = $this->sharedHelper->getContentElement($contentUid);
-					if ($contentElement['pid'] != $pid && $this->sharedHelper->isContentElementAvailable($contentUid)) {
-						$newContentUid = $this->convertToLocalCopy($pid, $field, $key + 1);
-						$this->convertToShortcut($newContentUid, $contentUid);
+					if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
+						if ($contentElement['pid'] != $pid) {
+							$newContentUid = $this->convertToLocalCopy($pid, $field, $position);
+							$this->convertToShortcut($newContentUid, $contentUid);
 
-						++$numRecords;
+							++$numRecords;
+						}
+						++$position;
 					}
 				}
 			}
