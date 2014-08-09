@@ -267,7 +267,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Sets the given colpos for the content element with the given uid
+	 * Sets the given colpos for the content element (and translation) with the given uid
 	 *
 	 * @param int $uid
 	 * @param int $newColPos
