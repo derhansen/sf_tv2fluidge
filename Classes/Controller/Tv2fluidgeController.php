@@ -121,7 +121,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @param Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper
 	 * @return void
 	 */
-	public function injectconvertMultilangContentHelper(Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper) {
+	public function injectConvertMultilangContentHelper(Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper) {
 		$this->convertMultilangContentHelper = $convertMultilangContentHelper;
 	}
 
