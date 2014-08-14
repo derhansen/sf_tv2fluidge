@@ -205,55 +205,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Creates a shortcut tt_content record for the given contentUid
-	 *
-	 * @param int $pageUid
-	 * @param int $contentUid
-	 * @param int $colPos
-	 * @param int $sorting
-	 * @return void
-	 */
-	public function createShortcutToContent($pageUid, $contentUid, $colPos, $sorting = 0) {
-		if ($this->isContentElementAvailable($contentUid)) {
-			$fields = array();
-			$fields['pid'] = $pageUid;
-			$fields['tstamp'] = time();
-			$fields['sorting'] = $sorting;
-			$fields['CType'] = 'shortcut';
-			$fields['records'] = 'tt_content_' . $contentUid;
-			$fields['colPos'] = $colPos;
-
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
-		}
-	}
-
-	/**
-	 * Creates a shortcut tt_content record for the given contentUid
-	 *
-	 * @param int $pageUid
-	 * @param int $contentUid
-	 * @param int $geContainer
-	 * @param int $colPos
-	 * @param int $sorting
-	 * @return void
-	 */
-	public function createShortcutToContentForGe($pageUid, $contentUid, $geContainer, $colPos, $sorting = 0) {
-		if ($this->isContentElementAvailable($contentUid)) {
-			$fields = array();
-			$fields['pid'] = $pageUid;
-			$fields['tstamp'] = time();
-			$fields['CType'] = 'shortcut';
-			$fields['records'] = 'tt_content_' . $contentUid;
-			$fields['colPos'] = -1;
-			$fields['sorting'] = $sorting;
-			$fields['tx_gridelements_container'] = $geContainer;
-			$fields['tx_gridelements_columns'] = $colPos;
-
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $fields);
-		}
-	}
-
-	/**
 	 * Checks if content element is still available (not deleted)
 	 *
 	 * @param int $contentUid
