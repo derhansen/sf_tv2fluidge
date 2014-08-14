@@ -26,6 +26,10 @@ a.btn_delete_unref {
 	background: url(../Icons/unlink.png) no-repeat;
 }
 
+a.btn_convert_ref {
+	background: url(../Icons/tv-makelocalcopy.gif) no-repeat;
+}
+
 a.btn_migrate_fce {
 	background: url(../Icons/tv-fce.png) no-repeat;
 }
