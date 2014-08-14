@@ -9,6 +9,7 @@ made with TemplaVoila to Fluidtemplate and Grid Elements
 ## Included modules
 
 * Module to mark all unreferenced elements as deleted
+* Module to convert references to "insert records" elements
 * Module to migrate the content of a flexible content element to a Grid Element
 * Module to migrate content from TemplaVoila columns to Fluidtemplate columns
 * Module to convert GridElements where the language is set to "all languages"
@@ -31,12 +32,13 @@ and TypoScript.
 1. Create Grid Elements for all Flexible Content Elements you wish to migrate
 2. Create backend layouts and Fluidtemplates for all TemplaVoila page templates you wish to migrate
 3. Delete all unreferenced elements
-4. Migrate all Flexible Content Elements to Grid Elements
-5. Migrate all TemplaVoila page templates to Fluidtemplate
-6. Delete TemplaVoila-Folder General Record Storage Page from root page
-7. Remove TemplaVoila
-8. Optionally convert GridElements with "all languages"
-9. Optionally fix the sorting of translated content elements
+4. Convert references to "insert records" elements
+5. Migrate all Flexible Content Elements to Grid Elements
+6. Migrate all TemplaVoila page templates to Fluidtemplate
+7. Delete TemplaVoila-Folder General Record Storage Page from root page
+8. Remove TemplaVoila
+9. Optionally convert GridElements with "all languages"
+10. Optionally fix the sorting of translated content elements
 
 ## Delete unreferenced elements
 
@@ -49,6 +51,16 @@ When migrating a TYPO3 website from TemplaVoila to Fluidtemplate, all unreferenc
 since they are not shown on the output page. You can use this module to perform this action.
 
 The action can safely be used, since it only flags all unreferenced elements as deleted.
+
+## Convert references to "insert records" elements
+
+This module searches recursive on all pages for TemplaVoila reference elements and converts them to "insert records"
+elements.
+
+This module replaces the setting "Create shortcut element for TV references" which was an optional setting in
+tv2fluidge < version 0.4.x.
+
+You should use this module before you start with migration of Flexible Content Elements and page content.
 
 ## Migrate FCE
 
@@ -122,9 +134,6 @@ to GridElement and sets the selected backend layout for the Grid Element. Then i
 `tx_templavoila_flex` to `pi_flexform`. If the selected Flexible Content Element has content columns, then all
 content elements will be mapped to the selected content columns of the target Grid Element.
 
-If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
-element will be insered as a shortcut in the given content column.
-
 ## Migrate content
 
 ![Content migration module](Documentation/Images/content-migration.png)
@@ -163,9 +172,6 @@ all content elements to column 0.
 The content migration module finds all pages with the selected TemplaVoila Page Template and remaps all content
 elements to the selected target content columns of the backend layout. After the content migration, the selected
 backend layout gets assigned to the "Backend Layout" select boxes.
-
-If you select to create shortcuts for content elements that are TemplaVoila references, then each matching content
-element will be insered as a shortcut in the given content column.
 
 ### Post-process steps
 
