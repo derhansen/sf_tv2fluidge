@@ -114,6 +114,14 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				'records' => 'tt_content_' . (int)$targetUid,
 			)
 		);
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			'tt_content',
+			'l18n_parent = ' . (int)$contentUid,
+			array(
+				'CType'   => 'shortcut',
+				'records' => 'tt_content_' . (int)$targetUid,
+			)
+		);
 	}
 
 }
