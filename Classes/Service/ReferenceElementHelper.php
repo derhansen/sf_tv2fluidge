@@ -46,9 +46,10 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	/**
 	 * Converts all reference elements to 'insert records' elements with a recursion level of 99
 	 *
+	 * @param bool $useParentUidForTranslatedRecords
 	 * @return int Number of records deleted
 	 */
-	public function convertReferenceElements() {
+	public function convertReferenceElements($useParentUidForTranslatedRecords = false) {
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
@@ -65,6 +66,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 						if ($contentElement['pid'] != $pid) {
 							$newContentUid = $this->convertToLocalCopy($pid, $field, $position);
 							$this->convertToShortcut($newContentUid, $contentUid);
+							$this->convertTranslatedRecordsToShortcut($newContentUid, $contentUid, $useParentUidForTranslatedRecords);
 
 							++$numRecords;
 						}
@@ -106,14 +108,63 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @return void
 	 */
 	protected function convertToShortcut($contentUid, $targetUid) {
+		$targetUid = (int)$targetUid;
+		$contentUid = (int)$contentUid;
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 			'tt_content',
-			'uid = ' . (int)$contentUid,
+			'uid = ' . $contentUid,
 			array(
 				'CType'   => 'shortcut',
-				'records' => 'tt_content_' . (int)$targetUid,
+				'records' => 'tt_content_' . $targetUid,
 			)
 		);
+	}
+
+	/**
+	 * Converts translated records to shortcut
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @param bool $useParentUidForTranslatedRecords
+	 * @return void
+	 */
+	protected function convertTranslatedRecordsToShortcut($contentUid, $targetUid, $useParentUidForTranslatedRecords = false) {
+		if ($useParentUidForTranslatedRecords) {
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+				'tt_content',
+				'(l18n_parent =' . $contentUid . ')' .
+				t3lib_BEfunc::deleteClause('tt_content'),
+				array(
+					'CType'   => 'shortcut',
+					'records' => 'tt_content_' . $targetUid,
+				)
+			);
+		} else {
+			$translatedRecords = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+				'uid, sys_language_uid',
+				'tt_content',
+				'(l18n_parent =' . $targetUid . ')' .
+				t3lib_BEfunc::deleteClause('tt_content')
+			);
+			if (!empty($translatedRecords)) {
+				foreach ($translatedRecords as $translatedRecord) {
+					$translatedTargetUid = (int)$translatedRecord['uid'];
+					$translatedTargetSysLanguageUid = (int)$translatedRecord['sys_language_uid'];
+					if (($translatedTargetUid > 0) && ($translatedTargetSysLanguageUid > 0)) {
+						$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+							'tt_content',
+							'(l18n_parent = ' . $contentUid . ')' .
+							' AND (sys_language_uid = '  . $translatedTargetSysLanguageUid . ')' .
+							t3lib_BEfunc::deleteClause('tt_content'),
+							array(
+								'CType'   => 'shortcut',
+								'records' => 'tt_content_' . $translatedTargetUid,
+							)
+						);
+					}
+				}
+			}
+		}
 	}
 
 }
