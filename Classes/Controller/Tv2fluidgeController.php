@@ -182,10 +182,15 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Migrates all reference elements to 'insert records' elements
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function convertReferenceElementsAction() {
-		$numRecords = $this->referenceElementHelper->convertReferenceElements();
+	public function convertReferenceElementsAction($formdata = NULL) {
+		$useParentUidForTranslatedRecords = false;
+		if (intval($formdata['useparentuidfortranslatedrecords']) === 1) {
+			$useParentUidForTranslatedRecords = true;
+		}
+		$numRecords = $this->referenceElementHelper->convertReferenceElements($useParentUidForTranslatedRecords);
 		$this->view->assign('numRecords', $numRecords);
 	}
 
