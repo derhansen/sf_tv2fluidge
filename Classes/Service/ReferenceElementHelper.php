@@ -95,7 +95,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 						$newContentUid = (int)$newContentUid;
 						if ($newContentUid > 0) {
 							$this->convertToShortcut($newContentUid, $contentUid);
-							$this->convertTranslationsOfShortcut($contentUid, $useParentUidForTranslations);
+							$this->convertTranslationsOfShortcut($newContentUid, $contentUid, $useParentUidForTranslations);
 							++$numRecords;
 						}
 					} else {
