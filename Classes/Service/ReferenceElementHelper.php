@@ -129,41 +129,65 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @return void
 	 */
 	protected function convertTranslationsOfShortcut($contentUid, $targetUid, $useParentUidForTranslations = false) {
-		$contentUid = (int)$contentUid;
-		$targetUid = (int)$targetUid;
 		if ($useParentUidForTranslations) {
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-				'tt_content',
-				'(l18n_parent =' . $contentUid . ')' .
-				t3lib_BEfunc::deleteClause('tt_content'),
-				array(
-					'CType'   => 'shortcut',
-					'records' => 'tt_content_' . $targetUid,
-				)
-			);
+			$this->convertTranslationsToShortCutUsingParentUid($contentUid, $targetUid);
 		} else {
-			$translations = $this->sharedHelper->getTranslationsForContentElement($targetUid);
-			if (!empty($translations)) {
-				foreach ($translations as $translation) {
-					$translationTargetUid = (int)$translation['uid'];
-					$translationTargetSysLanguageUid = (int)$translation['sys_language_uid'];
-					if (($translationTargetUid > 0) && ($translationTargetSysLanguageUid > 0)) {
-						$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-							'tt_content',
-							'(l18n_parent = ' . $contentUid . ')' .
-							' AND (sys_language_uid = '  . $translationTargetSysLanguageUid . ')' .
-							t3lib_BEfunc::deleteClause('tt_content'),
-							array(
-								'CType'   => 'shortcut',
-								'records' => 'tt_content_' . $translationTargetUid,
-							)
-						);
-					}
-				}
-			}
+			$this->convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid);
 		}
 
 		$this->fixLocalizationDiffSources($contentUid);
+	}
+
+	/**
+	 * Converts translated records to shortcut using uid of parent content element as record reference
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @return void
+	 */
+	protected function convertTranslationsToShortCutUsingParentUid($contentUid, $targetUid) {
+		$contentUid = (int)$contentUid;
+		$targetUid = (int)$targetUid;
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			'tt_content',
+			'(l18n_parent =' . $contentUid . ')' .
+			t3lib_BEfunc::deleteClause('tt_content'),
+			array(
+				'CType'   => 'shortcut',
+				'records' => 'tt_content_' . $targetUid,
+			)
+		);
+	}
+
+	/**
+	 * Converts translated records to shortcut using uid of translation content element as record reference
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @return void
+	 */
+	protected function convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid) {
+		$contentUid = (int)$contentUid;
+		$targetUid = (int)$targetUid;
+		$translations = $this->sharedHelper->getTranslationsForContentElement($targetUid);
+		if (!empty($translations)) {
+			foreach ($translations as $translation) {
+				$translationTargetUid = (int)$translation['uid'];
+				$translationTargetSysLanguageUid = (int)$translation['sys_language_uid'];
+				if (($translationTargetUid > 0) && ($translationTargetSysLanguageUid > 0)) {
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+						'tt_content',
+						'(l18n_parent = ' . $contentUid . ')' .
+						' AND (sys_language_uid = '  . $translationTargetSysLanguageUid . ')' .
+						t3lib_BEfunc::deleteClause('tt_content'),
+						array(
+							'CType'   => 'shortcut',
+							'records' => 'tt_content_' . $translationTargetUid,
+						)
+					);
+				}
+			}
+		}
 	}
 
 	/**
