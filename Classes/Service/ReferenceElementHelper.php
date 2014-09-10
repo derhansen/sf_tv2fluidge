@@ -56,20 +56,51 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$numRecords = 0;
 		foreach ($pids as $pid) {
 			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);
-			foreach ($tvContentArray as $field => $contentUidString) {
-				$contentUids = t3lib_div::trimExplode(',', $contentUidString);
-				$position = 1;
-				foreach ($contentUids as $contentUid) {
-					$contentElement = $this->sharedHelper->getContentElement($contentUid);
-					if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
-						if ($contentElement['pid'] != $pid) {
-							$newContentUid = $this->convertToLocalCopy($pid, $field, $position);
-							$this->convertToShortcut($newContentUid, $contentUid);
+			$numRecords += $this->convertTvContentArrayToReferenceElements($tvContentArray, $pid);
+		}
 
+		return $numRecords;
+	}
+
+	/**
+	 * converts an array of content elements to references, if they are references
+	 * also handles references inside fce
+	 *
+	 * @param array $tvContentArray
+	 * @param $pid
+	 * @return int
+	 */
+	protected function convertTvContentArrayToReferenceElements($tvContentArray, $pid, $fceUid = 0) {
+		$numRecords = 0;
+		$pid = (int)$pid;
+		$fceUid = (int)$fceUid;
+		foreach ($tvContentArray as $field => $contentUidString) {
+			$contentUids = t3lib_div::trimExplode(',', $contentUidString);
+			$position = 1;
+			foreach ($contentUids as $contentUid) {
+				$contentUid = (int)$contentUid;
+				$contentElement = $this->sharedHelper->getContentElement($contentUid);
+				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
+					if (intval($contentElement['pid']) != $pid) {
+						$newContentUid = NULL;
+						if ($fceUid > 0) {
+							$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position);
+						} else {
+							$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position);
+						}
+
+						$newContentUid = (int)$newContentUid;
+						if ($newContentUid > 0) {
+							$this->convertToShortcut($newContentUid, $contentUid);
 							++$numRecords;
 						}
-						++$position;
+					} else {
+						$fceContentElements = $this->sharedHelper->getTvContentArrayForContent($contentUid);
+						if (count($fceContentElements) > 0) {
+							$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $contentUid);
+						}
 					}
+					++$position;
 				}
 			}
 		}
@@ -78,15 +109,38 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * Converts reference to local copy
+	 * Converts page content element reference to local copy
 	 *
 	 * @param integer $pageUid
 	 * @param string $field
 	 * @param integer $position
 	 * @return integer
 	 */
-	protected function convertToLocalCopy($pageUid, $field, $position) {
-		$flexformPointerString = 'pages:' . $pageUid . ':sDEF:lDEF:' . $field . ':vDEF:' . $position;
+	protected function convertPageCeToLocalCopy($pageUid, $field, $position) {
+		$flexformPointerString = 'pages:' . (int)$pageUid . ':sDEF:lDEF:' . $field . ':vDEF:' . (int)$position;
+		return $this->convertFlexformPointerStringToLocalCopy($flexformPointerString);
+	}
+
+	/**
+	 * Converts fce reference to local copy
+	 *
+	 * @param integer $pageUid
+	 * @param string $field
+	 * @param integer $position
+	 * @return integer
+	 */
+	protected function convertFceToLocalCopy($contentUid, $field, $position) {
+		$flexformPointerString = 'tt_content:' . (int)$contentUid . ':sDEF:lDEF:' . $field . ':vDEF:' . (int)$position;
+		return $this->convertFlexformPointerStringToLocalCopy($flexformPointerString);
+	}
+
+	/**
+	 * converts flexform pointer string to local copy
+	 *
+	 * @param string $flexformPointerString
+	 * @return mixed
+	 */
+	protected function convertFlexformPointerStringToLocalCopy($flexformPointerString) {
 		$sourcePointer = $this->sharedHelper->getTemplavoilaAPIObj()->
 			flexform_getPointerFromString($flexformPointerString);
 
