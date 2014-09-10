@@ -83,32 +83,91 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			foreach ($contentUids as $contentUid) {
 				$contentUid = (int)$contentUid;
 				$contentElement = $this->sharedHelper->getContentElement($contentUid);
+				$contentElementPid = (int)$contentElement['pid'];
 				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
-					if (intval($contentElement['pid']) != $pid) {
-						$newContentUid = NULL;
-						if ($fceUid > 0) {
-							$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position);
-						} else {
-							$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position);
-						}
-
-						$newContentUid = (int)$newContentUid;
-						if ($newContentUid > 0) {
-							$this->convertToShortcut($newContentUid, $contentUid);
-							$this->convertTranslationsOfShortcut($newContentUid, $contentUid, $useParentUidForTranslations);
-							++$numRecords;
-						}
-					} else {
-						$fceContentElements = $this->sharedHelper->getTvContentArrayForContent($contentUid);
-						if (count($fceContentElements) > 0) {
-							$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $useParentUidForTranslations, $contentUid);
-						}
-					}
+					$numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $useParentUidForTranslations, $fceUid);
 					++$position;
 				}
 			}
 		}
 
+		return $numRecords;
+	}
+
+	/**
+	 * converts reference content elements, either current content element or sub content elements (FCE)
+	 * including translations to a insert record element
+	 *
+	 * @param int $contentUid
+	 * @param int $contentElementPid
+	 * @param int $pid
+	 * @param string $field
+	 * @param int $position
+	 * @param bool $useParentUidForTranslations
+	 * @param int $fceUid
+	 * @return int
+	 */
+	protected function convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $useParentUidForTranslations = false, $fceUid = 0) {
+		$numRecords = 0;
+		$contentElementPid = (int)$contentElementPid;
+		$pid = (int)$pid;
+		$fceUid = (int)$fceUid;
+		if ($contentElementPid !== $pid) {
+			$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $useParentUidForTranslations, $fceUid);
+		} else {
+			$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid, $useParentUidForTranslations);
+		}
+		return $numRecords;
+	}
+
+	/**
+	 * converts a reference content element - either current content element or sub content elements (FCE)
+	 * including translations to a insert record element
+	 *
+	 * @param int $contentUid
+	 * @param int $pid
+	 * @param string $field
+	 * @param int $position
+	 * @param bool $useParentUidForTranslations
+	 * @param int $fceUid
+	 * @return int
+	 */
+	protected function convertReferenceToShortcut($contentUid, $pid, $field, $position, $useParentUidForTranslations = false, $fceUid = 0) {
+		$numRecords = 0;
+		$newContentUid = NULL;
+		if ($fceUid > 0) {
+			$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position);
+		} else {
+			$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position);
+		}
+
+		$newContentUid = (int)$newContentUid;
+		if ($newContentUid > 0) {
+			$this->convertToShortcut($newContentUid, $contentUid);
+			$this->convertTranslationsOfShortcut($newContentUid, $contentUid, $useParentUidForTranslations);
+			++$numRecords;
+		}
+		return $numRecords;
+	}
+
+	/**
+	 * converts a references inside FCE to insert record elements
+	 *
+	 * @param int $contentUid
+	 * @param int $contentElementPid
+	 * @param int $pid
+	 * @param string $field
+	 * @param int $position
+	 * @param bool $useParentUidForTranslations
+	 * @param int $fceUid
+	 * @return int
+	 */
+	protected function convertReferencesInsideFceToShortcut($contentUid, $pid, $useParentUidForTranslations = false) {
+		$numRecords = 0;
+		$fceContentElements = $this->sharedHelper->getTvContentArrayForContent($contentUid);
+		if (count($fceContentElements) > 0) {
+			$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $useParentUidForTranslations, $contentUid);
+		}
 		return $numRecords;
 	}
 
