@@ -69,11 +69,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 *
 	 * @param array $tvContentArray
 	 * @param int $pid
+	 * @param bool $useParentUidForTranslations
 	 * @param int $fceUid
-	 * @param bool $useParentUidForTranslationss
 	 * @return int
 	 */
-	protected function convertTvContentArrayToReferenceElements($tvContentArray, $pid, $fceUid = 0, $useParentUidForTranslations = false) {
+	protected function convertTvContentArrayToReferenceElements($tvContentArray, $pid, $useParentUidForTranslations = false, $fceUid = 0) {
 		$numRecords = 0;
 		$pid = (int)$pid;
 		$fceUid = (int)$fceUid;
@@ -101,7 +101,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 					} else {
 						$fceContentElements = $this->sharedHelper->getTvContentArrayForContent($contentUid);
 						if (count($fceContentElements) > 0) {
-							$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $contentUid);
+							$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $useParentUidForTranslations, $contentUid);
 						}
 					}
 					++$position;
