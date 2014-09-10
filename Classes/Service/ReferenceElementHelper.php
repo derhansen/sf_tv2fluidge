@@ -46,9 +46,10 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	/**
 	 * Converts all reference elements to 'insert records' elements with a recursion level of 99
 	 *
+	 * @param bool $useParentUidForTranslations
 	 * @return int Number of records deleted
 	 */
-	public function convertReferenceElements() {
+	public function convertReferenceElements($useParentUidForTranslations = false) {
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
@@ -56,20 +57,54 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$numRecords = 0;
 		foreach ($pids as $pid) {
 			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);
-			foreach ($tvContentArray as $field => $contentUidString) {
-				$contentUids = t3lib_div::trimExplode(',', $contentUidString);
-				$position = 1;
-				foreach ($contentUids as $contentUid) {
-					$contentElement = $this->sharedHelper->getContentElement($contentUid);
-					if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
-						if ($contentElement['pid'] != $pid) {
-							$newContentUid = $this->convertToLocalCopy($pid, $field, $position);
-							$this->convertToShortcut($newContentUid, $contentUid);
+			$numRecords += $this->convertTvContentArrayToReferenceElements($tvContentArray, $pid, $useParentUidForTranslations);
+		}
 
+		return $numRecords;
+	}
+
+	/**
+	 * converts an array of content elements to references, if they are references
+	 * also handles references inside fce
+	 *
+	 * @param array $tvContentArray
+	 * @param int $pid
+	 * @param int $fceUid
+	 * @param bool $useParentUidForTranslationss
+	 * @return int
+	 */
+	protected function convertTvContentArrayToReferenceElements($tvContentArray, $pid, $fceUid = 0, $useParentUidForTranslations = false) {
+		$numRecords = 0;
+		$pid = (int)$pid;
+		$fceUid = (int)$fceUid;
+		foreach ($tvContentArray as $field => $contentUidString) {
+			$contentUids = t3lib_div::trimExplode(',', $contentUidString);
+			$position = 1;
+			foreach ($contentUids as $contentUid) {
+				$contentUid = (int)$contentUid;
+				$contentElement = $this->sharedHelper->getContentElement($contentUid);
+				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
+					if (intval($contentElement['pid']) != $pid) {
+						$newContentUid = NULL;
+						if ($fceUid > 0) {
+							$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position);
+						} else {
+							$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position);
+						}
+
+						$newContentUid = (int)$newContentUid;
+						if ($newContentUid > 0) {
+							$this->convertToShortcut($newContentUid, $contentUid);
+							$this->convertTranslationsOfShortcut($newContentUid, $contentUid, $useParentUidForTranslations);
 							++$numRecords;
 						}
-						++$position;
+					} else {
+						$fceContentElements = $this->sharedHelper->getTvContentArrayForContent($contentUid);
+						if (count($fceContentElements) > 0) {
+							$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $contentUid);
+						}
 					}
+					++$position;
 				}
 			}
 		}
@@ -78,15 +113,38 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * Converts reference to local copy
+	 * Converts page content element reference to local copy
 	 *
 	 * @param integer $pageUid
 	 * @param string $field
 	 * @param integer $position
 	 * @return integer
 	 */
-	protected function convertToLocalCopy($pageUid, $field, $position) {
-		$flexformPointerString = 'pages:' . $pageUid . ':sDEF:lDEF:' . $field . ':vDEF:' . $position;
+	protected function convertPageCeToLocalCopy($pageUid, $field, $position) {
+		$flexformPointerString = 'pages:' . (int)$pageUid . ':sDEF:lDEF:' . $field . ':vDEF:' . (int)$position;
+		return $this->convertFlexformPointerStringToLocalCopy($flexformPointerString);
+	}
+
+	/**
+	 * Converts fce reference to local copy
+	 *
+	 * @param integer $pageUid
+	 * @param string $field
+	 * @param integer $position
+	 * @return integer
+	 */
+	protected function convertFceToLocalCopy($contentUid, $field, $position) {
+		$flexformPointerString = 'tt_content:' . (int)$contentUid . ':sDEF:lDEF:' . $field . ':vDEF:' . (int)$position;
+		return $this->convertFlexformPointerStringToLocalCopy($flexformPointerString);
+	}
+
+	/**
+	 * converts flexform pointer string to local copy
+	 *
+	 * @param string $flexformPointerString
+	 * @return mixed
+	 */
+	protected function convertFlexformPointerStringToLocalCopy($flexformPointerString) {
 		$sourcePointer = $this->sharedHelper->getTemplavoilaAPIObj()->
 			flexform_getPointerFromString($flexformPointerString);
 
@@ -106,14 +164,121 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @return void
 	 */
 	protected function convertToShortcut($contentUid, $targetUid) {
+		$targetUid = (int)$targetUid;
+		$contentUid = (int)$contentUid;
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 			'tt_content',
-			'uid = ' . (int)$contentUid,
+			'uid = ' . $contentUid,
 			array(
 				'CType'   => 'shortcut',
-				'records' => 'tt_content_' . (int)$targetUid,
+				'records' => 'tt_content_' . $targetUid,
 			)
 		);
+	}
+
+	/**
+	 * Converts translated records to shortcut
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @param bool $useParentUidForTranslations
+	 * @return void
+	 */
+	protected function convertTranslationsOfShortcut($contentUid, $targetUid, $useParentUidForTranslations = false) {
+		if ($useParentUidForTranslations) {
+			$this->convertTranslationsToShortCutUsingParentUid($contentUid, $targetUid);
+		} else {
+			$this->convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid);
+		}
+
+		$this->fixLocalizationDiffSources($contentUid);
+	}
+
+	/**
+	 * Converts translated records to shortcut using uid of parent content element as record reference
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @return void
+	 */
+	protected function convertTranslationsToShortCutUsingParentUid($contentUid, $targetUid) {
+		$contentUid = (int)$contentUid;
+		$targetUid = (int)$targetUid;
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			'tt_content',
+			'(l18n_parent =' . $contentUid . ')' .
+			t3lib_BEfunc::deleteClause('tt_content'),
+			array(
+				'CType'   => 'shortcut',
+				'records' => 'tt_content_' . $targetUid,
+			)
+		);
+	}
+
+	/**
+	 * Converts translated records to shortcut using uid of translation content element as record reference
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @return void
+	 */
+	protected function convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid) {
+		$contentUid = (int)$contentUid;
+		$targetUid = (int)$targetUid;
+		$translations = $this->sharedHelper->getTranslationsForContentElement($targetUid);
+		if (!empty($translations)) {
+			foreach ($translations as $translation) {
+				$translationTargetUid = (int)$translation['uid'];
+				$translationTargetSysLanguageUid = (int)$translation['sys_language_uid'];
+				if (($translationTargetUid > 0) && ($translationTargetSysLanguageUid > 0)) {
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+						'tt_content',
+						'(l18n_parent = ' . $contentUid . ')' .
+						' AND (sys_language_uid = '  . $translationTargetSysLanguageUid . ')' .
+						t3lib_BEfunc::deleteClause('tt_content'),
+						array(
+							'CType'   => 'shortcut',
+							'records' => 'tt_content_' . $translationTargetUid,
+						)
+					);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fixes localization diff source field for translations of shortcut conversions
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @param bool $useParentUidForTranslations
+	 * @return void
+	 */
+	protected function fixLocalizationDiffSources($contentUid) {
+		$contentUid = (int)$contentUid;
+		$contentElement = $this->sharedHelper->getContentElement($contentUid);
+		if (!empty($contentElement) && !empty($contentElement['CType']) && !empty($contentElement['records'])) {
+			$translations = $this->sharedHelper->getTranslationsForContentElement($contentUid);
+
+			foreach ($translations as $translation) {
+				$translationUid = (int)$translation['uid'];
+				$diffSource = $translation['l18n_diffsource'];
+				if (!empty($diffSource) && ($translationUid > 0)) {
+					$diffSource = unserialize($diffSource);
+					$diffSource['CType'] = $contentElement['CType'];
+					$diffSource['records'] = $contentElement['records'];
+					$diffSource = serialize($diffSource);
+
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+						'tt_content',
+						'uid = ' . $translationUid,
+						array(
+							'l18n_diffsource' => $diffSource
+						)
+					);
+				}
+			}
+		}
 	}
 
 }
