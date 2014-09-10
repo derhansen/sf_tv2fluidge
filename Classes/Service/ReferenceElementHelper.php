@@ -129,6 +129,8 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @return void
 	 */
 	protected function convertTranslationsOfShortcut($contentUid, $targetUid, $useParentUidForTranslations = false) {
+		$contentUid = (int)$contentUid;
+		$targetUid = (int)$targetUid;
 		if ($useParentUidForTranslations) {
 			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				'tt_content',
@@ -140,23 +142,60 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				)
 			);
 		} else {
-			$translatedRecords = $this->sharedHelper->getTranslationsForContentElement($targetUid);
-			if (!empty($translatedRecords)) {
-				foreach ($translatedRecords as $translatedRecord) {
-					$translatedTargetUid = (int)$translatedRecord['uid'];
-					$translatedTargetSysLanguageUid = (int)$translatedRecord['sys_language_uid'];
-					if (($translatedTargetUid > 0) && ($translatedTargetSysLanguageUid > 0)) {
+			$translations = $this->sharedHelper->getTranslationsForContentElement($targetUid);
+			if (!empty($translations)) {
+				foreach ($translations as $translation) {
+					$translationTargetUid = (int)$translation['uid'];
+					$translationTargetSysLanguageUid = (int)$translation['sys_language_uid'];
+					if (($translationTargetUid > 0) && ($translationTargetSysLanguageUid > 0)) {
 						$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 							'tt_content',
 							'(l18n_parent = ' . $contentUid . ')' .
-							' AND (sys_language_uid = '  . $translatedTargetSysLanguageUid . ')' .
+							' AND (sys_language_uid = '  . $translationTargetSysLanguageUid . ')' .
 							t3lib_BEfunc::deleteClause('tt_content'),
 							array(
 								'CType'   => 'shortcut',
-								'records' => 'tt_content_' . $translatedTargetUid,
+								'records' => 'tt_content_' . $translationTargetUid,
 							)
 						);
 					}
+				}
+			}
+		}
+
+		$this->fixLocalizationDiffSources($contentUid);
+	}
+
+	/**
+	 * Fixes localization diff source field for translations of shortcut conversions
+	 *
+	 * @param integer $contentUid
+	 * @param integer $targetUid
+	 * @param bool $useParentUidForTranslations
+	 * @return void
+	 */
+	protected function fixLocalizationDiffSources($contentUid) {
+		$contentUid = (int)$contentUid;
+		$contentElement = $this->sharedHelper->getContentElement($contentUid);
+		if (!empty($contentElement) && !empty($contentElement['CType']) && !empty($contentElement['records'])) {
+			$translations = $this->sharedHelper->getTranslationsForContentElement($contentUid);
+
+			foreach ($translations as $translation) {
+				$translationUid = (int)$translation['uid'];
+				$diffSource = $translation['l18n_diffsource'];
+				if (!empty($diffSource) && ($translationUid > 0)) {
+					$diffSource = unserialize($diffSource);
+					$diffSource['CType'] = $contentElement['CType'];
+					$diffSource['records'] = $contentElement['records'];
+					$diffSource = serialize($diffSource);
+
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+						'tt_content',
+						'uid = ' . $translationUid,
+						array(
+							'l18n_diffsource' => $diffSource
+						)
+					);
 				}
 			}
 		}
