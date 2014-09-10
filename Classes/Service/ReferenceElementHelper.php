@@ -46,10 +46,10 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	/**
 	 * Converts all reference elements to 'insert records' elements with a recursion level of 99
 	 *
-	 * @param bool $useParentUidForTranslatedRecords
+	 * @param bool $useParentUidForTranslations
 	 * @return int Number of records deleted
 	 */
-	public function convertReferenceElements($useParentUidForTranslatedRecords = false) {
+	public function convertReferenceElements($useParentUidForTranslations = false) {
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
@@ -66,7 +66,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 						if ($contentElement['pid'] != $pid) {
 							$newContentUid = $this->convertToLocalCopy($pid, $field, $position);
 							$this->convertToShortcut($newContentUid, $contentUid);
-							$this->convertTranslatedRecordsToShortcut($newContentUid, $contentUid, $useParentUidForTranslatedRecords);
+							$this->convertTranslationsOfShortcut($newContentUid, $contentUid, $useParentUidForTranslations);
 
 							++$numRecords;
 						}
@@ -125,11 +125,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 *
 	 * @param integer $contentUid
 	 * @param integer $targetUid
-	 * @param bool $useParentUidForTranslatedRecords
+	 * @param bool $useParentUidForTranslations
 	 * @return void
 	 */
-	protected function convertTranslatedRecordsToShortcut($contentUid, $targetUid, $useParentUidForTranslatedRecords = false) {
-		if ($useParentUidForTranslatedRecords) {
+	protected function convertTranslationsOfShortcut($contentUid, $targetUid, $useParentUidForTranslations = false) {
+		if ($useParentUidForTranslations) {
 			$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 				'tt_content',
 				'(l18n_parent =' . $contentUid . ')' .
@@ -140,12 +140,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				)
 			);
 		} else {
-			$translatedRecords = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-				'uid, sys_language_uid',
-				'tt_content',
-				'(l18n_parent =' . $targetUid . ')' .
-				t3lib_BEfunc::deleteClause('tt_content')
-			);
+			$translatedRecords = $this->sharedHelper->getTranslationsForContentElement($targetUid);
 			if (!empty($translatedRecords)) {
 				foreach ($translatedRecords as $translatedRecord) {
 					$translatedTargetUid = (int)$translatedRecord['uid'];
