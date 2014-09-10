@@ -10,7 +10,10 @@
     <h3><f:translate key="label_what_does_it_do" /></h3>
     <p><f:translate key="mod_convertref_description" /></p>
 
-    <f:form action="convertReferenceElements">
+    <f:form action="convertReferenceElements" name="formdata" object="{formdata}">
+		<f:form.checkbox id="useparentuidfortranslations" name="useparentuidfortranslations" property="useparentuidfortranslations" value="1" checked="false"/>
+		<label for="useparentuidfortranslations"><f:translate key="label_use_parent_uid_for_translations"/></label>
+		<br/>
         <f:form.submit value="{f:translate(key: 'label_start')}" class="start"/>
     </f:form>
 
