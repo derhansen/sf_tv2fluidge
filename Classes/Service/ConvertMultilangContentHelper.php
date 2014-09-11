@@ -167,7 +167,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 				if ($contentElement['sys_language_uid'] > 0) {
 					// Rearrage CE to new localized GEs
 					$localizedGridElement = $this->getLocalizedGridElement($contentElementUid,
-					$contentElement['sys_language_uid']);
+																				$contentElement['sys_language_uid']);
 					$origUid = $contentElement['uid'];
 					unset($contentElement['uid']);
 					$contentElement['tx_gridelements_container'] = $localizedGridElement['uid'];
