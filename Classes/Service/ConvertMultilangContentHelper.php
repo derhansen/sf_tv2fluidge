@@ -54,6 +54,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		$cloned = 0;
 		$pageLanguages = $this->getAvailablePageTranslations($pageUid);
 		$gridElements = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
+		$languageIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
 
 		foreach ($gridElements as $contentElementUid) {
 			$origContentElement = $this->sharedHelper->getContentElement($contentElementUid);
@@ -63,6 +64,12 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 				$newContentElement['sys_language_uid'] = $langUid;
 				$newContentElement['t3_origuid'] = $origContentElement['uid'];
 				$newContentElement['l18n_parent'] = $origContentElement['uid'];
+				if (t3lib_extMgm::isLoaded('static_info_tables')) {
+					$langUid = (int)$newContentElement['sys_language_uid'];
+					if ($langUid > 0) {
+						$newContentElement['pi_flexform'] = $this->convertFlexformForTranslation($newContentElement['pi_flexform'], $languageIsoCodes[$langUid]);
+					}
+				}
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $newContentElement);
 				$cloned += 1;
 			}
@@ -72,6 +79,60 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $origContentElement);
 		}
 		return $cloned;
+	}
+
+	/**
+	 * @param $flexformArray
+	 * @param $langIsoCode
+	 * @return string
+	 */
+	protected function convertFlexformForTranslation($flexformString, $langIsoCode) {
+		$flexformArray = NULL;
+		if (!empty($flexformString)) {
+			if (!empty($langIsoCode)) {
+				$flexformArray = t3lib_div::xml2array($flexformString);
+				if (is_array($flexformArray)) {
+					if (is_array($flexformArray['data']['sDEF']['lDEF'])) {
+						foreach ($flexformArray['data'] as &$sheetData) {
+							foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
+								if (is_array($fieldData)) {
+									$fieldDataLang = NULL;
+									$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
+									if (is_array($fieldLangArray)) {
+										$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
+										if (!empty($fieldDataLang)) {
+											$fieldData['vDEF'] = $fieldDataLang;
+										} else {
+											$fieldDataLang = $fieldLangArray['vDEF'];
+											if (!empty($fieldDataLang)) {
+												$fieldData['vDEF'] = $fieldDataLang;
+											}
+										}
+									}
+
+									if (empty($fieldDataLang)) {
+										$fieldDataLang = $fieldData['v' . $langIsoCode];
+										if (!empty($fieldDataLang)) {
+											$fieldData['vDEF'] = $fieldDataLang;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!empty($flexformArray) && is_array($flexformArray)) {
+			/**
+			 * @var t3lib_flexformtools $flexformTools
+			 */
+			$flexformTools = t3lib_div::makeInstance('t3lib_flexformtools');
+			$flexformString = $flexformTools->flexArray2Xml($flexformArray, true);
+		}
+
+		return $flexformString;
 	}
 
 	/**
@@ -106,7 +167,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 				if ($contentElement['sys_language_uid'] > 0) {
 					// Rearrage CE to new localized GEs
 					$localizedGridElement = $this->getLocalizedGridElement($contentElementUid,
-						$contentElement['sys_language_uid']);
+																				$contentElement['sys_language_uid']);
 					$origUid = $contentElement['uid'];
 					unset($contentElement['uid']);
 					$contentElement['tx_gridelements_container'] = $localizedGridElement['uid'];

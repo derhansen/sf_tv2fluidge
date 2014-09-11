@@ -101,7 +101,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @return array
 	 */
 	public function getAllGe() {
-		$fields = 'uid, title';
+		$fields = 'uid, title, alias';
 		$table = 'tx_gridelements_backend_layout';
 		$where = 'deleted=0';
 
@@ -109,7 +109,12 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 
 		$gridElements = array();
 		foreach($res as $ge) {
-			$gridElements[$ge['uid']] = $ge['title'];
+			$geKey = $ge['uid'];
+			if (!empty($ge['alias'])) {
+				$geKey = $ge['alias'];
+			}
+
+			$gridElements[$geKey] = $ge['title'];
 		}
 
 		return $gridElements;
@@ -151,15 +156,15 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * Migrated the content from a TemplaVoila FCE to the given Grid Element
 	 *
 	 * @param array $contentElement
-	 * @param int $uidGe
+	 * @param string|int $geKey
 	 * @return void
 	 */
-	public function migrateFceFlexformContentToGe($contentElement, $uidGe) {
+	public function migrateFceFlexformContentToGe($contentElement, $geKey) {
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
 			array(
 				'CType' => 'gridelements_pi1',
 				'pi_flexform' => $contentElement['tx_templavoila_flex'],
-				'tx_gridelements_backend_layout' => $uidGe
+				'tx_gridelements_backend_layout' => $geKey
 			)
 		);
 	}
