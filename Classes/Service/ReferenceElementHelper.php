@@ -34,6 +34,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	protected $sharedHelper;
 
 	/**
+	 * @var bool
+	 */
+	protected $useParentUidForTranslations = false;
+
+	/**
 	 * DI for shared helper
 	 *
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
@@ -50,6 +55,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @return int Number of records deleted
 	 */
 	public function convertReferenceElements($useParentUidForTranslations = false) {
+		$this->useParentUidForTranslations = (bool)$useParentUidForTranslations;
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
@@ -57,7 +63,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$numRecords = 0;
 		foreach ($pids as $pid) {
 			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);
-			$numRecords += $this->convertTvContentArrayToReferenceElements($tvContentArray, $pid, $useParentUidForTranslations);
+			$numRecords += $this->convertTvContentArrayToReferenceElements($tvContentArray, $pid);
 		}
 
 		return $numRecords;
@@ -69,11 +75,10 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 *
 	 * @param array $tvContentArray
 	 * @param int $pid
-	 * @param bool $useParentUidForTranslations
 	 * @param int $fceUid
 	 * @return int
 	 */
-	protected function convertTvContentArrayToReferenceElements($tvContentArray, $pid, $useParentUidForTranslations = false, $fceUid = 0) {
+	protected function convertTvContentArrayToReferenceElements($tvContentArray, $pid, $fceUid = 0) {
 		$numRecords = 0;
 		$pid = (int)$pid;
 		$fceUid = (int)$fceUid;
@@ -85,7 +90,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				$contentElement = $this->sharedHelper->getContentElement($contentUid);
 				$contentElementPid = (int)$contentElement['pid'];
 				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
-					$numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $useParentUidForTranslations, $fceUid);
+					$numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid);
 					++$position;
 				}
 			}
@@ -103,19 +108,18 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param int $pid
 	 * @param string $field
 	 * @param int $position
-	 * @param bool $useParentUidForTranslations
 	 * @param int $fceUid
 	 * @return int
 	 */
-	protected function convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $useParentUidForTranslations = false, $fceUid = 0) {
+	protected function convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid = 0) {
 		$numRecords = 0;
 		$contentElementPid = (int)$contentElementPid;
 		$pid = (int)$pid;
 		$fceUid = (int)$fceUid;
 		if ($contentElementPid !== $pid) {
-			$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $useParentUidForTranslations, $fceUid);
+			$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid);
 		} else {
-			$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid, $useParentUidForTranslations);
+			$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid);
 		}
 		return $numRecords;
 	}
@@ -128,11 +132,10 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param int $pid
 	 * @param string $field
 	 * @param int $position
-	 * @param bool $useParentUidForTranslations
 	 * @param int $fceUid
 	 * @return int
 	 */
-	protected function convertReferenceToShortcut($contentUid, $pid, $field, $position, $useParentUidForTranslations = false, $fceUid = 0) {
+	protected function convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid = 0) {
 		$numRecords = 0;
 		$newContentUid = NULL;
 		if ($fceUid > 0) {
@@ -144,7 +147,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$newContentUid = (int)$newContentUid;
 		if ($newContentUid > 0) {
 			$this->convertToShortcut($newContentUid, $contentUid);
-			$this->convertTranslationsOfShortcut($newContentUid, $contentUid, $useParentUidForTranslations);
+			$this->convertTranslationsOfShortcut($newContentUid, $contentUid);
 			++$numRecords;
 		}
 		return $numRecords;
@@ -154,19 +157,14 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * converts a references inside FCE to insert record elements
 	 *
 	 * @param int $contentUid
-	 * @param int $contentElementPid
 	 * @param int $pid
-	 * @param string $field
-	 * @param int $position
-	 * @param bool $useParentUidForTranslations
-	 * @param int $fceUid
 	 * @return int
 	 */
-	protected function convertReferencesInsideFceToShortcut($contentUid, $pid, $useParentUidForTranslations = false) {
+	protected function convertReferencesInsideFceToShortcut($contentUid, $pid) {
 		$numRecords = 0;
 		$fceContentElements = $this->sharedHelper->getTvContentArrayForContent($contentUid);
 		if (count($fceContentElements) > 0) {
-			$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $useParentUidForTranslations, $contentUid);
+			$numRecords += $this->convertTvContentArrayToReferenceElements($fceContentElements, $pid, $contentUid);
 		}
 		return $numRecords;
 	}
@@ -240,11 +238,10 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 *
 	 * @param integer $contentUid
 	 * @param integer $targetUid
-	 * @param bool $useParentUidForTranslations
 	 * @return void
 	 */
-	protected function convertTranslationsOfShortcut($contentUid, $targetUid, $useParentUidForTranslations = false) {
-		if ($useParentUidForTranslations) {
+	protected function convertTranslationsOfShortcut($contentUid, $targetUid) {
+		if ($this->useParentUidForTranslations) {
 			$this->convertTranslationsToShortCutUsingParentUid($contentUid, $targetUid);
 		} else {
 			$this->convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid);
@@ -309,8 +306,6 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * Fixes localization diff source field for translations of shortcut conversions
 	 *
 	 * @param integer $contentUid
-	 * @param integer $targetUid
-	 * @param bool $useParentUidForTranslations
 	 * @return void
 	 */
 	protected function fixLocalizationDiffSources($contentUid) {
