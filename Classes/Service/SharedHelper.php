@@ -92,6 +92,21 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * @param string| int $value
+	 * @return bool
+	 */
+	public function canBeInterpretedAsInteger($value) {
+		$canBeInterpretedAsInteger = NULL;
+
+		if (class_exists('t3lib_utility_Math')) {
+			$canBeInterpretedAsInteger = t3lib_utility_Math::canBeInterpretedAsInteger($value);
+		} else {
+			$canBeInterpretedAsInteger= t3lib_div::testInt($value);
+		}
+		return $canBeInterpretedAsInteger;
+	}
+
+	/**
 	 * Returns an array with names of content columns for the given TemplaVoila Templateobject
 	 *
 	 * @param int $uidTvDs
@@ -133,11 +148,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	/**
 	 * Returns an array with names of content columns for the given gridelement
 	 *
-	 * @param int $uidGe
+	 * @param string|int $geKey
 	 * @return array
 	 */
-	public function getGeContentCols($uidGe) {
-		$geRecord = $this->getGridElement($uidGe);
+	public function getGeContentCols($geKey) {
+		$geRecord = $this->getGridElement($geKey);
 		return $this->getContentColsFromTs($geRecord['config']);
 	}
 
@@ -330,13 +345,20 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	/**
 	 * Returns the GridElement record for the given GE uid
 	 *
-	 * @param int $uid
+	 * @param string|int $key
 	 * @return array mixed
 	 */
-	private function getGridElement($uid) {
+	private function getGridElement($key) {
 		$fields = '*';
 		$table = 'tx_gridelements_backend_layout';
-		$where = 'uid=' . (int)$uid;
+		$where = '';
+		if ($this->canBeInterpretedAsInteger($key)) {
+			$key = (int)$key;
+			$where = "(uid = " . $key . ")";
+		} else {
+			$key = $GLOBALS['TYPO3_DB']->fullQuoteStr($key);
+			$where = "(alias = " . $key . ")";
+		}
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 		return $res;
