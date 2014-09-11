@@ -211,9 +211,9 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		}
 
 		if (isset($formdata['ge'])) {
-			$uidGe = $formdata['ge'];
+			$geKey = $formdata['ge'];
 		} else {
-			$uidGe = current(array_keys($allGe));
+			$geKey = current(array_keys($allGe));
 		}
 
 		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
@@ -222,8 +222,16 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		} else {
 			$fceContentCols = NULL;
 		}
-		if ($uidGe > 0) {
-			$geContentCols = $this->sharedHelper->getGeContentCols($uidGe);
+
+		if ($this->sharedHelper->canBeInterpretedAsInteger($geKey)) {
+			$geKey = (int)$geKey;
+			if ($geKey <= 0) {
+				$geKey = 0;
+			}
+		}
+
+		if (!empty($geKey)) {
+			$geContentCols = $this->sharedHelper->getGeContentCols($geKey);
 		} else {
 			$geContentCols = NULL;
 		}
