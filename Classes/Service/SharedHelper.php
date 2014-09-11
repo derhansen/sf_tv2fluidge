@@ -286,36 +286,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Return the sys_language record for the given uid
-	 *
-	 * @param int $uid
-	 * @return array
-	 */
-	public function getLanguagesIsoCodes() {
-		$languagesIsoCodes = array();
-
-		if (t3lib_extMgm::isLoaded('static_info_tables')) {
-			$fields = 'sys_language.uid AS langUid, static_languages.lg_iso_2 AS isoCode';
-			$tables = 'sys_language, static_languages';
-			$where = '(sys_language.static_lang_isocode = static_languages.uid)'
-						. t3lib_BEfunc::deleteClause('sys_language');
-
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $tables, $where, '', '', '');
-			if ($res !== NULL) {
-				foreach ($res as $row) {
-					$langUid = (int)$row['langUid'];
-					$isoCode = strtoupper(trim($row['isoCode']));
-					if (($langUid > 0) && !empty($isoCode)) {
-						$languagesIsoCodes[$langUid] = $isoCode;
-					}
-				}
-			}
-		}
-
-		return $languagesIsoCodes;
-	}
-
-	/**
 	 * Returns an array of TV FlexForm content fields for the given flexform
 	 *
 	 * @param $result
