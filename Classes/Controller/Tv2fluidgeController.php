@@ -263,11 +263,17 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	public function migrateFceAction($formdata) {
 		$fce = $formdata['fce'];
 		$ge = $formdata['ge'];
+		if ($this->sharedHelper->canBeInterpretedAsInteger($ge)) {
+			$ge = (int)$ge;
+			if ($ge <= 0) {
+				$ge = 0;
+			}
+		}
 
 		$fcesConverted = 0;
 		$contentElementsUpdated = 0;
 
-		if ($fce > 0 && $ge > 0) {
+		if ($fce > 0 && !empty($ge)) {
 			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
 				$fcesConverted++;
