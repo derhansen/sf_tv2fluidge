@@ -73,7 +73,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @access	protected
 	 */
 	function getUnreferencedElementsRecords($allReferencedElementsArr) {
-		global $TYPO3_DB;
+		global $TYPO3_DB, $BE_USER;
 
 		$elementRecordsArr = array();
 
