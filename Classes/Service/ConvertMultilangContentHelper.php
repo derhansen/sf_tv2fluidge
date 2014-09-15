@@ -129,15 +129,15 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		if ($this->insertRecordsConversionOption !== 'keep') {
 			foreach ($shortcutElements as $shortcutElement) {
 				if (!empty($shortcutElement['records']) && ($shortcutElement['CType'] === 'shortcut')) {
-					$records = t3lib_div::trimExplode(',', $shortcutElement['records'], true);
+					$records = t3lib_div::trimExplode(',', $shortcutElement['records'], TRUE);
 					$recordShortcutString = 'tt_content_' . (int)$contentElementUid;
-					$isShortcutRecord = false;
+					$isShortcutRecord = FALSE;
 					foreach ($records as &$record) {
 						if ($record === $recordShortcutString) {
 							if (($this->insertRecordsConversionOption === 'convertAndTranslate') && ($translationContentUid > 0)) {
 								$record = 'tt_content_' . $translationContentUid;
 							}
-							$isShortcutRecord = true;
+							$isShortcutRecord = TRUE;
 							break;
 						}
 					}
@@ -182,7 +182,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 				if ($langUid > 0) {
 					$forceLanguage = ($this->flexformConversionOption === 'forceLanguage');
 					if ($origUid <= 0) {
-						$forceLanguage = false;
+						$forceLanguage = FALSE;
 					}
 					$contentElement['pi_flexform'] = $this->convertFlexformForTranslation($contentElement['pi_flexform'], $this->langIsoCodes[$langUid], $forceLanguage);
 				}
@@ -212,7 +212,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param $langIsoCode
 	 * @return string
 	 */
-	protected function convertFlexformForTranslation($flexformString, $langIsoCode, $forceLanguage = false) {
+	protected function convertFlexformForTranslation($flexformString, $langIsoCode, $forceLanguage = FALSE) {
 		$flexformArray = NULL;
 		if (!empty($flexformString)) {
 			if (!empty($langIsoCode)) {
@@ -223,7 +223,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 							foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
 								if (is_array($fieldData)) {
 									$fieldDataLang = NULL;
-									$issetLangValue = false;
+									$issetLangValue = FALSE;
 									$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
 									if (is_array($fieldLangArray)) {
 										$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
@@ -231,7 +231,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 											$fieldData['vDEF'] = $fieldDataLang;
 										} else {
 											if (isset($fieldLangArray['v' . $langIsoCode])) {
-												$issetLangValue = true;
+												$issetLangValue = TRUE;
 											}
 											$fieldDataLang = $fieldLangArray['vDEF'];
 											if (!empty($fieldDataLang)) {
@@ -245,7 +245,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 										if (!empty($fieldDataLang)) {
 											$fieldData['vDEF'] = $fieldDataLang;
 										} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
-											$issetLangValue = true;
+											$issetLangValue = TRUE;
 										}
 									}
 
@@ -265,7 +265,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 			 * @var t3lib_flexformtools $flexformTools
 			 */
 			$flexformTools = t3lib_div::makeInstance('t3lib_flexformtools');
-			$flexformString = $flexformTools->flexArray2Xml($flexformArray, true);
+		$flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
 		}
 
 		return $flexformString;
