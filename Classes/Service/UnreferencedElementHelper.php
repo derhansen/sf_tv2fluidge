@@ -52,8 +52,15 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		$pids = $this->sharedHelper->getPageIds(99);
 		$allReferencedElementsArr = array();
 		foreach ($pids as $pid) {
-			$referencedElementsArr = $this->sharedHelper->getTemplavoilaAPIObj()->flexform_getListOfSubElementUidsRecursively ('pages', $pid, $dummyArr=array());
-			$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
+			$pageRecord = $this->sharedHelper->getPage($pid);
+			if (!empty($pageRecord)) {
+				$contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, false);
+				$referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
+				if (!empty($referencedElementsArrAsKeys)) {
+					$referencedElementsArr = array_keys($referencedElementsArrAsKeys);
+					$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
+				}
+			}
 		}
 		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
 		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
@@ -80,7 +87,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		$res = $TYPO3_DB->exec_SELECTquery (
 			'uid',
 			'tt_content',
-			'uid NOT IN ('.implode(',',$allReferencedElementsArr).') AND l18n_parent NOT IN ('.implode(',',$allReferencedElementsArr).')'.
+			'uid NOT IN ('.implode(',',$allReferencedElementsArr).')'.
 			' AND t3ver_wsid='.intval($BE_USER->workspace).
 			t3lib_BEfunc::deleteClause('tt_content').
 			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),

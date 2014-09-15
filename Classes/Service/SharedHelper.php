@@ -256,6 +256,21 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Return the pages element record for the given uid
+	 *
+	 * @param int $uid
+	 * @return array
+	 */
+	public function getPage($uid) {
+		$fields = '*';
+		$table = 'pages';
+		$where = 'uid=' . (int)$uid;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
 	 * Return the tt_content element record for the given uid
 	 *
 	 * @param int $uid
