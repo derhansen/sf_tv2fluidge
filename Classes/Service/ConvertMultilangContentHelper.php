@@ -90,10 +90,10 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 */
 	public function cloneLangAllGEs($pageUid) {
 		$cloned = 0;
-		$pageLanguages = $this->getAvailablePageTranslations($pageUid);
+		$pageLanguages = $this->getAvailablePageTranslations(27);
 		$gridElements = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
 		$this->langIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
-
+		
 		foreach ($gridElements as $contentElementUid) {
 			$origContentElement = $this->sharedHelper->getContentElement($contentElementUid);
 			foreach ($pageLanguages as $langUid) {
@@ -275,7 +275,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 			 * @var t3lib_flexformtools $flexformTools
 			 */
 			$flexformTools = t3lib_div::makeInstance('t3lib_flexformtools');
-		$flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
+			$flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
 		}
 
 		return $flexformString;
@@ -334,7 +334,8 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	public function getAvailablePageTranslations($pageUid) {
 		$fields = '*';
 		$table = 'pages_language_overlay';
-		$where = 'pid=' . (int)$pageUid;
+		$where = '(pid=' . (int)$pageUid . ') '.
+					' AND (sys_language_uid > 0)';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
