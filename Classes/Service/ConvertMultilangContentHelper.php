@@ -237,12 +237,15 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 										if (!empty($fieldDataLang)) {
 											$fieldData['vDEF'] = $fieldDataLang;
 										} else {
-											if (isset($fieldLangArray['v' . $langIsoCode])) {
+											if (isset($fieldLangArray['v' . $langIsoCode]) && $forceLanguage) {
 												$issetLangValue = TRUE;
-											}
-											$fieldDataLang = $fieldLangArray['vDEF'];
-											if (!empty($fieldDataLang)) {
-												$fieldData['vDEF'] = $fieldDataLang;
+											} else {
+												$fieldDataLang = $fieldLangArray['vDEF'];
+												if (!empty($fieldDataLang)) {
+													$fieldData['vDEF'] = $fieldDataLang;
+												} elseif (isset($fieldLangArray['vDEF'])) {
+													$issetLangValue = TRUE;
+												}
 											}
 										}
 									}
