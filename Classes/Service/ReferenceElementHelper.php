@@ -41,7 +41,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	/**
 	 * @var bool
 	 */
-	protected $useParentUidForTranslations = false;
+	protected $useParentUidForTranslations = FALSE;
 
 	/**
 	 * DI for shared helper
@@ -69,7 +69,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param bool $useParentUidForTranslations
 	 * @return int Number of records deleted
 	 */
-	public function convertReferenceElements($useParentUidForTranslations = false) {
+	public function convertReferenceElements($useParentUidForTranslations = FALSE) {
 		$this->useParentUidForTranslations = (bool)$useParentUidForTranslations;
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;

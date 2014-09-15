@@ -54,7 +54,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		foreach ($pids as $pid) {
 			$pageRecord = $this->sharedHelper->getPage($pid);
 			if (!empty($pageRecord)) {
-				$contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, false);
+				$contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
 				$referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
 				if (!empty($referencedElementsArrAsKeys)) {
 					$referencedElementsArr = array_keys($referencedElementsArrAsKeys);

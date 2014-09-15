@@ -303,7 +303,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	/**
 	 * Return the sys_language record for the given uid
 	 *
-	 * @param int $uid
 	 * @return array
 	 */
 	public function getLanguagesIsoCodes() {

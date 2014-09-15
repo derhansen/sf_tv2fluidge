@@ -101,7 +101,8 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @return array
 	 */
 	public function getAllGe() {
-		$fields = 'uid, title, alias';
+		/* Select all, because field "alias" is not available in older versions of GE */
+		$fields = '*';
 		$table = 'tx_gridelements_backend_layout';
 		$where = 'deleted=0';
 
