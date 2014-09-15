@@ -182,10 +182,15 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Migrates all reference elements to 'insert records' elements
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function convertReferenceElementsAction() {
-		$numRecords = $this->referenceElementHelper->convertReferenceElements();
+	public function convertReferenceElementsAction($formdata = NULL) {
+		$useParentUidForTranslations = false;
+		if (intval($formdata['useparentuidfortranslations']) === 1) {
+			$useParentUidForTranslations = true;
+		}
+		$numRecords = $this->referenceElementHelper->convertReferenceElements($useParentUidForTranslations);
 		$this->view->assign('numRecords', $numRecords);
 	}
 
@@ -211,9 +216,9 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		}
 
 		if (isset($formdata['ge'])) {
-			$uidGe = $formdata['ge'];
+			$geKey = $formdata['ge'];
 		} else {
-			$uidGe = current(array_keys($allGe));
+			$geKey = current(array_keys($allGe));
 		}
 
 		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
@@ -222,8 +227,16 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		} else {
 			$fceContentCols = NULL;
 		}
-		if ($uidGe > 0) {
-			$geContentCols = $this->sharedHelper->getGeContentCols($uidGe);
+
+		if ($this->sharedHelper->canBeInterpretedAsInteger($geKey)) {
+			$geKey = (int)$geKey;
+			if ($geKey <= 0) {
+				$geKey = 0;
+			}
+		}
+
+		if (!empty($geKey)) {
+			$geContentCols = $this->sharedHelper->getGeContentCols($geKey);
 		} else {
 			$geContentCols = NULL;
 		}
@@ -250,11 +263,17 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	public function migrateFceAction($formdata) {
 		$fce = $formdata['fce'];
 		$ge = $formdata['ge'];
+		if ($this->sharedHelper->canBeInterpretedAsInteger($ge)) {
+			$ge = (int)$ge;
+			if ($ge <= 0) {
+				$ge = 0;
+			}
+		}
 
 		$fcesConverted = 0;
 		$contentElementsUpdated = 0;
 
-		if ($fce > 0 && $ge > 0) {
+		if ($fce > 0 && !empty($ge)) {
 			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
 				$fcesConverted++;
