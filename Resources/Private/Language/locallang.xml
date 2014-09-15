@@ -28,6 +28,12 @@
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
             <label index="label_convertmultilang_content">Convert Grid Elements</label>
+			<label index="label_convert_flexform_merge">Merge flexform translation (translated not blank fields are used from translations, others from default)</label>
+			<label index="label_convert_flexform_exclude">Exclude flexform translation (use default translation)</label>
+			<label index="label_convert_flexform_force_language">Forces all fields to be used from translation, even if blank</label>
+			<label index="label_references_all_lang_keep">Keeps insert records elements that contain this element as they are</label>
+			<label index="label_references_all_lang_conversion">Converts insert records elements that contain this element from all language to per language elements</label>
+			<label index="label_references_all_lang_update_translated_element">Converts insert records elements that contain this element from all language to per language elements and updates reference to translation element</label>
             <label index="label_fix_sorting">Fix sorting</label>
             <label index="label_tv_template">TV Page Template</label>
             <label index="label_be_layout">Backend Layout</label>

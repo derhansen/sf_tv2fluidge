@@ -376,13 +376,16 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Does the content conversion for all GridElements on all pages
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function convertMultilangContentAction() {
+	public function convertMultilangContentAction($formdata = NULL) {
 		$pageUids = $this->sharedHelper->getPageIds(99);
 
 		$numGEs = 0;
 		$numCEs = 0;
+
+		$this->convertMultilangContentHelper->initFormData($formdata);
 
 		foreach($pageUids as $pageUid) {
 			$numGEs += $this->convertMultilangContentHelper->cloneLangAllGEs($pageUid);
