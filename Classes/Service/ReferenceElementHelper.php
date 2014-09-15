@@ -263,7 +263,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			$this->convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid);
 		}
 
-		$this->fixLocalizationDiffSources($contentUid);
+		$this->sharedHelper->fixLocalizationDiffSources($contentUid);
 	}
 
 	/**
@@ -336,38 +336,4 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			}
 		}
 	}
-
-	/**
-	 * Fixes localization diff source field for translations of shortcut conversions
-	 *
-	 * @param integer $contentUid
-	 * @return void
-	 */
-	protected function fixLocalizationDiffSources($contentUid) {
-		$contentUid = (int)$contentUid;
-		$contentElement = $this->sharedHelper->getContentElement($contentUid);
-		if (!empty($contentElement) && !empty($contentElement['CType']) && !empty($contentElement['records'])) {
-			$translations = $this->sharedHelper->getTranslationsForContentElement($contentUid);
-
-			foreach ($translations as $translation) {
-				$translationUid = (int)$translation['uid'];
-				$diffSource = $translation['l18n_diffsource'];
-				if (!empty($diffSource) && ($translationUid > 0)) {
-					$diffSource = unserialize($diffSource);
-					$diffSource['CType'] = $contentElement['CType'];
-					$diffSource['records'] = $contentElement['records'];
-					$diffSource = serialize($diffSource);
-
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-						'tt_content',
-						'uid = ' . $translationUid,
-						array(
-							'l18n_diffsource' => $diffSource
-						)
-					);
-				}
-			}
-		}
-	}
-
 }
