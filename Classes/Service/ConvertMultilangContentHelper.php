@@ -34,6 +34,16 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	protected $sharedHelper;
 
 	/**
+	 * @var string
+	 */
+	protected $flexformConversionOption = 'merge';
+
+	/**
+	 * @var string
+	 */
+	protected $insertRecordsConversionOption = 'keep';
+
+	/**
 	 * DI for shared helper
 	 *
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
@@ -41,6 +51,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 */
 	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
 		$this->sharedHelper = $sharedHelper;
+	}
+
+	public function initFormData($formdata) {
+		$this->flexformConversionOption = $formdata['convertflexformoption'];
+		$this->insertRecordsConversionOption = $formdata['convertinsertrecords'];
 	}
 
 	/**
@@ -64,10 +79,12 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 				$newContentElement['sys_language_uid'] = $langUid;
 				$newContentElement['t3_origuid'] = $origContentElement['uid'];
 				$newContentElement['l18n_parent'] = $origContentElement['uid'];
-				if (t3lib_extMgm::isLoaded('static_info_tables')) {
-					$langUid = (int)$newContentElement['sys_language_uid'];
-					if ($langUid > 0) {
-						$newContentElement['pi_flexform'] = $this->convertFlexformForTranslation($newContentElement['pi_flexform'], $languageIsoCodes[$langUid]);
+				if ($this->flexformConversionOption !== 'exclude') {
+					if (t3lib_extMgm::isLoaded('static_info_tables')) {
+						$langUid = (int)$newContentElement['sys_language_uid'];
+						if ($langUid > 0) {
+							$newContentElement['pi_flexform'] = $this->convertFlexformForTranslation($newContentElement['pi_flexform'], $languageIsoCodes[$langUid]);
+						}
 					}
 				}
 				$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $newContentElement);
@@ -115,6 +132,10 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 										if (!empty($fieldDataLang)) {
 											$fieldData['vDEF'] = $fieldDataLang;
 										}
+									}
+
+									if (empty($fieldDataLang) && $this->flexformConversionOption === 'forceLanguage') {
+										$fieldData['vDEF'] = $this->flexformConversionOption;
 									}
 								}
 							}
@@ -223,6 +244,16 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		}
 		return $gridElements;
 	}
+//
+//	public function getShortcutElements($uidContentElement, $langUid) {
+//		$fields = 'uid';
+//		$table = 'tt_content';
+//		$where = '(CType = \'shortcut\')' .
+//					' AND (sys_language_uid = ' . (int)$langUid . ')' .
+//					' AND (records LIKE \'%tt_content_' . (int) $uidContentElement . '\'';
+//
+//		return $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+//	}
 
 	/**
 	 * Returns the uid of the localized content element (grid element) for the given uid
