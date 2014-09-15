@@ -93,7 +93,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		$pageLanguages = $this->getAvailablePageTranslations(27);
 		$gridElements = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
 		$this->langIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
-		
+
 		foreach ($gridElements as $contentElementUid) {
 			$origContentElement = $this->sharedHelper->getContentElement($contentElementUid);
 			foreach ($pageLanguages as $langUid) {
