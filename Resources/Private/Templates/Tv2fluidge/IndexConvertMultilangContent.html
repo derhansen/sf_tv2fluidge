@@ -19,7 +19,7 @@
     <f:form action="convertMultilangContent" name="formdata" object="{formdata}">
 		<f:form.select options="{merge: '{f:translate(key: \'label_convert_flexform_merge\')}', exclude: '{f:translate(key: \'label_convert_flexform_exclude\')}', forceLanguage: '{f:translate(key: \'label_convert_flexform_force_language\')}'}" name="convertflexformoption" property="convertflexformoption" />
 		<br><br>
-		<f:form.select options="{convert: '{f:translate(key: \'label_references_all_lang_conversion\')}', convertAndTranslate: '{f:translate(key: \'label_references_all_lang_update_translated_element\')}', keep: '{f:translate(key: \'label_references_all_lang_keep\')}'}" name="convertinsertrecords" property="convertinsertrecords" />
+		<f:form.select options="{convertAndTranslate: '{f:translate(key: \'label_references_all_lang_update_translated_element\')}', convert: '{f:translate(key: \'label_references_all_lang_conversion\')}', keep: '{f:translate(key: \'label_references_all_lang_keep\')}'}" name="convertinsertrecords" property="convertinsertrecords" />
 		<br><br>
 		<f:form.submit value="{f:translate(key: 'label_start')}" class="start"/>
     </f:form>
