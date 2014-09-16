@@ -159,13 +159,15 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $contentElementUid
 	 */
 	protected function updateSysLanguageOfAllLanguageShortcuts($contentElementUid) {
-		$contentElementUid = (int)$contentElementUid;
-		$shortcutElements = $this->getShortcutElements($contentElementUid);
-		foreach ($shortcutElements as $shortcutElement) {
-			$shortcutElementUid = (int)$shortcutElement['uid'];
-			$shortcutElementLanguage = (int)$shortcutElement['sys_language_uid'];
-			if (($shortcutElementUid > 0) && ($shortcutElementLanguage < 0)) {
-				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $shortcutElementUid, array('sys_language_uid' => 0));
+		if ($this->insertRecordsConversionOption !== 'keep') {
+			$contentElementUid = (int)$contentElementUid;
+			$shortcutElements = $this->getShortcutElements($contentElementUid);
+			foreach ($shortcutElements as $shortcutElement) {
+				$shortcutElementUid = (int)$shortcutElement['uid'];
+				$shortcutElementLanguage = (int)$shortcutElement['sys_language_uid'];
+				if (($shortcutElementUid > 0) && ($shortcutElementLanguage < 0)) {
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $shortcutElementUid, array('sys_language_uid' => 0));
+				}
 			}
 		}
 	}
