@@ -179,7 +179,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	public function migrateContentForPage($formdata, $pageUid) {
 		$fieldMapping = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'be_col_');
 		$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pageUid);
-		
+
 		$count = 0;
 		$sorting = 0;
 		foreach ($tvContentArray as $key => $contentUidString) {
