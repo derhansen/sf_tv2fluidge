@@ -486,6 +486,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 					$diffSource['CType'] = $contentElement['CType'];
 					$diffSource['records'] = $contentElement['records'];
 					$diffSource['colPos'] = $contentElement['colPos'];
+					$diffSource['sorting'] = $contentElement['sorting'];
 					$diffSource = serialize($diffSource);
 
 					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
