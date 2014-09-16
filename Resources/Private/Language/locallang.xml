@@ -21,6 +21,7 @@
             <label index="label_fce">Flexible Content Element</label>
             <label index="label_ge">Grid Element</label>
             <label index="label_mark_deleted">Flag original FCE as deleted</label>
+			<label index="label_mark_deleted_tv_template">Flag original Templavoila template as deleted</label>
 			<label index="label_use_parent_uid_for_translations">Use parent uid for content translations</label>
             <label index="label_create_reference">Create shortcut content element for TV references</label>
 			<label index="label_delete_unref">Delete unused Elements</label>

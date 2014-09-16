@@ -339,16 +339,84 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$contentArray = array();
 
 		if ($result['tx_templavoila_flex'] != '') {
-			$localFlexform = simplexml_load_string($result['tx_templavoila_flex']);
-			$elements = $localFlexform->xpath("data/sheet/language/*");
+			$flexFormArray = t3lib_div::xml2array($result['tx_templavoila_flex']);
+			$languageSheets = $this->moveDefLanguageFirstFlexformArray($flexFormArray['data']['sDEF'], 'lDEF');
 
-			foreach($elements as $element) {
-				$contentArray[(string)$element->attributes()->index] = (string)$element->value;
+			foreach ($languageSheets as $languageSheet) {
+				if (is_array($languageSheet)) {
+					foreach ($languageSheet as $fieldName => $values) {
+						$values = $this->moveDefLanguageFirstFlexformArray($values, 'vDEF');
+						$this->addValuesToContentArray($contentArray, $fieldName, $values);
+					}
+				}
 			}
 		}
 		return $contentArray;
 	}
 
+	private function moveDefLanguageFirstFlexformArray($flexformArray, $firstElementKey) {
+		$defLanguageFirstFlexformArray = array();
+		if (!empty($firstElementKey) && isset($flexformArray[$firstElementKey])) {
+			$defLanguageFirstFlexformArray[$firstElementKey] = $flexformArray[$firstElementKey];
+		}
+		foreach ($flexformArray as $key => $subArray) {
+			if ($key != $firstElementKey) {
+				$defLanguageFirstFlexformArray[$key] = $subArray;
+			}
+		}
+		return $defLanguageFirstFlexformArray;
+	}
+
+	/**
+	 * @param array $contentArray
+	 * @param string $fieldName
+	 * @param array $values
+	 */
+	private function addValuesToContentArray(&$contentArray, $fieldName, $values) {
+
+		foreach($values as $languageValues) {
+			$fieldValues = array();
+			if (!empty($contentArray[$fieldName])) {
+				$fieldValues = explode(',', $contentArray[$fieldName]);
+			}
+
+			$languageValues = t3lib_div::trimExplode(',', $languageValues, TRUE);
+			$languageValues = array_values($languageValues);
+			$languageValuesCount = count($languageValues);
+			for ($languageValueIndex = 0; $languageValueIndex < $languageValuesCount; $languageValueIndex++) {
+				if (!empty($languageValues[$languageValueIndex])) {
+					if (!in_array($languageValues[$languageValueIndex], $fieldValues)) {
+						$indexOfExistingValue = FALSE;
+						if ($languageValueIndex >= 1) {
+							$indexOfExistingValue = array_search($languageValues[$languageValueIndex - 1], $fieldValues);
+							if ($indexOfExistingValue !== FALSE) {
+								$fieldValues = array_merge(
+									array_slice($fieldValues, 0, $indexOfExistingValue + 1),
+									array($languageValues[$languageValueIndex]),
+									array_slice($fieldValues, $indexOfExistingValue + 1)
+								);
+							}
+						}
+
+						if ($indexOfExistingValue === FALSE) {
+							$indexOfExistingValue = array_search($languageValues[$languageValueIndex + 1], $fieldValues);
+							if ($indexOfExistingValue !== FALSE) {
+								$fieldValues = array_merge(
+									array_slice($fieldValues, 0, $indexOfExistingValue),
+									array($languageValues[$languageValueIndex]),
+									array_slice($fieldValues, $indexOfExistingValue)
+								);
+							} else {
+								$fieldValues[] = $languageValues[$languageValueIndex];
+							}
+						}
+					}
+				}
+			}
+
+			$contentArray[$fieldName] = implode(',', $fieldValues);
+		}
+	}
 
 	/**
 	 * Returns an array with names of content columns for the given TypoScript

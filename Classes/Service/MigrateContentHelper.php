@@ -179,7 +179,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	public function migrateContentForPage($formdata, $pageUid) {
 		$fieldMapping = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'be_col_');
 		$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pageUid);
-
+		
 		$count = 0;
 		$sorting = 0;
 		foreach ($tvContentArray as $key => $contentUidString) {
@@ -197,6 +197,18 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 			}
 		}
 		return $count;
+	}
+
+	/**
+	 * Marks the TemplaVoila Template with the given uid as deleted
+	 *
+	 * @param int $uidTvTemplate
+	 * @return void
+	 */
+	public function markTvTemplateDeleted($uidTvTemplate) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidTvTemplate),
+			array('deleted' => 1)
+		);
 	}
 
 	/**

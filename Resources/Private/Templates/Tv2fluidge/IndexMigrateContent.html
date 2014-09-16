@@ -45,6 +45,10 @@
             </f:if>
         </table>
 
+		<f:form.checkbox id="markdeleted" name="markdeleted" property="markdeleted" value="1" checked="false"/>
+		<label for="markdeleted"><f:translate key="label_mark_deleted_tv_template"/></label>
+		<br/>
+
         <f:form.submit value="" property="dummySubmit" style="display: none; "/>
         <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" class="start"/>
     </f:form>

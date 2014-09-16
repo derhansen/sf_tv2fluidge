@@ -358,6 +358,10 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 				// Update page template (must be called for every page, since to and next_to must be checked
 				$pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
 			}
+
+			if ($formdata['markdeleted']) {
+				$this->migrateContentHelper->markTvTemplateDeleted($uidTvTemplate);
+			}
 		}
 
 		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
