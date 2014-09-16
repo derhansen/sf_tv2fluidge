@@ -189,6 +189,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 					$contentElement = $this->sharedHelper->getContentElement($contentUid);
 					if ($contentElement['pid'] == $pageUid) {
 						$this->sharedHelper->updateContentElementColPos($contentUid, $fieldMapping[$key], $sorting);
+						$this->sharedHelper->fixLocalizationDiffSources($contentElement);
 					}
 					$sorting += 25;
 					$count++;
