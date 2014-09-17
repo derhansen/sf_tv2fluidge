@@ -201,7 +201,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 				' AND (uid NOT IN (' . implode(',', $sortedContentElements) . '))' .
 				t3lib_BEfunc::deleteClause('tt_content');
 
-			$contentElements = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'sorting ASC, uid ASC', '');
+			$contentElements = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'sorting ASC, sys_language_uid ASC, uid ASC', '');
 		}
 		return $contentElements;
 	}
