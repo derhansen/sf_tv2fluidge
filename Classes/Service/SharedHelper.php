@@ -109,33 +109,35 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			$depth = $this->getPagesDepthLimit();
 		}
 
+		echo $depth . ',' . $this->getIncludeNonRootPagesIsEnabled();
+
 		/**
 		 * @var t3lib_queryGenerator $tree
 		 */
 		$tree = t3lib_div::makeInstance('t3lib_queryGenerator');
-		$allPids = '';
+
+		$startPages = array();
 
 		if ($this->getIncludeNonRootPagesIsEnabled()) {
-			$allPids = $tree->getTreeList(0, $depth, 0, 1);
-			print_r($allPids);die();
+			$startPages = $this->getFirstLevelPages();
 		} else {
-			$rootPages = $this->getRootPages();
+			$startPages = $this->getRootPages();
+		}
 
-			foreach($rootPages as $rootPage) {
-				$pids = $tree->getTreeList($rootPage['uid'], $depth, 0, 1);
-				if ($allPids == '') {
-					$allPids = $pids;
-				} else {
-					$allPids .= ',' . $pids;
-				}
-			}
-
-			// Fallback: If no RootPage is set, then assume page 1 is the root page
+		$allPids = '';
+		foreach($startPages as $startPage) {
+			$pids = $tree->getTreeList($startPage['uid'], $depth, 0, 1);
 			if ($allPids == '') {
-				$allPids = $tree->getTreeList(1, $depth, 0, 1);
+				$allPids = $pids;
+			} else {
+				$allPids .= ',' . $pids;
 			}
 		}
 
+		// Fallback: If no RootPage is set, then assume page 1 is the root page
+		if ($allPids == '') {
+			$allPids = $tree->getTreeList(1, $depth, 0, 1);
+		}
 
 		$result = array_unique(explode(',', $allPids));
 		return $result;
@@ -184,7 +186,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 				}
 			}
 		}
-		
+
 		return $contentCols;
 	}
 
@@ -632,6 +634,15 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$fields = 'uid';
 		$table = 'pages';
 		$where = 'is_siteroot=1';
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	private function getFirstLevelPages() {
+		$fields = 'uid';
+		$table = 'pages';
+		$where = 'pid=0';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 		return $res;
