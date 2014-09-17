@@ -351,7 +351,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 			$pageUids = $this->sharedHelper->getPageIds();
 
 			foreach($pageUids as $pageUid) {
-				if ($this->migrateContentHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
+				if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
 					$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
 				}
 

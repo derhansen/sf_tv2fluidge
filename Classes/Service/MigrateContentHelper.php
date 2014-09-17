@@ -116,45 +116,6 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns the uid of the TemplaVoila page template for the given page uid
-	 *
-	 * @param $pageUid
-	 * @return int
-	 */
-	public function getTvPageTemplateUid($pageUid) {
-		$pageRecord = $this->getPageRecord($pageUid);
-		$tvTemplateObjectUid = 0;
-		if ($pageRecord['tx_templavoila_to'] != '' && $pageRecord['tx_templavoila_to'] != 0) {
-			$tvTemplateObjectUid = $pageRecord['tx_templavoila_to'];
-		} else {
-			$rootLine = t3lib_beFunc::BEgetRootLine($pageRecord['uid'],'', TRUE);
-			foreach($rootLine as $rootLineRecord) {
-				$myPageRecord = t3lib_beFunc::getRecordWSOL('pages', $rootLineRecord['uid']);
-				if ($myPageRecord['tx_templavoila_next_to']) {
-					$tvTemplateObjectUid = $myPageRecord['tx_templavoila_next_to'];
-					break;
-				}
-			}
-		}
-		return $tvTemplateObjectUid;
-	}
-
-	/**
-	 * Returns the page record for the given page uid
-	 *
-	 * @param $uid
-	 * @return array mixed
-	 */
-	public function getPageRecord($uid) {
-		$fields = '*';
-		$table = 'pages';
-		$where = 'uid=' . (int)$uid;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		return $res;
-	}
-
-	/**
 	 * Returns the uid of the DS for the given template
 	 *
 	 * @param int $uidTemplate
@@ -221,7 +182,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	 * @return int Number of page templates updated
 	 */
 	public function updatePageTemplate($pageUid, $UidTvTemplate, $uidBeLayout) {
-		$pageRecord = $this->getPageRecord($pageUid);
+		$pageRecord = $this->sharedHelper->getPageRecord($pageUid);
 		$updateFields = array();
 		$count = 0;
 		if ($pageRecord['tx_templavoila_to'] > 0 && $pageRecord['tx_templavoila_to'] == $UidTvTemplate) {
