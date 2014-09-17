@@ -620,9 +620,10 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	public function getTranslationsForContentElement($uidContent) {
 		$fields = '*';
 		$table = 'tt_content';
-		$where = 'l18n_parent=' . (int)$uidContent;
+		$where = '(l18n_parent=' . (int)$uidContent . ')' .
+					t3lib_BEfunc::deleteClause('tt_content');
 
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'sys_language_uid ASC', '');
 	}
 
 	/**
