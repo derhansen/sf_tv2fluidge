@@ -56,7 +56,6 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 		$sorting = 0;
 
 		$contentElements = $this->getPageContentElementsForLang($pageUid, 0);
-		$contentElementList = $this->sharedHelper->getTvContentArrayForPage($pageUid);
 		foreach ($contentElements as $origContentElement) {
 			$sorting += self::SORTING_OFFSET;
 			$origUid = (int)$origContentElement['uid'];
