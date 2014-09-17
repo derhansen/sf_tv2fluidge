@@ -28,6 +28,8 @@
  */
 class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 
+	const SORTING_OFFSET = 25;
+
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
 	 */
@@ -46,41 +48,56 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 	/**
 	 * Fixes the sorting of all translated content elements for the given page uid
 	 *
-	 * @todo Add check if new sorting value of translated content element would exceeds int field limit.
-	 *
 	 * @param int $pageUid
 	 * @return int
 	 */
 	public function fixSortingForPage($pageUid) {
 		$updated = 0;
+		$sorting = 0;
 
-		$contentElements = $this->getPageContentElementsForDefaultLang($pageUid);
+		$contentElements = $this->getPageContentElementsForLang($pageUid, 0);
 		foreach ($contentElements as $origContentElement) {
+			$sorting += self::SORTING_OFFSET;
+			$origUid = (int)$origContentElement['uid'];
 			$translations = $this->sharedHelper->getTranslationsForContentElement($origContentElement['uid']);
 			foreach($translations as $translation) {
-				$origUid = $translation['uid'];
+				$translationUid = $translation['uid'];
 				unset($translation['uid']);
-				$translation['sorting'] = $origContentElement['sorting'] * $translation['sys_language_uid'];
-				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $translation);
+				$translation['sorting'] = $sorting;
+				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $translationUid, $translation);
 				$updated += 1;
 			}
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, array('sorting' => $sorting));
 		}
+
+		$pageLanguages = $this->sharedHelper->getAvailablePageTranslations($pageUid);
+		foreach ($pageLanguages as $pageLanguage) {
+			$contentElements = $this->getPageContentElementsForLang($pageUid, $pageLanguage);
+			foreach ($contentElements as $contentElement) {
+				$sorting += self::SORTING_OFFSET;
+				$contentElementUid = (int)$contentElement['uid'];
+				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $contentElementUid, array('sorting' => $sorting));
+			}
+		}
+
 		return $updated;
 	}
 
 	/**
-	 * Returns all content elements for the given page, where the language is set to the default language
+	 * Returns all content elements for the given page, where the language is set to $langUid
 	 *
 	 * @param int $pageUid
+	 * @param int $langUid
 	 * @return mixed
 	 */
-	public function getPageContentElementsForDefaultLang($pageUid) {
+	public function getPageContentElementsForLang($pageUid, $langUid) {
 		$fields = '*';
 		$table = 'tt_content';
-		$where = 'pid=' . (int)$pageUid . ' AND sys_language_uid = 0';
+		$where = '(pid=' . (int)$pageUid . ')' .
+					' AND (sys_language_uid = ' . $langUid . ')' .
+					t3lib_BEfunc::deleteClause('tt_content');
 
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
-
+		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'sorting ASC, uid ASC', '');
 	}
 
 }
