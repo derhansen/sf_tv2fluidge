@@ -350,6 +350,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		return $updated;
 	}
 
+	/**
+	 * @param int $pageUid
+	 * @param int $geElementUid
+	 * @param array $childElement
+	 */
 	protected function updateInGeAllLangElements($pageUid, $geElementUid, $childElement) {
 		$pageUid = (int)$pageUid;
 		$geElementUid = (int)$geElementUid;
