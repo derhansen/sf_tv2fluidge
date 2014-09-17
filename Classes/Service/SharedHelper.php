@@ -624,6 +624,59 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Returns an array with UIDs of languages for the given page (default language not included)
+	 *
+	 * @param int $pageUid
+	 * @return array
+	 */
+	public function getAvailablePageTranslations($pageUid) {
+		$fields = '*';
+		$table = 'pages_language_overlay';
+		$where = '(pid=' . (int)$pageUid . ') '.
+			' AND (sys_language_uid > 0)' . t3lib_BEfunc::deleteClause('pages_language_overlay');;
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+
+		$languages = array();
+		if ($res) {
+			foreach($res as $lang) {
+				$languageUid = (int)$lang['sys_language_uid'];
+				if ($languageUid > 0) {
+					$languages[$languageUid] = $languageUid;
+				}
+			}
+		}
+		ksort($languages);
+		return $languages;
+	}
+
+	/**
+	 * Returns an array with UIDs of all available languages (default language not included)
+	 *
+	 * @param int $pageUid
+	 * @return array
+	 */
+	public function getAllLanguages() {
+		$fields = 'uid';
+		$table = 'sys_language';
+		$where = '(1=1)' . t3lib_BEfunc::deleteClause('sys_language');
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+
+		$languages = array();
+		if ($res) {
+			foreach($res as $lang) {
+				$languageUid = (int)$lang['uid'];
+				if ($languageUid > 0) {
+					$languages[$languageUid] = $languageUid;
+				}
+			}
+		}
+		ksort($languages);
+		return $languages;
+	}
+
+	/**
 	 * Returns an array with UIDs of root pages
 	 *
 	 * @return array

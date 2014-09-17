@@ -49,6 +49,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	protected $insertRecordsConversionOption = 'convertAndTranslate';
 
 	/**
+	 * @var bool
+	 */
+	protected $allLanguageRecordsInGeToShortcut = false;
+
+	/**
 	 * @var array
 	 */
 	protected $langIsoCodes = array();
@@ -79,6 +84,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	public function initFormData($formdata) {
 		$this->flexformConversionOption = $formdata['convertflexformoption'];
 		$this->insertRecordsConversionOption = $formdata['convertinsertrecords'];
+		$this->allLanguageRecordsInGeToShortcut = (intval($formdata['alllanguagerecordsingetoshortcut']) === 1);
 	}
 
 	/**
@@ -90,9 +96,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 */
 	public function cloneLangAllGEs($pageUid) {
 		$cloned = 0;
-		$pageLanguages = $this->getAvailablePageTranslations($pageUid);
-		$allLanguages = $this->getAllLanguages();
+
+		$pageLanguages = $this->sharedHelper->getAvailablePageTranslations($pageUid);
+		$allLanguages = $this->sharedHelper->getAllLanguages();
 		$nonPageLanguages = array_diff($allLanguages, $pageLanguages);
+
 		$gridElements = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
 		$this->langIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
 
@@ -305,11 +313,12 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		foreach ($gridElements as $contentElementUid) {
 			$contentElements = $this->getChildContentElements($contentElementUid);
 			foreach ($contentElements as $contentElement) {
-				$translations = $this->sharedHelper->getTranslationsForContentElement($contentElement['uid']);
+				$childElementUid = (int)$contentElement['uid'];
+				$translations = $this->sharedHelper->getTranslationsForContentElement($childElementUid);
 				if (!empty($translations)) {
 					foreach($translations as $translatedContentElement) {
 						$localizedGridElement = $this->getLocalizedGridElement($contentElementUid,
-							$translatedContentElement['sys_language_uid']);
+														$translatedContentElement['sys_language_uid']);
 						if ($localizedGridElement) {
 							$origUid = $translatedContentElement['uid'];
 							unset($translatedContentElement['uid']);
@@ -332,60 +341,40 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 					$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $contentElement);
 					$updated += 1;
 				}
+				$this->updateInGeAllLangElements($pageUid, $contentElementUid, $contentElement);
+				$this->sharedHelper->fixLocalizationDiffSources($childElementUid);
 			}
+
+			$this->sharedHelper->fixLocalizationDiffSources($contentElementUid);
 		}
 		return $updated;
 	}
 
-	/**
-	 * Returns an array with UIDs of languages for the given page (default language not included)
-	 *
-	 * @param int $pageUid
-	 * @return array
-	 */
-	public function getAvailablePageTranslations($pageUid) {
-		$fields = '*';
-		$table = 'pages_language_overlay';
-		$where = '(pid=' . (int)$pageUid . ') '.
-					' AND (sys_language_uid > 0)' . t3lib_BEfunc::deleteClause('pages_language_overlay');;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
-
-		$languages = array();
-		if ($res) {
-			foreach($res as $lang) {
-				$languageUid = (int)$lang['sys_language_uid'];
-				if ($languageUid > 0) {
-					$languages[$languageUid] = $languageUid;
+	protected function updateInGeAllLangElements($pageUid, $geElementUid, $childElement) {
+		$pageUid = (int)$pageUid;
+		$geElementUid = (int)$geElementUid;
+		$childElementUid = (int)$childElement['uid'];
+		if (($childElement['sys_language_uid'] < 0) && $this->allLanguageRecordsInGeToShortcut) {
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $childElementUid, array('sys_language_uid' => 0));
+			$pageLanguages = $this->sharedHelper->getAvailablePageTranslations($pageUid);
+			foreach ($pageLanguages as $langUid) {
+				$langUid = (int)$langUid;
+				if ($langUid > 0) {
+					$localizedGridElement = $this->getLocalizedGridElement($geElementUid, $langUid);
+					$localizedGridElementUid = (int)$localizedGridElement['uid'];
+					if ($localizedGridElementUid > 0) {
+						$translationContentElement = $childElement;
+						$translationContentElement['tx_gridelements_container'] = $localizedGridElementUid;
+						$translationContentElement['CType'] = 'shortcut';
+						$translationContentElement['records'] = 'tt_content_' . $childElementUid;
+						$newUid = (int)$this->addTranslationContentElement($translationContentElement, $langUid, $childElementUid);
+						if ($newUid > 0) {
+							$this->refIndex->updateRefIndexTable('tt_content', $newUid);
+						}
+					}
 				}
 			}
 		}
-		return $languages;
-	}
-
-	/**
-	 * Returns an array with UIDs of all available languages (default language not included)
-	 *
-	 * @param int $pageUid
-	 * @return array
-	 */
-	public function getAllLanguages() {
-		$fields = 'uid';
-		$table = 'sys_language';
-		$where = '(1=1)' . t3lib_BEfunc::deleteClause('sys_language');
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
-
-		$languages = array();
-		if ($res) {
-			foreach($res as $lang) {
-				$languageUid = (int)$lang['uid'];
-				if ($languageUid > 0) {
-					$languages[$languageUid] = $languageUid;
-				}
-			}
-		}
-		return $languages;
 	}
 
 	/**

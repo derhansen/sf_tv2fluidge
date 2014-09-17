@@ -21,6 +21,9 @@
 		<br><br>
 		<label for="convert_insert_records"><f:translate key="label_references_all_lang_label" /></label><br><f:form.select options="{convertAndTranslate: '{f:translate(key: \'label_references_all_lang_update_translated_element\')}', convert: '{f:translate(key: \'label_references_all_lang_conversion\')}', keep: '{f:translate(key: \'label_references_all_lang_keep\')}'}" id="convert_insert_records" name="convertinsertrecords" property="convertinsertrecords" />
 		<br><br>
+		<f:form.checkbox id="alllanguagerecordsingetoshortcut" name="alllanguagerecordsingetoshortcut" property="alllanguagerecordsingetoshortcut" value="1" checked="false" />
+		<label for="alllanguagerecordsingetoshortcut"><f:translate key="label_convert_alllang_records_in_ge_to_shortcut"/></label>
+		<br><br>
 		<f:form.submit value="{f:translate(key: 'label_start')}" class="start"/>
     </f:form>
 </f:section>

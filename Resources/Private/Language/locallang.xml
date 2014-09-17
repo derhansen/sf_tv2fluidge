@@ -37,6 +37,7 @@
 			<label index="label_references_all_lang_keep">No modification</label>
 			<label index="label_references_all_lang_conversion">Convert to translations with parent uid</label>
 			<label index="label_references_all_lang_update_translated_element">Converts to translations with translation uid</label>
+			<label index="label_convert_alllang_records_in_ge_to_shortcut">Convert all language records inside grid elements to shortcut elements on parent element (only use if config.sys_language_overlay will not be used in page)</label>
             <label index="label_fix_sorting">Fix sorting</label>
             <label index="label_tv_template">TV Page Template</label>
             <label index="label_be_layout">Backend Layout</label>
