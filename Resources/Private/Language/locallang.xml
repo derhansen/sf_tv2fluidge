@@ -40,6 +40,8 @@
             <label index="label_be_layout">Backend Layout</label>
             <label index="label_fix_options">Options</label>
             <label index="label_page_uid">Page UID</label>
+			<label index="label_ext_conf_migration_pages_depth_limit">Pages depth limit for migration</label>
+			<label index="label_ext_conf_include_non_root_pages">Include non root pages in migration</label>
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
             <label index="desc_docs_and_help">This extension is hosted on GitHub. Feel free to submit feedback, bugs and changerequest directly at</label>

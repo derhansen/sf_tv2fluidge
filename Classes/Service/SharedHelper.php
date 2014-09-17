@@ -31,15 +31,28 @@ require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php'
 class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 
 	/**
+	 * @var int
+	 */
+	const DEFAULT_PAGES_DEPTH_LIMIT = 99;
+
+	/**
 	 * @var tx_templavoila_api
 	 */
 	protected $templavoilaAPIObj;
+
+	/**
+	 * @var array
+	 */
+	protected $extConf = array();
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->templavoilaAPIObj = t3lib_div::makeInstance ('tx_templavoila_api');
+		if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge'])) {
+			$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge']);
+		}
 	}
 
 	/**
@@ -63,29 +76,66 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Returns the depth limit of pages to migrate
+	 *
+	 * @return int
+	 */
+	public function getPagesDepthLimit() {
+		$pagesDepthLimit = (int)$this->extConf['pagesDepthLimit'];
+		if ($pagesDepthLimit <= 0) {
+			$pagesDepthLimit = self::DEFAULT_PAGES_DEPTH_LIMIT;
+		}
+
+		return $pagesDepthLimit;
+	}
+
+	/**
+	 * Returns if non root pages are also to migrate
+	 *
+	 * @return bool
+	 */
+	public function getIncludeNonRootPagesIsEnabled() {
+		return (intval($this->extConf['includeNonRootPages']) === 1);
+	}
+
+	/**
 	 * Returns an array of page uids up to the given amount recursionlevel
 	 *
-	 * @param int $depth
+	 * @param int $depth	if not supplied, the extension setting will be used
 	 * @return array
 	 */
-	public function getPageIds($depth) {
-		$tree = t3lib_div::makeInstance('t3lib_queryGenerator');
-		$rootPages = $this->getRootPages();
+	public function getPageIds($depth = 0) {
+		if ($depth <= 0) {
+			$depth = $this->getPagesDepthLimit();
+		}
 
+		/**
+		 * @var t3lib_queryGenerator $tree
+		 */
+		$tree = t3lib_div::makeInstance('t3lib_queryGenerator');
 		$allPids = '';
-		foreach($rootPages as $rootPage) {
-			$pids = $tree->getTreeList($rootPage['uid'], $depth, 0, 1);
+
+		if ($this->getIncludeNonRootPagesIsEnabled()) {
+			$allPids = $tree->getTreeList(0, $depth, 0, 1);
+			print_r($allPids);die();
+		} else {
+			$rootPages = $this->getRootPages();
+
+			foreach($rootPages as $rootPage) {
+				$pids = $tree->getTreeList($rootPage['uid'], $depth, 0, 1);
+				if ($allPids == '') {
+					$allPids = $pids;
+				} else {
+					$allPids .= ',' . $pids;
+				}
+			}
+
+			// Fallback: If no RootPage is set, then assume page 1 is the root page
 			if ($allPids == '') {
-				$allPids = $pids;
-			} else {
-				$allPids .= ',' . $pids;
+				$allPids = $tree->getTreeList(1, $depth, 0, 1);
 			}
 		}
 
-		// Fallback: If no RootPage is set, then assume page 1 is the root page
-		if ($allPids == '') {
-			$allPids = $tree->getTreeList(1, $depth, 0, 1);
-		}
 
 		$result = array_unique(explode(',', $allPids));
 		return $result;
@@ -122,15 +172,19 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			$dsRecord = $this->getTvDatastructure($uidTvDs);
 			$flexform = simplexml_load_string($dsRecord['dataprot']);
 		}
-		$elements = $flexform->xpath("ROOT/el/*");
 
 		$contentCols = array();
-		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tv2fluidge');
-		foreach ($elements as $element) {
-			if ($element->tx_templavoila->eType == 'ce') {
-				$contentCols[$element->getName()] = (string)$element->tx_templavoila->title;
+
+		if (!empty($flexform)) {
+			$elements = $flexform->xpath("ROOT/el/*");
+			$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tv2fluidge');
+			foreach ($elements as $element) {
+				if ($element->tx_templavoila->eType == 'ce') {
+					$contentCols[$element->getName()] = (string)$element->tx_templavoila->title;
+				}
 			}
 		}
+		
 		return $contentCols;
 	}
 

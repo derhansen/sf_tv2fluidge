@@ -49,7 +49,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @return int Number of records deleted
 	 */
 	public function markDeletedUnreferencedElementsRecords() {
-		$pids = $this->sharedHelper->getPageIds(99);
+		$pids = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
 		foreach ($pids as $pid) {
 			$pageRecord = $this->sharedHelper->getPage($pid);

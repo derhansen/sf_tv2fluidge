@@ -74,7 +74,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
-		$pids = $this->sharedHelper->getPageIds(99);
+		$pids = $this->sharedHelper->getPageIds();
 		$numRecords = 0;
 		foreach ($pids as $pid) {
 			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);

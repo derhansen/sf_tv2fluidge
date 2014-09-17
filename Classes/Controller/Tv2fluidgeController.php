@@ -348,7 +348,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$pageTemplatesUpdated = 0;
 
 		if ($uidTvTemplate > 0 && $uidBeLayout > 0) {
-			$pageUids = $this->sharedHelper->getPageIds(99);
+			$pageUids = $this->sharedHelper->getPageIds();
 
 			foreach($pageUids as $pageUid) {
 				if ($this->migrateContentHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
@@ -384,7 +384,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function convertMultilangContentAction($formdata = NULL) {
-		$pageUids = $this->sharedHelper->getPageIds(99);
+		$pageUids = $this->sharedHelper->getPageIds();
 
 		$numGEs = 0;
 		$numCEs = 0;
@@ -433,7 +433,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		if ($formdata['fixOptions'] == 'singlePage') {
 			$numUpdated = $this->fixSortingHelper->fixSortingForPage($formdata['pageUid']);
 		} else {
-			$pageUids = $this->sharedHelper->getPageIds(99);
+			$pageUids = $this->sharedHelper->getPageIds();
 			foreach($pageUids as $pageUid) {
 				$numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUid);
 			}
