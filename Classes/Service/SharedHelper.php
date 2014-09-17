@@ -456,8 +456,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			}
 		}
 
-		print_r($contentArray);die();
-
 		return $contentArray;
 	}
 
