@@ -90,7 +90,9 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 */
 	public function cloneLangAllGEs($pageUid) {
 		$cloned = 0;
-		$pageLanguages = $this->getAvailablePageTranslations(27);
+		$pageLanguages = $this->getAvailablePageTranslations($pageUid);
+		$allLanguages = $this->getAllLanguages();
+		$nonPageLanguages = array_diff($allLanguages, $pageLanguages);
 		$gridElements = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
 		$this->langIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
 
@@ -101,6 +103,14 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 				$this->updateShortcutElements($contentElementUid, $langUid, $translationContentUid);
 				$cloned += 1;
 			}
+
+			// modify shortcuts for non non page translations (could be other languages available)
+			if (!empty($nonPageLanguages)) {
+				foreach ($nonPageLanguages as $pageLanguageUid) {
+					$this->updateShortcutElements($contentElementUid, $pageLanguageUid, $contentElementUid);
+				}
+			}
+
 			$origContentElement['sys_language_uid'] = 0;
 			$origUid = $origContentElement['uid'];
 			unset ($origContentElement['uid']);
@@ -337,14 +347,42 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		$fields = '*';
 		$table = 'pages_language_overlay';
 		$where = '(pid=' . (int)$pageUid . ') '.
-					' AND (sys_language_uid > 0)';
+					' AND (sys_language_uid > 0)' . t3lib_BEfunc::deleteClause('pages_language_overlay');;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
 		$languages = array();
 		if ($res) {
 			foreach($res as $lang) {
-				$languages[] = $lang['sys_language_uid'];
+				$languageUid = (int)$lang['sys_language_uid'];
+				if ($languageUid > 0) {
+					$languages[$languageUid] = $languageUid;
+				}
+			}
+		}
+		return $languages;
+	}
+
+	/**
+	 * Returns an array with UIDs of all available languages (default language not included)
+	 *
+	 * @param int $pageUid
+	 * @return array
+	 */
+	public function getAllLanguages() {
+		$fields = 'uid';
+		$table = 'sys_language';
+		$where = '(1=1)' . t3lib_BEfunc::deleteClause('sys_language');
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+
+		$languages = array();
+		if ($res) {
+			foreach($res as $lang) {
+				$languageUid = (int)$lang['uid'];
+				if ($languageUid > 0) {
+					$languages[$languageUid] = $languageUid;
+				}
 			}
 		}
 		return $languages;

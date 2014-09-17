@@ -109,8 +109,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			$depth = $this->getPagesDepthLimit();
 		}
 
-		echo $depth . ',' . $this->getIncludeNonRootPagesIsEnabled();
-
 		/**
 		 * @var t3lib_queryGenerator $tree
 		 */
