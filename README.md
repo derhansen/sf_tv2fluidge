@@ -33,7 +33,7 @@ and TypoScript.
 2. Create backend layouts and Fluidtemplates for all TemplaVoila page templates you wish to migrate
 3. Delete all unreferenced elements
 4. Convert references to "insert records" elements
-5. Delete all unreferenced elements (conversion of "insert records" elements creates no unreferenced elements)
+5. Delete all unreferenced elements (conversion of references to FCE elements to insert records creates new unreferenced elements)
 6. Migrate all Flexible Content Elements to Grid Elements
 7. Migrate all TemplaVoila page templates to Fluidtemplate
 8. Delete TemplaVoila-Folder General Record Storage Page from root page
