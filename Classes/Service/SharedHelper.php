@@ -99,6 +99,18 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * sets PHP timeout to unlimited for execution
+	 */
+	public function setUnlimitedTimeout() {
+		if (function_exists('set_time_limit')) {
+			try {
+				set_time_limit(0);
+			} catch (\Exception $setMaxTimeOutExcpetion) {
+			}
+		}
+	}
+
+	/**
 	 * Returns an array of page uids up to the given amount recursionlevel
 	 *
 	 * @param int $depth	if not supplied, the extension setting will be used

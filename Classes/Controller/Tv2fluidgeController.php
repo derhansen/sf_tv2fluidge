@@ -166,6 +166,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function deleteUnreferencedElementsAction() {
+		$this->sharedHelper->setUnlimitedTimeout();
 		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords();
 		$this->view->assign('numRecords', $numRecords);
 	}
@@ -186,6 +187,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function convertReferenceElementsAction($formdata = NULL) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$useParentUidForTranslations = FALSE;
 		if (intval($formdata['useparentuidfortranslations']) === 1) {
 			$useParentUidForTranslations = TRUE;
@@ -261,6 +264,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function migrateFceAction($formdata) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$fce = $formdata['fce'];
 		$ge = $formdata['ge'];
 		if ($this->sharedHelper->canBeInterpretedAsInteger($ge)) {
@@ -349,6 +354,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function migrateContentAction($formdata) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$uidTvTemplate = (int)$formdata['tvtemplate'];
 		$uidBeLayout = (int)$formdata['belayout'];
 
@@ -393,6 +400,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function convertMultilangContentAction($formdata = NULL) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$pageUids = $this->sharedHelper->getPageIds();
 
 		$numGEs = 0;
@@ -438,6 +447,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function fixSortingAction($formdata) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$numUpdated = 0;
 		if ($formdata['fixOptions'] == 'singlePage') {
 			$numUpdated = $this->fixSortingHelper->fixSortingForPage($formdata['pageUid']);
@@ -449,6 +460,5 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		}
 		$this->view->assign('numUpdated', $numUpdated);
 	}
-
 }
 ?>
