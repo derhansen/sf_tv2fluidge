@@ -33,12 +33,13 @@ and TypoScript.
 2. Create backend layouts and Fluidtemplates for all TemplaVoila page templates you wish to migrate
 3. Delete all unreferenced elements
 4. Convert references to "insert records" elements
-5. Migrate all Flexible Content Elements to Grid Elements
-6. Migrate all TemplaVoila page templates to Fluidtemplate
-7. Delete TemplaVoila-Folder General Record Storage Page from root page
-8. Remove TemplaVoila
-9. Optionally convert GridElements with "all languages"
-10. Optionally fix the sorting of translated content elements
+5. Delete all unreferenced elements (conversion of "insert records" elements creates no unreferenced elements)
+6. Migrate all Flexible Content Elements to Grid Elements
+7. Migrate all TemplaVoila page templates to Fluidtemplate
+8. Delete TemplaVoila-Folder General Record Storage Page from root page
+9. Remove TemplaVoila
+10. Optionally convert GridElements with "all languages"
+11. Optionally fix the sorting of translated content elements
 
 ## Delete unreferenced elements
 
