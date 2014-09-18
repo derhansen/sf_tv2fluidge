@@ -167,6 +167,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 */
 	public function deleteUnreferencedElementsAction() {
 		$this->sharedHelper->setUnlimitedTimeout();
+		
 		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords();
 		$this->view->assign('numRecords', $numRecords);
 	}
