@@ -216,6 +216,7 @@ should **not** contain `sys_language_overlay = hideNonTranslated`
 Or in TYPO3 v6.2 one can keep this setting but also
 needs to use the new TypoScript option: `select.includeRecordsWithoutDefaultTranslation`,
 see http://docs.typo3.org/typo3cms/TyposcriptReference/Functions/Select/Index.html
+
 If css_styled_content is used this option could be used the following way:
 ```
 styles.content.get.select.includeRecordsWithoutDefaultTranslation = 1
