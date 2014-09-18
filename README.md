@@ -216,12 +216,12 @@ should **not** contain `sys_language_overlay = hideNonTranslated`
 Or in TYPO3 v6.2 one can keep this setting but also
 needs to use the new select TypoScript option: includeRecordsWithoutDefaultTranslation,
 e.g by setting the following if css_styled_content is used:
-`
+```
 styles.content.get.select.includeRecordsWithoutDefaultTranslation = 1
 styles.content.getLeft.select.includeRecordsWithoutDefaultTranslation = 1
 styles.content.getRight.select.includeRecordsWithoutDefaultTranslation = 1
 styles.content.getBorder.select.includeRecordsWithoutDefaultTranslation = 1
-`
+```
 
 ## Fix sorting of translated content elements
 
