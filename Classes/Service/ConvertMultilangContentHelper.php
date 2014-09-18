@@ -122,6 +122,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 			$origContentElement['sys_language_uid'] = 0;
 			$origUid = $origContentElement['uid'];
 			unset ($origContentElement['uid']);
+			$tvTemplateUid = (int)$origContentElement['tx_templavoila_to'];
+			if (!empty($origContentElement['tx_templavoila_flex'])) {
+				$origContentElement['pi_flexform'] = $origContentElement['tx_templavoila_flex'];
+			}
+			$origContentElement['pi_flexform'] = $this->sharedHelper->cleanFlexform($origContentElement['pi_flexform'], $tvTemplateUid);
 			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $origContentElement);
 			$this->updateSysLanguageOfAllLanguageShortcuts($contentElementUid);
 		}
@@ -203,6 +208,10 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		$contentElement['t3_origuid'] = (int)$origUid;
 		$contentElement['l18n_parent'] = (int)$origUid;
 
+		$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
+		if (!empty($contentElement['tx_templavoila_flex'])) {
+			$contentElement['pi_flexform'] = $contentElement['tx_templavoila_flex'];
+		}
 		if (($this->flexformConversionOption !== 'exclude')) {
 			if (t3lib_extMgm::isLoaded('static_info_tables')) {
 				$langUid = (int)$contentElement['sys_language_uid'];
@@ -211,13 +220,15 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 					if ($origUid <= 0) {
 						$forceLanguage = FALSE;
 					}
-					$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
+
 					if (!$this->sharedHelper->isTvDataLangDisabled($tvTemplateUid)) {
 						$contentElement['pi_flexform'] = $this->sharedHelper->convertFlexformForTranslation($contentElement['pi_flexform'], $this->langIsoCodes[$langUid], $forceLanguage);
 					}
 				}
 			}
 		}
+
+		$contentElement['pi_flexform'] = $this->sharedHelper->cleanFlexform($contentElement['pi_flexform'], $tvTemplateUid);
 
 		$existingTranslation = $this->sharedHelper->getTranslationForContentElementAndLanguage($origUid, $langUid);
 		$existingTranslationUid = 0;

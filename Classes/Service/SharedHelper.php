@@ -553,6 +553,62 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		}
 	}
 
+	public function cleanFlexform($flexformString, $tvTemplateUid, $cleanLanguage = true) {
+		$tvTemplateUid = (int)$tvTemplateUid;
+		$flexformArray = NULL;
+		if (!empty($flexformString)) {
+			$contentCols = $this->getTvContentCols($tvTemplateUid, false);
+			if (empty($contentCols)) {
+				$contentCols = array();
+			}
+
+			$flexformArray = t3lib_div::xml2array($flexformString);
+			if (is_array($flexformArray['data']['sDEF'])) {
+				if ($cleanLanguage) {
+					$languageKeys = array_keys($flexformArray['data']['sDEF']);
+					if (!empty($languageKeys)) {
+						foreach ($languageKeys as $languageKey) {
+							if ($languageKey !== 'lDEF') {
+								unset($flexformArray['data']['sDEF'][$languageKey]);
+							}
+						}
+					}
+				}
+
+				$fieldKeys = array_keys($flexformArray['data']['sDEF']['lDEF']);
+
+				foreach ($fieldKeys as $fieldKey) {
+					if (isset($contentCols[$fieldKey])) {
+						unset($flexformArray['data']['sDEF']['lDEF'][$fieldKey]);
+					} else {
+						if ($cleanLanguage) {
+							if (is_array($flexformArray['data']['sDEF']['lDEF'][$fieldKey])) {
+								$languageKeys = array_keys($flexformArray['data']['sDEF']['lDEF'][$fieldKey]);
+								if (!empty($languageKeys)) {
+									foreach ($languageKeys as $languageKey) {
+										if ($languageKey !== 'vDEF') {
+											unset($flexformArray['data']['sDEF']['lDEF'][$fieldKey][$languageKey]);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!empty($flexformArray) && is_array($flexformArray)) {
+			/**
+			 * @var t3lib_flexformtools $flexformTools
+			 */
+			$flexformTools = t3lib_div::makeInstance('t3lib_flexformtools');
+			$flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
+		}
+
+		return $flexformString;
+	}
+
 	/**
 	 * @param $flexformArray
 	 * @param $langIsoCode

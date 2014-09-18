@@ -177,10 +177,12 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function migrateFceFlexformContentToGe($contentElement, $geKey) {
+		$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
+		$flexform = $this->sharedHelper->cleanFlexform($contentElement['tx_templavoila_flex'], $tvTemplateUid, false);
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
 			array(
 				'CType' => 'gridelements_pi1',
-				'pi_flexform' => $contentElement['tx_templavoila_flex'],
+				'pi_flexform' => $flexform,
 				'tx_gridelements_backend_layout' => $geKey
 			)
 		);
