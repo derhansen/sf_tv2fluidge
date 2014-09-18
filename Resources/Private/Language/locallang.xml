@@ -35,8 +35,8 @@
 			<label index="label_convert_flexform_exclude">No translation (keep default)</label>
 			<label index="label_convert_flexform_force_language">Force translation (even if blank)</label>
 			<label index="label_flexform_field_prefix">Prefix for flexform (non content) fields:</label>
-			<label index="label_references_all_lang_label">How to all language references to all language gridelements:</label>
-			<label index="label_references_all_lang_keep">No modification</label>
+			<label index="label_references_all_lang_label">How to convert all language shortcuts to all language gridelements:</label>
+			<label index="label_references_all_lang_keep">No conversion</label>
 			<label index="label_references_all_lang_conversion">Convert to translations with parent uid</label>
 			<label index="label_references_all_lang_update_translated_element">Converts to translations with translation uid</label>
 			<label index="label_convert_alllang_records_in_ge_to_shortcut">Convert all language records inside grid elements to shortcut elements on parent element (only use if config.sys_language_overlay will not be used in page)</label>

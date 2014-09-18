@@ -215,7 +215,7 @@ Also check, if you have content, which does not have a default language. In this
 should **not** contain `sys_language_overlay = hideNonTranslated`
 Or in TYPO3 v6.2 one can keep this setting but also
 needs to use the new TypoScript option: `select.includeRecordsWithoutDefaultTranslation`,
-see http://docs.typo3.org/typo3cms/TyposcriptReference/Functions/Select/Index.html 
+see http://docs.typo3.org/typo3cms/TyposcriptReference/Functions/Select/Index.html
 
 If css_styled_content is used this option could be used the following way:
 ```
@@ -240,10 +240,6 @@ This module should only be used when the following steps are processed:
 * Migration of content from TemplaVoila to Fluid Template
 * Conversion of Grid Elements with language set to "all languages"
 * It is recommended to create a backup of your TYPO3 database, so you can easily roll back if the result is not as expected
-
-## What does not work?
-
-I did not test the migration Flexible Content Elements with containers for elements.
 
 ## Feedback and updates
 
