@@ -203,15 +203,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @return array
 	 */
 	public function getTvContentCols($uidTvDs, $addSelectLabel = true) {
-		if ($this->getTemplavoilaStaticDsIsEnabled()) {
-			$toRecord = $this->getTvTemplateObject($uidTvDs);
-			$path = t3lib_div::getFileAbsFileName($toRecord['datastructure']);
-			$flexform = simplexml_load_file($path);
-		}
-		else {
-			$dsRecord = $this->getTvDatastructure($uidTvDs);
-			$flexform = simplexml_load_string($dsRecord['dataprot']);
-		}
+		$flexform = $this->getTvDataStructureSimpleXmlObject($uidTvDs);
 
 		$contentCols = array();
 
@@ -228,6 +220,44 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		}
 
 		return $contentCols;
+	}
+
+	/**
+	 * @param int $uidTvDs
+	 * @return bool
+	 */
+	public function isTvDataLangDisabled($uidTvDs) {
+		$langDisabled = FALSE;
+		$flexform = $this->getTvDataStructureSimpleXmlObject($uidTvDs);
+		if (!empty($flexform)) {
+			$elements = $flexform->xpath("meta/langDisable");
+			if (is_array($elements) && !empty($elements)) {
+				$element = current($elements);
+				if (!empty($element)) {
+					$langDisabled = (intval($element->__toString()) === 1);
+				}
+			}
+		}
+
+		return $langDisabled;
+	}
+
+	/**
+	 * @param int $uidTvDs
+	 * @return SimpleXMLElement
+	 */
+	protected function getTvDataStructureSimpleXmlObject($uidTvDs) {
+		$flexform = NULL;
+		if ($this->getTemplavoilaStaticDsIsEnabled()) {
+			$toRecord = $this->getTvTemplateObject($uidTvDs);
+			$path = t3lib_div::getFileAbsFileName($toRecord['datastructure']);
+			$flexform = simplexml_load_file($path);
+		}
+		else {
+			$dsRecord = $this->getTvDatastructure($uidTvDs);
+			$flexform = simplexml_load_string($dsRecord['dataprot']);
+		}
+		return $flexform;
 	}
 
 	/**
@@ -521,6 +551,73 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 
 			$contentArray[$fieldName] = implode(',', $fieldValues);
 		}
+	}
+
+	/**
+	 * @param $flexformArray
+	 * @param $langIsoCode
+	 * @return string
+	 */
+	public function convertFlexformForTranslation($flexformString, $langIsoCode, $forceLanguage = FALSE) {
+		$flexformArray = NULL;
+		if (!empty($flexformString)) {
+			if (!empty($langIsoCode)) {
+				$flexformArray = t3lib_div::xml2array($flexformString);
+				if (is_array($flexformArray)) {
+					if (is_array($flexformArray['data']['sDEF']['lDEF'])) {
+						foreach ($flexformArray['data'] as &$sheetData) {
+							foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
+								if (is_array($fieldData)) {
+									$fieldDataLang = NULL;
+									$issetLangValue = FALSE;
+									$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
+									if (is_array($fieldLangArray)) {
+										$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
+										if (!empty($fieldDataLang)) {
+											$fieldData['vDEF'] = $fieldDataLang;
+										} else {
+											if (isset($fieldLangArray['v' . $langIsoCode]) && $forceLanguage) {
+												$issetLangValue = TRUE;
+											} else {
+												$fieldDataLang = $fieldLangArray['vDEF'];
+												if (!empty($fieldDataLang)) {
+													$fieldData['vDEF'] = $fieldDataLang;
+												} elseif (isset($fieldLangArray['vDEF'])) {
+													$issetLangValue = TRUE;
+												}
+											}
+										}
+									}
+
+									if (empty($fieldDataLang)) {
+										$fieldDataLang = $fieldData['v' . $langIsoCode];
+										if (!empty($fieldDataLang)) {
+											$fieldData['vDEF'] = $fieldDataLang;
+										} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
+											$issetLangValue = TRUE;
+										}
+									}
+
+									if ($issetLangValue && $forceLanguage) {
+										$fieldData['vDEF'] = $fieldDataLang;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!empty($flexformArray) && is_array($flexformArray)) {
+			/**
+			 * @var t3lib_flexformtools $flexformTools
+			 */
+			$flexformTools = t3lib_div::makeInstance('t3lib_flexformtools');
+			$flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
+		}
+
+		return $flexformString;
 	}
 
 	/**

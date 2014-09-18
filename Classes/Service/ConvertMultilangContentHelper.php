@@ -211,7 +211,10 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 					if ($origUid <= 0) {
 						$forceLanguage = FALSE;
 					}
-					$contentElement['pi_flexform'] = $this->convertFlexformForTranslation($contentElement['pi_flexform'], $this->langIsoCodes[$langUid], $forceLanguage);
+					$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
+					if (!$this->sharedHelper->isTvDataLangDisabled($tvTemplateUid)) {
+						$contentElement['pi_flexform'] = $this->sharedHelper->convertFlexformForTranslation($contentElement['pi_flexform'], $this->langIsoCodes[$langUid], $forceLanguage);
+					}
 				}
 			}
 		}
@@ -232,73 +235,6 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		}
 
 		return $contentElementUid;
-	}
-
-	/**
-	 * @param $flexformArray
-	 * @param $langIsoCode
-	 * @return string
-	 */
-	protected function convertFlexformForTranslation($flexformString, $langIsoCode, $forceLanguage = FALSE) {
-		$flexformArray = NULL;
-		if (!empty($flexformString)) {
-			if (!empty($langIsoCode)) {
-				$flexformArray = t3lib_div::xml2array($flexformString);
-				if (is_array($flexformArray)) {
-					if (is_array($flexformArray['data']['sDEF']['lDEF'])) {
-						foreach ($flexformArray['data'] as &$sheetData) {
-							foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
-								if (is_array($fieldData)) {
-									$fieldDataLang = NULL;
-									$issetLangValue = FALSE;
-									$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
-									if (is_array($fieldLangArray)) {
-										$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
-										if (!empty($fieldDataLang)) {
-											$fieldData['vDEF'] = $fieldDataLang;
-										} else {
-											if (isset($fieldLangArray['v' . $langIsoCode]) && $forceLanguage) {
-												$issetLangValue = TRUE;
-											} else {
-												$fieldDataLang = $fieldLangArray['vDEF'];
-												if (!empty($fieldDataLang)) {
-													$fieldData['vDEF'] = $fieldDataLang;
-												} elseif (isset($fieldLangArray['vDEF'])) {
-													$issetLangValue = TRUE;
-												}
-											}
-										}
-									}
-
-									if (empty($fieldDataLang)) {
-										$fieldDataLang = $fieldData['v' . $langIsoCode];
-										if (!empty($fieldDataLang)) {
-											$fieldData['vDEF'] = $fieldDataLang;
-										} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
-											$issetLangValue = TRUE;
-										}
-									}
-
-									if ($issetLangValue && $forceLanguage) {
-										$fieldData['vDEF'] = $fieldDataLang;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (!empty($flexformArray) && is_array($flexformArray)) {
-			/**
-			 * @var t3lib_flexformtools $flexformTools
-			 */
-			$flexformTools = t3lib_div::makeInstance('t3lib_flexformtools');
-			$flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
-		}
-
-		return $flexformString;
 	}
 
 	/**
