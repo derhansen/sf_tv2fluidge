@@ -10,7 +10,10 @@
     <h3><f:translate key="label_what_does_it_do" /></h3>
     <p><f:translate key="mod_deleteunref_description" /></p>
 
-    <f:form action="deleteUnreferencedElements">
+    <f:form action="deleteUnreferencedElements" name="formdata" object="{formdata}">
+		<f:form.checkbox id="markasnegativecolpos" name="markasnegativecolpos" property="markasnegativecolpos" value="1" checked="false"/>
+		<label for="markasnegativecolpos"><f:translate key="label_mark_as_negative_col_pos"/></label>
+		<br>
         <f:form.submit value="{f:translate(key: 'label_start')}" class="start"/>
     </f:form>
 

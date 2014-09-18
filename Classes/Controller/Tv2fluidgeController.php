@@ -163,12 +163,16 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Sets all unreferenced Elements to deleted
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function deleteUnreferencedElementsAction() {
+	public function deleteUnreferencedElementsAction($formdata = NULL) {
 		$this->sharedHelper->setUnlimitedTimeout();
-		
-		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords();
+		$markAsNegativeColPos = FALSE;
+		if (intval($formdata['markasnegativecolpos']) === 1) {
+			$markAsNegativeColPos = TRUE;
+		}
+		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords($markAsNegativeColPos);
 		$this->view->assign('numRecords', $numRecords);
 	}
 

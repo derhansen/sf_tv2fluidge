@@ -48,7 +48,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 *
 	 * @return int Number of records deleted
 	 */
-	public function markDeletedUnreferencedElementsRecords() {
+	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE) {
 		$pids = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
 		foreach ($pids as $pid) {
@@ -66,7 +66,11 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
 		$countRecords = count($allRecordUids);
 
-		$this->markDeleted($allRecordUids);
+		if ($markAsNegativeColPos) {
+			$this->markNegativeColPos($allRecordUids);
+		} else {
+			$this->markDeleted($allRecordUids);
+		}
 
 		return $countRecords;
 	}
@@ -111,9 +115,19 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 */
 	private function markDeleted($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
-		$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
 	}
 
+	/**
+	 * Marks the records with the given UIDs as using negative colPos
+	 *
+	 * @param $uids
+	 * @return void
+	 */
+	private function markNegativeColPos($uids) {
+		$where = 'uid IN (' . implode(',', $uids) . ')';
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1));
+	}
 }
 
 ?>
