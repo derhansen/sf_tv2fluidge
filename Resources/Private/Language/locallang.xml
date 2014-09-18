@@ -85,7 +85,7 @@
             <label index="mod_fixsorting_description2">As a result of this action, the sorting of all translated content elements will be the same as the sorting of the original content elements.</label>
             <label index="mod_fixsorting_warning">Use this module after you have migrated your TV FCEs and the page content. Also make sure you create another SQL dump of the migrated TYPO3 database so you quickly can do a rollback if the result does'nt look as expected.</label>
             <label index="mod_fixsorting_page_uid_missing">You must enter a page UID</label>
-            <label index="mod_fixsorting_updated">translated content elements have been updated</label>
+            <label index="mod_fixsorting_updated"> content elements have been updated</label>
 
             <label index="mod_migratefce_ce_updated">content elements have been updated.</label>
             <label index="mod_migratefce_fces_converted">flexible content elements have been migrated.</label>
