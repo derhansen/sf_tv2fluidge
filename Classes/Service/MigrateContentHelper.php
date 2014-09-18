@@ -139,6 +139,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	 */
 	public function migrateTvFlexformForPage($formdata, $pageUid) {
 		$pageUid = (int)$pageUid;
+		$localizationDiffSourceFields = array();
 		$flexformConversionOption = $formdata['convertflexformoption'];
 		$flexformFieldPrefix = $formdata['flexformfieldprefix'];
 		$pageRecord = $this->sharedHelper->getPage($pageUid);
@@ -154,7 +155,6 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 			}
 			array_unshift($allAvailableLanguages, 0);
 
-			$localizationDiffSourceFields = array();
 			foreach ($allAvailableLanguages as $langUid) {
 				$flexformString = $pageFlexformString;
 				$langUid = (int)$langUid;
@@ -218,11 +218,8 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 					}
 				}
 			}
-
-			if (!empty($localizationDiffSourceFields) && is_array($localizationDiffSourceFields)) {
-				$this->sharedHelper->fixPageLocalizationDiffSources($pageUid, $localizationDiffSourceFields);
-			}
 		}
+		$this->sharedHelper->fixPageLocalizationDiffSources($pageUid, $localizationDiffSourceFields);
 	}
 
 	/**

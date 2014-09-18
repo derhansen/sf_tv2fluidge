@@ -70,6 +70,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 		$sorting = 0;
 
 		$contentElementArray = $this->sharedHelper->getTvContentArrayForPage($pageUid);
+		$this->sharedHelper->fixPageLocalizationDiffSources($pageUid);
 		$modifiedSortingCeUids = $this->fixSortingForContentArray($contentElementArray, $pageUid, $sorting);
 		$updated = count($modifiedSortingCeUids);
 

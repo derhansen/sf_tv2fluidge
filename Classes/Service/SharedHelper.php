@@ -829,11 +829,21 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @param array $fields
 	 * @return void
 	 */
-	public function fixPageLocalizationDiffSources($pageUid, $fields) {
+	public function fixPageLocalizationDiffSources($pageUid, $additionalFields = array()) {
 		$pageUid = (int)$pageUid;
 		if ($pageUid > 0) {
+			if (!is_array($additionalFields)) {
+				$additionalFields = array();
+			}
+			$fields = array_merge(
+				array(
+					'backend_layout',
+					'backend_layout_next_level'
+				),
+				$additionalFields
+			);
 			$pageRecord = $this->getPage($pageUid);
-			if (!empty($pageRecord) && !empty($fields) && is_array($pageRecord) && is_array($fields)) {
+			if (!empty($pageRecord) && !empty($fields) && is_array($pageRecord)) {
 				$translations = $this->getPageOverlays($pageUid);
 				$this->fixDiffSourcesForTranslationRecords(
 					$pageRecord,
