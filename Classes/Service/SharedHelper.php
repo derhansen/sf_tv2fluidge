@@ -864,7 +864,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 				if (!empty($diffSource) && ($translationUid > 0)) {
 					$diffSource = unserialize($diffSource);
 					foreach ($fields as $field) {
-						if (empty($origRecord[$field])) {
+						if (!isset($origRecord[$field])) {
 							$origRecord[$field] = '';
 						}
 						$diffSource[$field] = $origRecord[$field];
