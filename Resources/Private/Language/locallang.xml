@@ -33,6 +33,7 @@
 			<label index="label_convert_flexform_merge">Merge translation (if not blank)</label>
 			<label index="label_convert_flexform_exclude">No translation (keep default)</label>
 			<label index="label_convert_flexform_force_language">Force translation (even if blank)</label>
+			<label index="label_flexform_field_prefix">Prefix for flexform (non content) fields:</label>
 			<label index="label_references_all_lang_label">How to all language references to all language gridelements:</label>
 			<label index="label_references_all_lang_keep">No modification</label>
 			<label index="label_references_all_lang_conversion">Convert to translations with parent uid</label>

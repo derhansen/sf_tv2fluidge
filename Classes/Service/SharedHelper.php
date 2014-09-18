@@ -163,7 +163,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @return int
 	 */
 	public function getTvPageTemplateUid($pageUid) {
-		$pageRecord = $this->getPageRecord($pageUid);
+		$pageRecord = $this->getPage($pageUid);
 		$tvTemplateObjectUid = 0;
 		if ($pageRecord['tx_templavoila_to'] != '' && $pageRecord['tx_templavoila_to'] != 0) {
 			$tvTemplateObjectUid = $pageRecord['tx_templavoila_to'];
@@ -178,21 +178,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			}
 		}
 		return $tvTemplateObjectUid;
-	}
-
-	/**
-	 * Returns the page record for the given page uid
-	 *
-	 * @param $uid
-	 * @return array mixed
-	 */
-	public function getPageRecord($uid) {
-		$fields = '*';
-		$table = 'pages';
-		$where = 'uid=' . (int)$uid;
-
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
-		return $res;
 	}
 
 	/**
@@ -410,6 +395,23 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$where = 'uid=' . (int)$uid;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+		return $res;
+	}
+
+	/**
+	 * gets pages overlay for page with $uid
+	 *
+	 * @param $uid
+	 * @return mixed
+	 */
+	public function getPageOverlays($uid) {
+		$fields = '*';
+		$table = 'pages_language_overlay';
+		$where = '(pid = ' . (int)$uid . ')' .
+						' AND (sys_language_uid > 0)' .
+						t3lib_BEfunc::deleteClause('pages_language_overlay');
+
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 		return $res;
 	}
 
@@ -794,30 +796,73 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Fixes localization diff source field for translations of shortcut conversions
+	 * Fixes localization diff sources for content elements
 	 *
 	 * @param integer $contentUid
 	 * @return void
 	 */
-	public function fixLocalizationDiffSources($contentUid) {
+	public function fixContentElementLocalizationDiffSources($contentUid) {
 		$contentUid = (int)$contentUid;
-		$contentElement = $this->getContentElement($contentUid);
-		if (!empty($contentElement) && !empty($contentElement['CType'])) {
-			$translations = $this->getTranslationsForContentElement($contentUid);
+		if ($contentUid > 0) {
+			$contentElement = $this->getContentElement($contentUid);
+			if (!empty($contentElement) && !empty($contentElement['CType'])) {
+				$translations = $this->getTranslationsForContentElement($contentUid);
+				$this->fixDiffSourcesForTranslationRecords(
+					$contentElement,
+					'tt_content',
+					$translations,
+					array(
+						'CType',
+						'records',
+						'colPos',
+						'sorting'
+					)
+				);
+			}
+		}
+	}
 
+	/**
+	 * Fixes localization diff source field for translations of shortcut conversions
+	 *
+	 * @param integer $pageUid
+	 * @param array $fields
+	 * @return void
+	 */
+	public function fixPageLocalizationDiffSources($pageUid, $fields) {
+		$pageUid = (int)$pageUid;
+		if ($pageUid > 0) {
+			$pageRecord = $this->getPage($pageUid);
+			if (!empty($pageRecord) && !empty($fields) && is_array($pageRecord) && is_array($fields)) {
+				$translations = $this->getPageOverlays($pageUid);
+				$this->fixDiffSourcesForTranslationRecords(
+					$pageRecord,
+					'pages_language_overlay',
+					$translations,
+					$fields
+				);
+			}
+		}
+	}
+
+	public function fixDiffSourcesForTranslationRecords($origRecord, $table, $translations, $fields) {
+		if (!empty($origRecord) && !empty($table) && !empty($translations) && !empty($fields) &&
+			is_array($origRecord) && is_string($table) && is_array($translations) && is_array($fields)) {
 			foreach ($translations as $translation) {
 				$translationUid = (int)$translation['uid'];
 				$diffSource = $translation['l18n_diffsource'];
 				if (!empty($diffSource) && ($translationUid > 0)) {
 					$diffSource = unserialize($diffSource);
-					$diffSource['CType'] = $contentElement['CType'];
-					$diffSource['records'] = $contentElement['records'];
-					$diffSource['colPos'] = $contentElement['colPos'];
-					$diffSource['sorting'] = $contentElement['sorting'];
+					foreach ($fields as $field) {
+						if (empty($origRecord[$field])) {
+							$origRecord[$field] = '';
+						}
+						$diffSource[$field] = $origRecord[$field];
+					}
 					$diffSource = serialize($diffSource);
 
 					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-						'tt_content',
+						$table,
 						'uid = ' . $translationUid,
 						array(
 							'l18n_diffsource' => $diffSource
@@ -838,7 +883,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$fields = '*';
 		$table = 'pages_language_overlay';
 		$where = '(pid=' . (int)$pageUid . ') '.
-			' AND (sys_language_uid > 0)' . t3lib_BEfunc::deleteClause('pages_language_overlay');;
+					' AND (sys_language_uid > 0)' .
+					t3lib_BEfunc::deleteClause('pages_language_overlay');
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 

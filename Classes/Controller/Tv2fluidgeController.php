@@ -318,6 +318,14 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 			$uidBeLayout = current(array_keys($beLayouts));
 		}
 
+		if (!isset($formdata['flexformfieldprefix'])) {
+			$formdata['flexformfieldprefix'] = 'tx_';
+		}
+
+		if (!isset($formdata['convertflexformoption'])) {
+			$formdata['convertflexformoption'] = 'merge';
+		}
+
 		// Fetch content columns from TV and BE layouts depending on selection (first entry if empty)
 		$tvContentCols = $this->sharedHelper->getTvContentCols($uidTvTemplate);
 		$beContentCols = $this->sharedHelper->getBeLayoutContentCols($uidBeLayout);
@@ -353,6 +361,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 			foreach($pageUids as $pageUid) {
 				if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
 					$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
+					$this->migrateContentHelper->migrateTvFlexformForPage($formdata, $pageUid);
 				}
 
 				// Update page template (must be called for every page, since to and next_to must be checked

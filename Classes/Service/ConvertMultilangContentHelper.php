@@ -289,10 +289,10 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 					$updated += 1;
 				}
 				$this->updateInGeAllLangElements($pageUid, $contentElementUid, $contentElement);
-				$this->sharedHelper->fixLocalizationDiffSources($childElementUid);
+				$this->sharedHelper->fixContentElementLocalizationDiffSources($childElementUid);
 			}
 
-			$this->sharedHelper->fixLocalizationDiffSources($contentElementUid);
+			$this->sharedHelper->fixContentElementLocalizationDiffSources($contentElementUid);
 		}
 		return $updated;
 	}

@@ -263,7 +263,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			$this->convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid);
 		}
 
-		$this->sharedHelper->fixLocalizationDiffSources($contentUid);
+		$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
 	}
 
 	/**

@@ -47,7 +47,15 @@
 
 		<f:form.checkbox id="markdeleted" name="markdeleted" property="markdeleted" value="1" checked="false"/>
 		<label for="markdeleted"><f:translate key="label_mark_deleted_tv_template"/></label>
-		<br/>
+		<br><br>
+
+		<label for="convert_flexform_option"><f:translate key="label_convert_flexform_label" /></label><br>
+		<f:form.select value="{formdata.convertflexformoption}" options="{merge: '{f:translate(key: \'label_convert_flexform_merge\')}', exclude: '{f:translate(key: \'label_convert_flexform_exclude\')}', forceLanguage: '{f:translate(key: \'label_convert_flexform_force_language\')}'}" id="convert_flexform_option" name="convertflexformoption" property="convertflexformoption" />
+		<br><br>
+
+		<label for="flexformfieldprefix"><f:translate key="label_flexform_field_prefix"/></label><br>
+		<f:form.textfield id="flexform_field_prefix" name="flexformfieldprefix" property="flexformfieldprefix" value="{formdata.flexformfieldprefix}" />
+		<br><br>
 
         <f:form.submit value="" property="dummySubmit" style="display: none; "/>
         <f:form.submit value="{f:translate(key: 'label_start')}" property="startAction" class="start"/>

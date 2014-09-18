@@ -131,6 +131,101 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Migrates templavoila flexform of page to db fields with the given pageUid to the selected column positions
+	 *
+	 * @param array $formdata
+	 * @param int $pageUid
+	 * @return int Number of Content elements updated
+	 */
+	public function migrateTvFlexformForPage($formdata, $pageUid) {
+		$pageUid = (int)$pageUid;
+		$flexformConversionOption = $formdata['convertflexformoption'];
+		$flexformFieldPrefix = $formdata['flexformfieldprefix'];
+		$pageRecord = $this->sharedHelper->getPage($pageUid);
+		$tvTemplateUid = (int)$this->sharedHelper->getTvPageTemplateUid($pageUid);
+		$isTvDataLangDisabled = $this->sharedHelper->isTvDataLangDisabled($tvTemplateUid);
+		$pageFlexformString = $pageRecord['tx_templavoila_flex'];
+
+		if (!empty($pageFlexformString)) {
+			$langIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
+			$allAvailableLanguages = $this->sharedHelper->getAvailablePageTranslations($pageUid);
+			if (empty($allAvailableLanguages)) {
+				$allAvailableLanguages = array();
+			}
+			array_unshift($allAvailableLanguages, 0);
+
+			$localizationDiffSourceFields = array();
+			foreach ($allAvailableLanguages as $langUid) {
+				$flexformString = $pageFlexformString;
+				$langUid = (int)$langUid;
+				if (($flexformConversionOption !== 'exclude')) {
+					if (t3lib_extMgm::isLoaded('static_info_tables')) {
+						if ($langUid > 0) {
+							$forceLanguage = ($flexformConversionOption === 'forceLanguage');
+							if (!$isTvDataLangDisabled) {
+								$flexformString = $this->sharedHelper->convertFlexformForTranslation($flexformString, $langIsoCodes[$langUid], $forceLanguage);
+							}
+						}
+					}
+				}
+
+				$flexformString = $this->sharedHelper->cleanFlexform($flexformString, $tvTemplateUid);
+
+				if (!empty($flexformString)) {
+					$flexformArray = t3lib_div::xml2array($flexformString);
+					if (is_array($flexformArray['data'])) {
+						foreach ($flexformArray['data'] as $sheetData) {
+							if (is_array($sheetData['lDEF'])) {
+								foreach ($sheetData['lDEF'] as $fieldName => $fieldData) {
+									if (isset($fieldData['vDEF'])) {
+										$fieldValue = (string)$fieldData['vDEF'];
+										$fullFieldName = $flexformFieldPrefix . $fieldName;
+										if ($langUid === 0) {
+											$fields = $GLOBALS['TYPO3_DB']->admin_get_fields('pages');
+											if (!empty($fields[$fullFieldName])) {
+												if ($GLOBALS['TYPO3_DB']->quoteStr($fullFieldName, 'pages') === $fullFieldName) {
+													$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+														'pages',
+														'uid=' . intval($pageUid),
+														array(
+															$fullFieldName => $fieldValue
+														)
+													);
+												}
+											}
+										} elseif ($langUid > 0) {
+											$fields = $GLOBALS['TYPO3_DB']->admin_get_fields('pages_language_overlay');
+											if (!empty($fields[$fullFieldName])) {
+												if ($GLOBALS['TYPO3_DB']->quoteStr($fullFieldName, 'pages_language_overlay') === $fullFieldName) {
+													$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+														'pages_language_overlay',
+														'(pid=' . intval($pageUid) . ')'
+														. ' AND (sys_language_uid = ' . $langUid . ')' .
+														t3lib_BEfunc::deleteClause('pages_language_overlay'),
+
+														array(
+															$fullFieldName => $fieldValue
+														)
+													);
+												}
+												$localizationDiffSourceFields[] = $fullFieldName;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if (!empty($localizationDiffSourceFields) && is_array($localizationDiffSourceFields)) {
+				$this->sharedHelper->fixPageLocalizationDiffSources($pageUid, $localizationDiffSourceFields);
+			}
+		}
+	}
+
+	/**
 	 * Migrates all content elements for the page with the given pageUid to the selected column positions
 	 *
 	 * @param array $formdata
@@ -150,7 +245,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 					$contentElement = $this->sharedHelper->getContentElement($contentUid);
 					if ($contentElement['pid'] == $pageUid) {
 						$this->sharedHelper->updateContentElementColPos($contentUid, $fieldMapping[$key], $sorting);
-						$this->sharedHelper->fixLocalizationDiffSources($contentElement);
+						$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
 					}
 					$sorting += 25;
 					$count++;
@@ -182,7 +277,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	 * @return int Number of page templates updated
 	 */
 	public function updatePageTemplate($pageUid, $UidTvTemplate, $uidBeLayout) {
-		$pageRecord = $this->sharedHelper->getPageRecord($pageUid);
+		$pageRecord = $this->sharedHelper->getPage($pageUid);
 		$updateFields = array();
 		$count = 0;
 		if ($pageRecord['tx_templavoila_to'] > 0 && $pageRecord['tx_templavoila_to'] == $UidTvTemplate) {

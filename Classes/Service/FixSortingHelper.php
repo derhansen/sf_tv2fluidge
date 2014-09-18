@@ -80,7 +80,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 				$sorting += self::SORTING_OFFSET;
 				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $remainingContentElementUid, array('sorting' => $sorting));
 				$this->refIndex->updateRefIndexTable('tt_content', $remainingContentElementUid);
-				$this->sharedHelper->fixLocalizationDiffSources($remainingContentElementUid);
+				$this->sharedHelper->fixContentElementLocalizationDiffSources($remainingContentElementUid);
 				$updated++;
 			}
 		}
@@ -129,7 +129,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 					}
 
 					$this->refIndex->updateRefIndexTable('tt_content', $contentElementUid);
-					$this->sharedHelper->fixLocalizationDiffSources($contentElementUid);
+					$this->sharedHelper->fixContentElementLocalizationDiffSources($contentElementUid);
 
 					if (!empty($contentTvFlexform)) {
 						$contentArrayForFce = $this->sharedHelper->getTvContentArrayForContent($contentElementUid);

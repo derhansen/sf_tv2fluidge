@@ -248,7 +248,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 					$sorting += 25;
 					$count++;
 
-					$this->sharedHelper->fixLocalizationDiffSources($contentUid);
+					$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
 					$this->refIndex->updateRefIndexTable('tt_content', $contentUid);
 				}
 			}
