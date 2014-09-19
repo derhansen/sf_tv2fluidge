@@ -681,6 +681,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 										$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
 										if (is_array($fieldLangArray)) {
 											$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
+											if (isset($fieldDataLang)) {
+												if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
+													$fieldDataLang = (int)$fieldDataLang;
+												}
+											}
 											if (!empty($fieldDataLang)) {
 												$fieldData['vDEF'] = $fieldDataLang;
 											} else {
@@ -688,6 +693,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 													$issetLangValue = TRUE;
 												} else {
 													$fieldDataLang = $fieldLangArray['vDEF'];
+													if (isset($fieldDataLang)) {
+														if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
+															$fieldDataLang = (int)$fieldDataLang;
+														}
+													}
 													if (!empty($fieldDataLang)) {
 														$fieldData['vDEF'] = $fieldDataLang;
 													} elseif (isset($fieldLangArray['vDEF'])) {
@@ -697,6 +707,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 											}
 										}
 
+										if (isset($fieldDataLang)) {
+											if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
+												$fieldDataLang = (int)$fieldDataLang;
+											}
+										}
 										if (empty($fieldDataLang)) {
 											$fieldDataLang = $fieldData['v' . $langIsoCode];
 											if (!empty($fieldDataLang)) {
