@@ -154,6 +154,23 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Tests if the input can be interpreted as float.
+	 *
+	 * Note: Float casting from objects or arrays is considered undefined and thus will return false.
+	 * @see http://php.net/manual/en/language.types.float.php
+	 *
+	 * @param $var mixed Any input variable to test
+	 * @return boolean Returns TRUE if string is an float
+	 */
+	public static function canBeInterpretedAsFloat($var) {
+		if ($var === '' || is_object($var) || is_array($var)) {
+			return FALSE;
+		}
+
+		return (filter_var($var, FILTER_VALIDATE_FLOAT) !== FALSE);
+	}
+
+	/**
 	 * @param string| int $value
 	 * @return bool
 	 */
@@ -681,10 +698,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 										$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
 										if (is_array($fieldLangArray)) {
 											$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
-											if (isset($fieldDataLang)) {
-												if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
-													$fieldDataLang = (int)$fieldDataLang;
-												}
+											if (isset($fieldLangArray['v' . $langIsoCode])) {
+												$fieldDataLang = $this->parseFieldDataLang($fieldDataLang);
 											}
 											if (!empty($fieldDataLang)) {
 												$fieldData['vDEF'] = $fieldDataLang;
@@ -693,10 +708,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 													$issetLangValue = TRUE;
 												} else {
 													$fieldDataLang = $fieldLangArray['vDEF'];
-													if (isset($fieldDataLang)) {
-														if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
-															$fieldDataLang = (int)$fieldDataLang;
-														}
+													if (isset($fieldLangArray['vDEF'])) {
+														$fieldDataLang = $this->parseFieldDataLang($fieldDataLang);
 													}
 													if (!empty($fieldDataLang)) {
 														$fieldData['vDEF'] = $fieldDataLang;
@@ -707,13 +720,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 											}
 										}
 
-										if (isset($fieldDataLang)) {
-											if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
-												$fieldDataLang = (int)$fieldDataLang;
-											}
-										}
 										if (empty($fieldDataLang)) {
 											$fieldDataLang = $fieldData['v' . $langIsoCode];
+											if (isset($fieldData['v' . $langIsoCode])) {
+												$fieldDataLang = $this->parseFieldDataLang($fieldDataLang);
+											}
 											if (!empty($fieldDataLang)) {
 												$fieldData['vDEF'] = $fieldDataLang;
 											} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
@@ -732,7 +743,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 				}
 			}
 		}
-
+		
 		if (!empty($flexformArray) && is_array($flexformArray)) {
 			/**
 			 * @var t3lib_flexformtools $flexformTools
@@ -742,6 +753,21 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		}
 
 		return $flexformString;
+	}
+
+	/**
+	 * @param mixed $fieldDataLang
+	 * @return mixed
+	 */
+	private function parseFieldDataLang($fieldDataLang) {
+		if (isset($fieldDataLang) && ($fieldDataLang !== NULL)) {
+			if ($this->canBeInterpretedAsInteger($fieldDataLang)) {
+				$fieldDataLang = (int)$fieldDataLang;
+			} elseif ($this->canBeInterpretedAsFloat($fieldDataLang)) {
+				$fieldDataLang = (float)$fieldDataLang;
+			}
+		}
+		return $fieldDataLang;
 	}
 
 	/**
