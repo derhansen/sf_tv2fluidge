@@ -230,8 +230,12 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			$elements = $flexform->xpath("meta/langDisable");
 			if (is_array($elements) && !empty($elements)) {
 				$element = current($elements);
-				if (!empty($element)) {
-					$langDisabled = (intval($element->__toString()) === 1);
+
+				if ($element !== NULL) {
+					try {
+						$langDisabled = (intval($element->__toString()) === 1);
+					} catch (\Exception $e) {
+					}
 				}
 			}
 		}
@@ -485,14 +489,26 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			$contentCols = $this->getTvContentCols($tvTemplateUid, false);
 			if (($result['tx_templavoila_flex'] != '') && is_array($contentCols) && !empty($contentCols)) {
 				$flexFormArray = t3lib_div::xml2array($result['tx_templavoila_flex']);
-				$languageSheets = $this->moveDefLanguageFirstFlexformArray($flexFormArray['data']['sDEF'], 'lDEF');
+				if (is_array($flexFormArray['data'])) {
+					foreach ($flexFormArray['data'] as $flexFormSheet) {
+						if (is_array($flexFormSheet)) {
+							$languageSheets = array('lDEF' => $flexFormSheet['lDEF']);
+							if (!$this->isTvDataLangDisabled($tvTemplateUid)) {
+								$languageSheets = $this->moveDefLanguageToFirstPositionOfFlexformArray($flexFormSheet, 'lDEF');
+							}
 
-				foreach ($languageSheets as $languageSheet) {
-					if (is_array($languageSheet)) {
-						foreach ($languageSheet as $fieldName => $values) {
-							if (!empty($fieldName) && isset($contentCols[$fieldName])) {
-								$values = $this->moveDefLanguageFirstFlexformArray($values, 'vDEF');
-								$this->addValuesToContentArray($contentArray, $fieldName, $values);
+							foreach ($languageSheets as $languageSheet) {
+								if (is_array($languageSheet)) {
+									foreach ($languageSheet as $fieldName => $values) {
+										if (!empty($fieldName) && isset($contentCols[$fieldName])) {
+											if ($this->isTvDataLangDisabled($tvTemplateUid)) {
+												$values = array('vDEF' => $values['vDEF']);
+											}
+											$values = $this->moveDefLanguageToFirstPositionOfFlexformArray($values, 'vDEF');
+											$this->addValuesToContentArray($contentArray, $fieldName, $values);
+										}
+									}
+								}
 							}
 						}
 					}
@@ -503,7 +519,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		return $contentArray;
 	}
 
-	private function moveDefLanguageFirstFlexformArray($flexformArray, $firstElementKey) {
+	private function moveDefLanguageToFirstPositionOfFlexformArray($flexformArray, $firstElementKey) {
 		$defLanguageFirstFlexformArray = array();
 		if (!empty($firstElementKey) && isset($flexformArray[$firstElementKey])) {
 			$defLanguageFirstFlexformArray[$firstElementKey] = $flexformArray[$firstElementKey];
@@ -522,7 +538,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * @param array $values
 	 */
 	private function addValuesToContentArray(&$contentArray, $fieldName, $values) {
-
 		foreach($values as $languageValues) {
 			$fieldValues = array();
 			if (!empty($contentArray[$fieldName])) {
@@ -567,6 +582,15 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		}
 	}
 
+	/**
+	 * cleans templavoila flexform of unnecessary elements and languages, e.g. remove not default languages during
+	 * convert all languages gridelements or remove content element references
+	 *
+	 * @param string $flexformString
+	 * @param int $tvTemplateUid
+	 * @param bool $cleanLanguage
+	 * @return string
+	 */
 	public function cleanFlexform($flexformString, $tvTemplateUid, $cleanLanguage = true) {
 		$tvTemplateUid = (int)$tvTemplateUid;
 		$flexformArray = NULL;
@@ -577,31 +601,35 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			}
 
 			$flexformArray = t3lib_div::xml2array($flexformString);
-			if (is_array($flexformArray['data']['sDEF'])) {
-				if ($cleanLanguage) {
-					$languageKeys = array_keys($flexformArray['data']['sDEF']);
-					if (!empty($languageKeys)) {
-						foreach ($languageKeys as $languageKey) {
-							if ($languageKey !== 'lDEF') {
-								unset($flexformArray['data']['sDEF'][$languageKey]);
+			if (is_array($flexformArray['data'])) {
+				foreach ($flexformArray['data'] as &$sheetData) {
+					if (is_array($sheetData)) {
+						if ($cleanLanguage) {
+							$languageKeys = array_keys($sheetData);
+							if (!empty($languageKeys)) {
+								foreach ($languageKeys as $languageKey) {
+									if ($languageKey !== 'lDEF') {
+										unset($sheetData[$languageKey]);
+									}
+								}
 							}
 						}
-					}
-				}
 
-				$fieldKeys = array_keys($flexformArray['data']['sDEF']['lDEF']);
+						$fieldKeys = array_keys($sheetData['lDEF']);
 
-				foreach ($fieldKeys as $fieldKey) {
-					if (isset($contentCols[$fieldKey])) {
-						unset($flexformArray['data']['sDEF']['lDEF'][$fieldKey]);
-					} else {
-						if ($cleanLanguage) {
-							if (is_array($flexformArray['data']['sDEF']['lDEF'][$fieldKey])) {
-								$languageKeys = array_keys($flexformArray['data']['sDEF']['lDEF'][$fieldKey]);
-								if (!empty($languageKeys)) {
-									foreach ($languageKeys as $languageKey) {
-										if ($languageKey !== 'vDEF') {
-											unset($flexformArray['data']['sDEF']['lDEF'][$fieldKey][$languageKey]);
+						foreach ($fieldKeys as $fieldKey) {
+							if (isset($contentCols[$fieldKey])) {
+								unset($sheetData['lDEF'][$fieldKey]);
+							} else {
+								if ($cleanLanguage) {
+									if (is_array($sheetData['lDEF'][$fieldKey])) {
+										$languageKeys = array_keys($sheetData['lDEF'][$fieldKey]);
+										if (!empty($languageKeys)) {
+											foreach ($languageKeys as $languageKey) {
+												if ($languageKey !== 'vDEF') {
+													unset($sheetData['lDEF'][$fieldKey][$languageKey]);
+												}
+											}
 										}
 									}
 								}
@@ -624,6 +652,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * converts flexform for a translation, to use translated values instead of default values
+	 *
 	 * @param $flexformArray
 	 * @param $langIsoCode
 	 * @return string
@@ -634,42 +664,44 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			if (!empty($langIsoCode)) {
 				$flexformArray = t3lib_div::xml2array($flexformString);
 				if (is_array($flexformArray)) {
-					if (is_array($flexformArray['data']['sDEF']['lDEF'])) {
+					if (is_array($flexformArray['data'])) {
 						foreach ($flexformArray['data'] as &$sheetData) {
-							foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
-								if (is_array($fieldData)) {
-									$fieldDataLang = NULL;
-									$issetLangValue = FALSE;
-									$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
-									if (is_array($fieldLangArray)) {
-										$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
-										if (!empty($fieldDataLang)) {
-											$fieldData['vDEF'] = $fieldDataLang;
-										} else {
-											if (isset($fieldLangArray['v' . $langIsoCode]) && $forceLanguage) {
-												$issetLangValue = TRUE;
+							if (is_array($sheetData)) {
+								foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
+									if (is_array($fieldData)) {
+										$fieldDataLang = NULL;
+										$issetLangValue = FALSE;
+										$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
+										if (is_array($fieldLangArray)) {
+											$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
+											if (!empty($fieldDataLang)) {
+												$fieldData['vDEF'] = $fieldDataLang;
 											} else {
-												$fieldDataLang = $fieldLangArray['vDEF'];
-												if (!empty($fieldDataLang)) {
-													$fieldData['vDEF'] = $fieldDataLang;
-												} elseif (isset($fieldLangArray['vDEF'])) {
+												if (isset($fieldLangArray['v' . $langIsoCode]) && $forceLanguage) {
 													$issetLangValue = TRUE;
+												} else {
+													$fieldDataLang = $fieldLangArray['vDEF'];
+													if (!empty($fieldDataLang)) {
+														$fieldData['vDEF'] = $fieldDataLang;
+													} elseif (isset($fieldLangArray['vDEF'])) {
+														$issetLangValue = TRUE;
+													}
 												}
 											}
 										}
-									}
 
-									if (empty($fieldDataLang)) {
-										$fieldDataLang = $fieldData['v' . $langIsoCode];
-										if (!empty($fieldDataLang)) {
-											$fieldData['vDEF'] = $fieldDataLang;
-										} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
-											$issetLangValue = TRUE;
+										if (empty($fieldDataLang)) {
+											$fieldDataLang = $fieldData['v' . $langIsoCode];
+											if (!empty($fieldDataLang)) {
+												$fieldData['vDEF'] = $fieldDataLang;
+											} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
+												$issetLangValue = TRUE;
+											}
 										}
-									}
 
-									if ($issetLangValue && $forceLanguage) {
-										$fieldData['vDEF'] = $fieldDataLang;
+										if ($issetLangValue && $forceLanguage) {
+											$fieldData['vDEF'] = $fieldDataLang;
+										}
 									}
 								}
 							}
