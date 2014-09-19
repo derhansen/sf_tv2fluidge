@@ -605,29 +605,36 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 				foreach ($flexformArray['data'] as &$sheetData) {
 					if (is_array($sheetData)) {
 						if ($cleanLanguage) {
-							$languageKeys = array_keys($sheetData);
-							if (!empty($languageKeys)) {
-								foreach ($languageKeys as $languageKey) {
-									if ($languageKey !== 'lDEF') {
-										unset($sheetData[$languageKey]);
+							$languageSheetKeys = array_keys($sheetData);
+							if (!empty($languageSheetKeys)) {
+								foreach ($languageSheetKeys as $languageSheetKey) {
+									if ($languageSheetKey !== 'lDEF') {
+										unset($sheetData[$languageSheetKey]);
 									}
 								}
 							}
 						}
 
-						$fieldKeys = array_keys($sheetData['lDEF']);
 
-						foreach ($fieldKeys as $fieldKey) {
-							if (isset($contentCols[$fieldKey])) {
-								unset($sheetData['lDEF'][$fieldKey]);
-							} else {
-								if ($cleanLanguage) {
-									if (is_array($sheetData['lDEF'][$fieldKey])) {
-										$languageKeys = array_keys($sheetData['lDEF'][$fieldKey]);
-										if (!empty($languageKeys)) {
-											foreach ($languageKeys as $languageKey) {
-												if ($languageKey !== 'vDEF') {
-													unset($sheetData['lDEF'][$fieldKey][$languageKey]);
+						$languageSheetKeys = array_keys($sheetData);
+						if (is_array($languageSheetKeys)) {
+							foreach ($languageSheetKeys as $languageSheetKey) {
+								$fieldKeys = array_keys($sheetData[$languageSheetKey]);
+								if (is_array($fieldKeys)) {
+									foreach ($fieldKeys as $fieldKey) {
+										if (isset($contentCols[$fieldKey])) {
+											unset($sheetData[$languageSheetKey][$fieldKey]);
+										} else {
+											if ($cleanLanguage) {
+												if (is_array($sheetData[$languageSheetKey][$fieldKey])) {
+													$languageKeys = array_keys($sheetData[$languageSheetKey][$fieldKey]);
+													if (!empty($languageKeys)) {
+														foreach ($languageKeys as $languageKey) {
+															if ($languageKey !== 'vDEF') {
+																unset($sheetData[$languageSheetKey][$fieldKey][$languageKey]);
+															}
+														}
+													}
 												}
 											}
 										}
