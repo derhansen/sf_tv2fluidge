@@ -694,24 +694,26 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 								foreach ($sheetData['lDEF'] as $fieldName => &$fieldData) {
 									if (is_array($fieldData)) {
 										$fieldDataLang = NULL;
+										$chkFieldDataLang = NULL;
 										$issetLangValue = FALSE;
 										$fieldLangArray = $sheetData['l' . $langIsoCode][$fieldName];
 										if (is_array($fieldLangArray)) {
-											$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
+											$chkFieldDataLang = $fieldDataLang = $fieldLangArray['v' . $langIsoCode];
 											if (isset($fieldLangArray['v' . $langIsoCode])) {
-												$fieldDataLang = $this->parseFieldDataLang($fieldDataLang);
+												$chkFieldDataLang = $this->parseFieldDataLang($fieldDataLang);
 											}
-											if (!empty($fieldDataLang)) {
+											if (!empty($chkFieldDataLang)) {
 												$fieldData['vDEF'] = $fieldDataLang;
 											} else {
 												if (isset($fieldLangArray['v' . $langIsoCode]) && $forceLanguage) {
+													$fieldDataLang = $fieldLangArray['v' . $langIsoCode];
 													$issetLangValue = TRUE;
 												} else {
-													$fieldDataLang = $fieldLangArray['vDEF'];
+													$chkFieldDataLang = $fieldDataLang = $fieldLangArray['vDEF'];
 													if (isset($fieldLangArray['vDEF'])) {
-														$fieldDataLang = $this->parseFieldDataLang($fieldDataLang);
+														$chkFieldDataLang = $this->parseFieldDataLang($fieldDataLang);
 													}
-													if (!empty($fieldDataLang)) {
+													if (!empty($chkFieldDataLang)) {
 														$fieldData['vDEF'] = $fieldDataLang;
 													} elseif (isset($fieldLangArray['vDEF'])) {
 														$issetLangValue = TRUE;
@@ -720,19 +722,25 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 											}
 										}
 
-										if (empty($fieldDataLang)) {
-											$fieldDataLang = $fieldData['v' . $langIsoCode];
+										if (empty($chkFieldDataLang)) {
+											$chkFieldDataLang = $fieldValueDataLang = $fieldData['v' . $langIsoCode];
+
 											if (isset($fieldData['v' . $langIsoCode])) {
-												$fieldDataLang = $this->parseFieldDataLang($fieldDataLang);
+												$chkFieldDataLang = $this->parseFieldDataLang($fieldValueDataLang);
 											}
-											if (!empty($fieldDataLang)) {
-												$fieldData['vDEF'] = $fieldDataLang;
+											if (!empty($chkFieldDataLang)) {
+												$fieldDataLang = $fieldValueDataLang;
+												$fieldData['vDEF'] = $fieldValueDataLang;
 											} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
+												$fieldDataLang = $fieldValueDataLang;
 												$issetLangValue = TRUE;
 											}
 										}
 
 										if ($issetLangValue && $forceLanguage) {
+											if ($fieldDataLang === NULL) {
+												$fieldDataLang = '';
+											}
 											$fieldData['vDEF'] = $fieldDataLang;
 										}
 									}
@@ -743,7 +751,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 				}
 			}
 		}
-		
+
 		if (!empty($flexformArray) && is_array($flexformArray)) {
 			/**
 			 * @var t3lib_flexformtools $flexformTools
