@@ -731,7 +731,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 											if (!empty($chkFieldDataLang)) {
 												$fieldDataLang = $fieldValueDataLang;
 												$fieldData['vDEF'] = $fieldValueDataLang;
-											} elseif (isset($fieldLangArray['v' . $langIsoCode])) {
+											} elseif (isset($fieldData['v' . $langIsoCode])) {
 												$fieldDataLang = $fieldValueDataLang;
 												$issetLangValue = TRUE;
 											}
