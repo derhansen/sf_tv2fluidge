@@ -20,7 +20,9 @@
             <label index="label_warning">Warning</label>
             <label index="label_fce">Flexible Content Element</label>
             <label index="label_ge">Grid Element</label>
+			<label index="label_mark_as_negative_col_pos">Mark unreferenced elements as "colPos = -1" instead</label>
             <label index="label_mark_deleted">Flag original FCE as deleted</label>
+			<label index="label_mark_deleted_tv_template">Flag original Templavoila template as deleted</label>
 			<label index="label_use_parent_uid_for_translations">Use parent uid for content translations</label>
             <label index="label_create_reference">Create shortcut content element for TV references</label>
 			<label index="label_delete_unref">Delete unused Elements</label>
@@ -28,11 +30,23 @@
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
             <label index="label_convertmultilang_content">Convert Grid Elements</label>
+			<label index="label_convert_flexform_label">How to handle gridelements flexform (regarding language options):</label>
+			<label index="label_convert_flexform_merge">Merge translation (if not blank)</label>
+			<label index="label_convert_flexform_exclude">No translation (keep default)</label>
+			<label index="label_convert_flexform_force_language">Force translation (even if blank)</label>
+			<label index="label_flexform_field_prefix">Prefix for flexform (non content) fields:</label>
+			<label index="label_references_all_lang_label">How to convert all language shortcuts to all language gridelements:</label>
+			<label index="label_references_all_lang_keep">No conversion</label>
+			<label index="label_references_all_lang_conversion">Convert to translations with parent uid</label>
+			<label index="label_references_all_lang_update_translated_element">Converts to translations with translation uid</label>
+			<label index="label_convert_alllang_records_in_ge_to_shortcut">Convert all language records inside grid elements to shortcut elements on parent element (only use if config.sys_language_overlay will not be used in page)</label>
             <label index="label_fix_sorting">Fix sorting</label>
             <label index="label_tv_template">TV Page Template</label>
             <label index="label_be_layout">Backend Layout</label>
             <label index="label_fix_options">Options</label>
             <label index="label_page_uid">Page UID</label>
+			<label index="label_ext_conf_migration_pages_depth_limit">Pages depth limit for migration</label>
+			<label index="label_ext_conf_include_non_root_pages">Include non root pages in migration</label>
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
             <label index="desc_docs_and_help">This extension is hosted on GitHub. Feel free to submit feedback, bugs and changerequest directly at</label>
@@ -72,7 +86,7 @@
             <label index="mod_fixsorting_description2">As a result of this action, the sorting of all translated content elements will be the same as the sorting of the original content elements.</label>
             <label index="mod_fixsorting_warning">Use this module after you have migrated your TV FCEs and the page content. Also make sure you create another SQL dump of the migrated TYPO3 database so you quickly can do a rollback if the result does'nt look as expected.</label>
             <label index="mod_fixsorting_page_uid_missing">You must enter a page UID</label>
-            <label index="mod_fixsorting_updated">translated content elements have been updated</label>
+            <label index="mod_fixsorting_updated">content elements have been updated</label>
 
             <label index="mod_migratefce_ce_updated">content elements have been updated.</label>
             <label index="mod_migratefce_fces_converted">flexible content elements have been migrated.</label>

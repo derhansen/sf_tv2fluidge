@@ -34,6 +34,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	protected $sharedHelper;
 
 	/**
+	 * @var t3lib_refindex
+	 */
+	protected $refIndex;
+
+	/**
 	 * @var bool
 	 */
 	protected $useParentUidForTranslations = FALSE;
@@ -49,6 +54,16 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
+	 * DI for t3lib_refindex
+	 *
+	 * @param t3lib_refindex t3lib_refindex
+	 * @return void
+	 */
+	public function injectRefIndex(t3lib_refindex $refIndex) {
+		$this->refIndex = $refIndex;
+	}
+
+	/**
 	 * Converts all reference elements to 'insert records' elements with a recursion level of 99
 	 *
 	 * @param bool $useParentUidForTranslations
@@ -59,7 +74,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
-		$pids = $this->sharedHelper->getPageIds(99);
+		$pids = $this->sharedHelper->getPageIds();
 		$numRecords = 0;
 		foreach ($pids as $pid) {
 			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);
@@ -148,6 +163,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		if ($newContentUid > 0) {
 			$this->convertToShortcut($newContentUid, $contentUid);
 			$this->convertTranslationsOfShortcut($newContentUid, $contentUid);
+			$this->refIndex->updateRefIndexTable('tt_content', $newContentUid);
 			++$numRecords;
 		}
 		return $numRecords;
@@ -247,7 +263,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			$this->convertTranslationsToShortCutUsingTranslationUid($contentUid, $targetUid);
 		}
 
-		$this->fixLocalizationDiffSources($contentUid);
+		$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
 	}
 
 	/**
@@ -299,40 +315,25 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 					);
 				}
 			}
+
+			$this->updateRefIndexTranslations($contentUid);
 		}
 	}
 
 	/**
-	 * Fixes localization diff source field for translations of shortcut conversions
+	 * updates sys_refindex for translation content elements
 	 *
-	 * @param integer $contentUid
-	 * @return void
+	 * @param $contentUid
 	 */
-	protected function fixLocalizationDiffSources($contentUid) {
-		$contentUid = (int)$contentUid;
-		$contentElement = $this->sharedHelper->getContentElement($contentUid);
-		if (!empty($contentElement) && !empty($contentElement['CType']) && !empty($contentElement['records'])) {
-			$translations = $this->sharedHelper->getTranslationsForContentElement($contentUid);
-
-			foreach ($translations as $translation) {
-				$translationUid = (int)$translation['uid'];
-				$diffSource = $translation['l18n_diffsource'];
-				if (!empty($diffSource) && ($translationUid > 0)) {
-					$diffSource = unserialize($diffSource);
-					$diffSource['CType'] = $contentElement['CType'];
-					$diffSource['records'] = $contentElement['records'];
-					$diffSource = serialize($diffSource);
-
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
-						'tt_content',
-						'uid = ' . $translationUid,
-						array(
-							'l18n_diffsource' => $diffSource
-						)
-					);
+	protected function updateRefIndexTranslations($contentUid) {
+		$updateRefIndexTranslations = $this->sharedHelper->getTranslationsForContentElement($contentUid);
+		if (!empty($updateRefIndexTranslations)) {
+			foreach ($updateRefIndexTranslations as $updateRefIndexTranslation) {
+				$updateRefIndexTranslationUid = (int)$updateRefIndexTranslation['uid'];
+				if ($updateRefIndexTranslationUid > 0) {
+					$this->refIndex->updateRefIndexTable('tt_content', $updateRefIndexTranslationUid);
 				}
 			}
 		}
 	}
-
 }

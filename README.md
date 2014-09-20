@@ -33,12 +33,13 @@ and TypoScript.
 2. Create backend layouts and Fluidtemplates for all TemplaVoila page templates you wish to migrate
 3. Delete all unreferenced elements
 4. Convert references to "insert records" elements
-5. Migrate all Flexible Content Elements to Grid Elements
-6. Migrate all TemplaVoila page templates to Fluidtemplate
-7. Delete TemplaVoila-Folder General Record Storage Page from root page
-8. Remove TemplaVoila
-9. Optionally convert GridElements with "all languages"
-10. Optionally fix the sorting of translated content elements
+5. Delete all unreferenced elements (conversion of references to FCE elements to insert records creates new unreferenced elements)
+6. Migrate all Flexible Content Elements to Grid Elements
+7. Migrate all TemplaVoila page templates to Fluidtemplate
+8. Delete TemplaVoila-Folder General Record Storage Page from root page
+9. Remove TemplaVoila
+10. Optionally convert GridElements with "all languages"
+11. Optionally fix the sorting of translated content elements
 
 ## Delete unreferenced elements
 
@@ -142,6 +143,10 @@ This module migrates content from TemplaVoila content columns to backend layout 
 Fluidtemplate. After the content migration, the selected backend layout gets assigned to the "Backend Layout"
 select boxes.
 
+It also migrates flexform fields (e.g. textfields or images, which are used in your frontend output).
+The flexform fields will be migrated to the Database fields, if those fields exist.
+If the corresponding field does not exist, they will be ignored.
+
 ### Prerequisites
 
 Before you can start with the migration, you must create a backend layout and Fluidtemplate for each TemplaVoila
@@ -154,8 +159,9 @@ identify them when remapping from TemplaVoila content columns to backend layout 
 It is important to check, that both dropdown boxes for the TemplaVoila Template Design contains a template.
 So make sure "Use Template Design" and "Subpages - Use Template Design" contains a valid template.
 
-If your TemplaVoila template contains FlexForm fields (e.g. input, images, ...), then you should consider to
-resturcture your template.
+If your TemplaVoila template contains FlexForm fields (e.g. input, images, ...) and you want to keep them
+then you should create database fields for them (in table "pages" and "pages_language_overlay").
+Those fields need to be named as the fields in the FlexForm but can contain a prefix (which can be specified per template).
 
 ### Migrating content from TemplaVoila
 
@@ -202,12 +208,23 @@ This module should only be used when the following steps are processed:
 Atfer the conversion, you should use the module "Fix sorting" to apply the sorting of the original content elements
 to the translated content elements.
 
-If the original Flexible Content Elements used flexform fields (e.g. textfields or imagefields), you must manually
-copy the content of all translated fields to the corresponding fields in the GridElement. Afterwards, you must add
+If the original Flexible Content Elements used flexform fields (e.g. textfields or imagefields), the migration
+will also modified the FlexForm to use lDEF and vDEF only, so one has to set
 `<langDisable>1</langDisable>` to the flexform of your GridElement
 
 Also check, if you have content, which does not have a default language. In this case, your TypoScript Setup
 should **not** contain `sys_language_overlay = hideNonTranslated`
+Or in TYPO3 v6.2 one can keep this setting but also
+needs to use the new TypoScript option: `select.includeRecordsWithoutDefaultTranslation`,
+see http://docs.typo3.org/typo3cms/TyposcriptReference/Functions/Select/Index.html
+
+If css_styled_content is used this option could be used the following way:
+```
+styles.content.get.select.includeRecordsWithoutDefaultTranslation = 1
+styles.content.getLeft.select.includeRecordsWithoutDefaultTranslation = 1
+styles.content.getRight.select.includeRecordsWithoutDefaultTranslation = 1
+styles.content.getBorder.select.includeRecordsWithoutDefaultTranslation = 1
+```
 
 ## Fix sorting of translated content elements
 
@@ -224,12 +241,6 @@ This module should only be used when the following steps are processed:
 * Migration of content from TemplaVoila to Fluid Template
 * Conversion of Grid Elements with language set to "all languages"
 * It is recommended to create a backup of your TYPO3 database, so you can easily roll back if the result is not as expected
-
-## What does not work?
-
-I did not test the migration Flexible Content Elements with containers for elements. Also the migration does not
-respect TemplaVoila page templates with flexform fields (e.g. textfields or images, which are used in your frontend
-output).
 
 ## Feedback and updates
 
