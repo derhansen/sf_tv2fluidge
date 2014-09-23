@@ -915,7 +915,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 						'CType',
 						'records',
 						'colPos',
-						'sorting'
+						'sorting',
+						'sys_language_uid'
 					)
 				);
 			}
