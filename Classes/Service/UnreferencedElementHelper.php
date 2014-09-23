@@ -48,18 +48,29 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 *
 	 * @return int Number of records deleted
 	 */
-	public function markDeletedUnreferencedElementsRecords() {
-		$pids = $this->sharedHelper->getPageIds(99);
+	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE) {
+		$pids = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
 		foreach ($pids as $pid) {
-			$referencedElementsArr = $this->sharedHelper->getTemplavoilaAPIObj()->flexform_getListOfSubElementUidsRecursively ('pages', $pid, $dummyArr=array());
-			$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
+			$pageRecord = $this->sharedHelper->getPage($pid);
+			if (!empty($pageRecord)) {
+				$contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
+				$referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
+				if (!empty($referencedElementsArrAsKeys)) {
+					$referencedElementsArr = array_keys($referencedElementsArrAsKeys);
+					$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
+				}
+			}
 		}
 		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
 		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
 		$countRecords = count($allRecordUids);
 
-		$this->markDeleted($allRecordUids);
+		if ($markAsNegativeColPos) {
+			$this->markNegativeColPos($allRecordUids);
+		} else {
+			$this->markDeleted($allRecordUids);
+		}
 
 		return $countRecords;
 	}
@@ -73,14 +84,14 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @access	protected
 	 */
 	function getUnreferencedElementsRecords($allReferencedElementsArr) {
-		global $TYPO3_DB;
+		global $TYPO3_DB, $BE_USER;
 
 		$elementRecordsArr = array();
 
 		$res = $TYPO3_DB->exec_SELECTquery (
 			'uid',
 			'tt_content',
-			'uid NOT IN ('.implode(',',$allReferencedElementsArr).') AND l18n_parent NOT IN ('.implode(',',$allReferencedElementsArr).')'.
+			'uid NOT IN ('.implode(',',$allReferencedElementsArr).')'.
 			' AND t3ver_wsid='.intval($BE_USER->workspace).
 			t3lib_BEfunc::deleteClause('tt_content').
 			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),
@@ -104,9 +115,19 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 */
 	private function markDeleted($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
-		$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
 	}
 
+	/**
+	 * Marks the records with the given UIDs as using negative colPos
+	 *
+	 * @param $uids
+	 * @return void
+	 */
+	private function markNegativeColPos($uids) {
+		$where = 'uid IN (' . implode(',', $uids) . ')';
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1));
+	}
 }
 
 ?>

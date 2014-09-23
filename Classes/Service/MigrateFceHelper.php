@@ -34,6 +34,11 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	protected $sharedHelper;
 
 	/**
+	 * @var t3lib_refindex
+	 */
+	protected $refIndex;
+
+	/**
 	 * DI for shared helper
 	 *
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
@@ -41,6 +46,16 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 */
 	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
 		$this->sharedHelper = $sharedHelper;
+	}
+
+	/**
+	 * DI for t3lib_refindex
+	 *
+	 * @param t3lib_refindex t3lib_refindex
+	 * @return void
+	 */
+	public function injectRefIndex(t3lib_refindex $refIndex) {
+		$this->refIndex = $refIndex;
 	}
 
 	/**
@@ -101,7 +116,8 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @return array
 	 */
 	public function getAllGe() {
-		$fields = 'uid, title';
+		/* Select all, because field "alias" is not available in older versions of GE */
+		$fields = '*';
 		$table = 'tx_gridelements_backend_layout';
 		$where = 'deleted=0';
 
@@ -109,7 +125,12 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 
 		$gridElements = array();
 		foreach($res as $ge) {
-			$gridElements[$ge['uid']] = $ge['title'];
+			$geKey = $ge['uid'];
+			if (!empty($ge['alias'])) {
+				$geKey = $ge['alias'];
+			}
+
+			$gridElements[$geKey] = $ge['title'];
 		}
 
 		return $gridElements;
@@ -140,7 +161,8 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	public function getContentElementsByFce($uidFce) {
 		$fields = '*';
 		$table = 'tt_content';
-		$where = 'CType = "templavoila_pi1" AND tx_templavoila_to=' . intval($uidFce);
+		$where = 'CType = "templavoila_pi1" AND tx_templavoila_to=' . intval($uidFce) .
+					t3lib_BEfunc::deleteClause('tt_content');
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
@@ -151,15 +173,17 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * Migrated the content from a TemplaVoila FCE to the given Grid Element
 	 *
 	 * @param array $contentElement
-	 * @param int $uidGe
+	 * @param string|int $geKey
 	 * @return void
 	 */
-	public function migrateFceFlexformContentToGe($contentElement, $uidGe) {
+	public function migrateFceFlexformContentToGe($contentElement, $geKey) {
+		$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
+		$flexform = $this->sharedHelper->cleanFlexform($contentElement['tx_templavoila_flex'], $tvTemplateUid, false);
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
 			array(
 				'CType' => 'gridelements_pi1',
-				'pi_flexform' => $contentElement['tx_templavoila_flex'],
-				'tx_gridelements_backend_layout' => $uidGe
+				'pi_flexform' => $flexform,
+				'tx_gridelements_backend_layout' => $geKey
 			)
 		);
 	}
@@ -186,7 +210,9 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	public function migrateContentElementsForFce($contentElement, $formdata) {
 		$fieldMapping = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'ge_col_');
 		$tvContentArray = $this->sharedHelper->getTvContentArrayForContent($contentElement['uid']);
-		$pageUid = $contentElement['pid'];
+		$translationParentUid = (int)$contentElement['l18n_parent'];
+		$sysLanguageUid = (int)$contentElement['sys_language_uid'];
+		$pageUid = (int)$contentElement['pid'];
 
 		$count = 0;
 		$sorting = 0;
@@ -194,12 +220,36 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
 				$contentUids = explode(',', $contentUidString);
 				foreach ($contentUids as $contentUid) {
+					$contentUid = (int)$contentUid;
+					$myContentElement = NULL;
 					$myContentElement = $this->sharedHelper->getContentElement($contentUid);
-					if ($myContentElement['pid'] == $pageUid) {
-						$this->sharedHelper->updateContentElementForGe($contentUid, $contentElement['uid'], $fieldMapping[$key], $sorting);
+					$containerUid = (int)$contentElement['uid'];
+					if (($translationParentUid > 0) && ($sysLanguageUid > 0)) {
+						$myCeTranslationParentUid = (int)$myContentElement['uid'];
+						if ($myCeTranslationParentUid > 0) {
+							$tmpMyContentElement = $this->sharedHelper->getTranslationForContentElementAndLanguage($myCeTranslationParentUid, $sysLanguageUid);
+							$tmpMyContentUid = (int)$tmpMyContentElement['uid'];
+							if ($tmpMyContentUid > 0) {
+								$contentUid = $tmpMyContentUid;
+								$myContentElement = $tmpMyContentElement;
+							} else {
+								$containerUid = $translationParentUid;
+							}
+						} else {
+							$containerUid = $translationParentUid;
+						}
+					} else {
+						$myContentElement = $this->sharedHelper->getContentElement($contentUid);
+					}
+
+					if (intval($myContentElement['pid']) === $pageUid) {
+						$this->sharedHelper->updateContentElementForGe($contentUid, $containerUid, $fieldMapping[$key], $sorting);
 					}
 					$sorting += 25;
 					$count++;
+
+					$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
+					$this->refIndex->updateRefIndexTable('tt_content', $contentUid);
 				}
 			}
 		}

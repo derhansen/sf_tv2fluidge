@@ -163,10 +163,16 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Sets all unreferenced Elements to deleted
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function deleteUnreferencedElementsAction() {
-		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords();
+	public function deleteUnreferencedElementsAction($formdata = NULL) {
+		$this->sharedHelper->setUnlimitedTimeout();
+		$markAsNegativeColPos = FALSE;
+		if (intval($formdata['markasnegativecolpos']) === 1) {
+			$markAsNegativeColPos = TRUE;
+		}
+		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords($markAsNegativeColPos);
 		$this->view->assign('numRecords', $numRecords);
 	}
 
@@ -182,9 +188,13 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Migrates all reference elements to 'insert records' elements
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function convertReferenceElementsAction() {
+	public function convertReferenceElementsAction($formdata = NULL) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
+		$this->referenceElementHelper->initFormData($formdata);
 		$numRecords = $this->referenceElementHelper->convertReferenceElements();
 		$this->view->assign('numRecords', $numRecords);
 	}
@@ -211,9 +221,9 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		}
 
 		if (isset($formdata['ge'])) {
-			$uidGe = $formdata['ge'];
+			$geKey = $formdata['ge'];
 		} else {
-			$uidGe = current(array_keys($allGe));
+			$geKey = current(array_keys($allGe));
 		}
 
 		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
@@ -222,8 +232,16 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		} else {
 			$fceContentCols = NULL;
 		}
-		if ($uidGe > 0) {
-			$geContentCols = $this->sharedHelper->getGeContentCols($uidGe);
+
+		if ($this->sharedHelper->canBeInterpretedAsInteger($geKey)) {
+			$geKey = (int)$geKey;
+			if ($geKey <= 0) {
+				$geKey = 0;
+			}
+		}
+
+		if (!empty($geKey)) {
+			$geContentCols = $this->sharedHelper->getGeContentCols($geKey);
 		} else {
 			$geContentCols = NULL;
 		}
@@ -248,13 +266,21 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function migrateFceAction($formdata) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$fce = $formdata['fce'];
 		$ge = $formdata['ge'];
+		if ($this->sharedHelper->canBeInterpretedAsInteger($ge)) {
+			$ge = (int)$ge;
+			if ($ge <= 0) {
+				$ge = 0;
+			}
+		}
 
 		$fcesConverted = 0;
 		$contentElementsUpdated = 0;
 
-		if ($fce > 0 && $ge > 0) {
+		if ($fce > 0 && !empty($ge)) {
 			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
 			foreach($contentElements as $contentElement) {
 				$fcesConverted++;
@@ -299,6 +325,14 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 			$uidBeLayout = current(array_keys($beLayouts));
 		}
 
+		if (!isset($formdata['flexformfieldprefix'])) {
+			$formdata['flexformfieldprefix'] = 'tx_';
+		}
+
+		if (!isset($formdata['convertflexformoption'])) {
+			$formdata['convertflexformoption'] = 'merge';
+		}
+
 		// Fetch content columns from TV and BE layouts depending on selection (first entry if empty)
 		$tvContentCols = $this->sharedHelper->getTvContentCols($uidTvTemplate);
 		$beContentCols = $this->sharedHelper->getBeLayoutContentCols($uidBeLayout);
@@ -322,6 +356,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function migrateContentAction($formdata) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$uidTvTemplate = (int)$formdata['tvtemplate'];
 		$uidBeLayout = (int)$formdata['belayout'];
 
@@ -329,15 +365,20 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$pageTemplatesUpdated = 0;
 
 		if ($uidTvTemplate > 0 && $uidBeLayout > 0) {
-			$pageUids = $this->sharedHelper->getPageIds(99);
+			$pageUids = $this->sharedHelper->getPageIds();
 
 			foreach($pageUids as $pageUid) {
-				if ($this->migrateContentHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
+				if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
 					$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
+					$this->migrateContentHelper->migrateTvFlexformForPage($formdata, $pageUid);
 				}
 
 				// Update page template (must be called for every page, since to and next_to must be checked
 				$pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
+			}
+
+			if ($formdata['markdeleted']) {
+				$this->migrateContentHelper->markTvTemplateDeleted($uidTvTemplate);
 			}
 		}
 
@@ -357,13 +398,18 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	/**
 	 * Does the content conversion for all GridElements on all pages
 	 *
+	 * @param array $formdata
 	 * @return void
 	 */
-	public function convertMultilangContentAction() {
-		$pageUids = $this->sharedHelper->getPageIds(99);
+	public function convertMultilangContentAction($formdata = NULL) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
+		$pageUids = $this->sharedHelper->getPageIds();
 
 		$numGEs = 0;
 		$numCEs = 0;
+
+		$this->convertMultilangContentHelper->initFormData($formdata);
 
 		foreach($pageUids as $pageUid) {
 			$numGEs += $this->convertMultilangContentHelper->cloneLangAllGEs($pageUid);
@@ -403,17 +449,18 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function fixSortingAction($formdata) {
+		$this->sharedHelper->setUnlimitedTimeout();
+
 		$numUpdated = 0;
 		if ($formdata['fixOptions'] == 'singlePage') {
 			$numUpdated = $this->fixSortingHelper->fixSortingForPage($formdata['pageUid']);
 		} else {
-			$pageUids = $this->sharedHelper->getPageIds(99);
+			$pageUids = $this->sharedHelper->getPageIds();
 			foreach($pageUids as $pageUid) {
 				$numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUid);
 			}
 		}
 		$this->view->assign('numUpdated', $numUpdated);
 	}
-
 }
 ?>

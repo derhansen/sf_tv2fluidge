@@ -28,10 +28,17 @@
  */
 class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 
+	const SORTING_OFFSET = 25;
+
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
 	 */
 	protected $sharedHelper;
+
+	/**
+	 * @var t3lib_refindex
+	 */
+	protected $refIndex;
 
 	/**
 	 * DI for shared helper
@@ -44,43 +51,143 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Fixes the sorting of all translated content elements for the given page uid
+	 * DI for t3lib_refindex
 	 *
-	 * @todo Add check if new sorting value of translated content element would exceeds int field limit.
+	 * @param t3lib_refindex t3lib_refindex
+	 * @return void
+	 */
+	public function injectRefIndex(t3lib_refindex $refIndex) {
+		$this->refIndex = $refIndex;
+	}
+
+	/**
+	 * Fixes the sorting of all translated content elements for the given page uid
 	 *
 	 * @param int $pageUid
 	 * @return int
 	 */
 	public function fixSortingForPage($pageUid) {
-		$updated = 0;
+		$sorting = 0;
+		$pageUid = (int)$pageUid;
 
-		$contentElements = $this->getPageContentElementsForDefaultLang($pageUid);
-		foreach ($contentElements as $origContentElement) {
-			$translations = $this->sharedHelper->getTranslationsForContentElement($origContentElement['uid']);
-			foreach($translations as $translation) {
-				$origUid = $translation['uid'];
-				unset($translation['uid']);
-				$translation['sorting'] = $origContentElement['sorting'] * $translation['sys_language_uid'];
-				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $translation);
-				$updated += 1;
+		$contentElementArray = $this->sharedHelper->getTvContentArrayForPage($pageUid);
+		$this->sharedHelper->fixPageLocalizationDiffSources($pageUid);
+		$modifiedSortingCeUids = $this->fixSortingForContentArray($contentElementArray, $pageUid, $sorting);
+		$updated = count($modifiedSortingCeUids);
+
+		$remainingContentElements = $this->getRemainingPageContentElements($pageUid, $modifiedSortingCeUids);
+		foreach ($remainingContentElements as $remainingContentElement) {
+			$remainingContentElementUid = (int)$remainingContentElement['uid'];
+			if ($remainingContentElementUid > 0) {
+				$sorting += self::SORTING_OFFSET;
+				$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $remainingContentElementUid, array('sorting' => $sorting));
+				$this->refIndex->updateRefIndexTable('tt_content', $remainingContentElementUid);
+				$this->sharedHelper->fixContentElementLocalizationDiffSources($remainingContentElementUid);
+				$updated++;
 			}
 		}
+
 		return $updated;
 	}
 
 	/**
-	 * Returns all content elements for the given page, where the language is set to the default language
+	 * @param array $contentArray
+	 * @param int $pageUid
+	 * @param int $sorting
+	 * @return array
+	 */
+	protected function fixSortingForContentArray($contentArray, $pageUid, &$sorting) {
+		$pageUid = (int)$pageUid;
+		$modifiedSortingCeUids = array();
+
+		if (is_array($contentArray)) {
+			$contentElementUids = $this->getContentElementUids($contentArray);
+			foreach ($contentElementUids as $ceUid) {
+				$contentElement = $this->sharedHelper->getContentElement($ceUid);
+				$contentTvFlexform = NULL;
+
+				$contentElementPageUid = (int)$contentElement['pid'];
+				if ($contentElementPageUid === $pageUid) {
+					$contentTvFlexform = $contentElement['tx_templavoila_flex'];
+					$contentElementUid = (int)$contentElement['uid'];
+					if ($contentElementUid > 0) {
+						$sorting += self::SORTING_OFFSET;
+						$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $contentElementUid, array('sorting' => $sorting));
+						$modifiedSortingCeUids[] = $contentElementUid;
+
+						$translations = $this->sharedHelper->getTranslationsForContentElement($contentElementUid);
+						if (!empty($translations)) {
+							foreach ($translations as $translation) {
+								$translationUid = $translation['uid'];
+								if ($translationUid > 0) {
+									$sorting += self::SORTING_OFFSET;
+									$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $translationUid, array('sorting' => $sorting));
+									$modifiedSortingCeUids[] = $translationUid;
+									$this->refIndex->updateRefIndexTable('tt_content', $translationUid);
+								}
+							}
+						}
+
+						$this->refIndex->updateRefIndexTable('tt_content', $contentElementUid);
+						$this->sharedHelper->fixContentElementLocalizationDiffSources($contentElementUid);
+
+						if (!empty($contentTvFlexform)) {
+							$contentArrayForFce = $this->sharedHelper->getTvContentArrayForContent($contentElementUid);
+							$fceModifiedCeUids = $this->fixSortingForContentArray($contentArrayForFce, $pageUid, $sorting);
+							$modifiedSortingCeUids = array_merge($modifiedSortingCeUids, $fceModifiedCeUids);
+						}
+					}
+				}
+			}
+		}
+		return $modifiedSortingCeUids;
+	}
+
+	/**
+	 * @param array $contentArray
+	 * @return array<int>
+	 */
+	protected function getContentElementUids($contentArray) {
+		$contentElementUidValues = array();
+		foreach ($contentArray as $contentElementList) {
+			$fieldContentUidValues = t3lib_div::trimExplode(',', $contentElementList, TRUE);
+			if (is_array($fieldContentUidValues)) {
+				foreach ($fieldContentUidValues as $fieldContentUid) {
+					$fieldContentUid = (int)$fieldContentUid;
+					if ($fieldContentUid > 0) {
+						$contentElementUidValues[] = $fieldContentUid;
+					}
+				}
+			}
+		}
+		return $contentElementUidValues;
+	}
+
+	/**
+	 * Returns all content elements for the given page, where the language is set to $langUid
 	 *
 	 * @param int $pageUid
+	 * @param int $langUid
 	 * @return mixed
 	 */
-	public function getPageContentElementsForDefaultLang($pageUid) {
-		$fields = '*';
-		$table = 'tt_content';
-		$where = 'pid=' . (int)$pageUid . ' AND sys_language_uid = 0';
+	public function getRemainingPageContentElements($pageUid, $sortedContentElements) {
+		$sortedContentElements = array_map('intval', $sortedContentElements);
+		$contentElements = array();
+		if (is_array($sortedContentElements)) {
+			$notInWhere = '';
+			if (!empty($sortedContentElements) && is_array($sortedContentElements)) {
+				$notInWhere = ' AND (uid NOT IN (' . implode(',', $sortedContentElements) . '))';
+			}
 
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+			$fields = '*';
+			$table = 'tt_content';
+			$where = '(pid=' . (int)$pageUid . ')' .
+				$notInWhere .
+				t3lib_BEfunc::deleteClause('tt_content');
 
+			$contentElements = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'sorting ASC, sys_language_uid ASC, uid ASC', '');
+		}
+		return $contentElements;
 	}
 
 }
