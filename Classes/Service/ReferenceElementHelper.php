@@ -44,6 +44,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	protected $useParentUidForTranslations = FALSE;
 
 	/**
+	 * @var bool
+	 */
+	protected $useAllLangIfDefaultLangIsReferenced = FALSE;
+
+	/**
 	 * DI for shared helper
 	 *
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
@@ -64,13 +69,20 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
+	 * @param array $formdata
+	 */
+	public function initFormData($formdata) {
+		$this->useParentUidForTranslations = (intval($formdata['useparentuidfortranslations']) === 1);
+		$this->useAllLangIfDefaultLangIsReferenced = (intval($formdata['usealllangifdefaultlangisreferenced']) === 1);
+	}
+
+	/**
 	 * Converts all reference elements to 'insert records' elements with a recursion level of 99
 	 *
 	 * @param bool $useParentUidForTranslations
 	 * @return int Number of records deleted
 	 */
-	public function convertReferenceElements($useParentUidForTranslations = FALSE) {
-		$this->useParentUidForTranslations = (bool)$useParentUidForTranslations;
+	public function convertReferenceElements() {
 		$GLOBALS['TCA']['tt_content']['ctrl']['hideAtCopy'] = 0;
 		$GLOBALS['TCA']['tt_content']['ctrl']['prependAtCopy'] = 0;
 
@@ -162,11 +174,40 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$newContentUid = (int)$newContentUid;
 		if ($newContentUid > 0) {
 			$this->convertToShortcut($newContentUid, $contentUid);
-			$this->convertTranslationsOfShortcut($newContentUid, $contentUid);
+
+			if (!$this->convertShortcutToAllLangShortCut($newContentUid, $contentUid)) {
+				$this->convertTranslationsOfShortcut($newContentUid, $contentUid);
+			}
+
 			$this->refIndex->updateRefIndexTable('tt_content', $newContentUid);
 			++$numRecords;
 		}
 		return $numRecords;
+	}
+
+	protected function convertShortcutToAllLangShortCut($contentUid, $targetUid) {
+		$contentUid = (int)$contentUid;
+		$targetUid = (int)$targetUid;
+		$convertedToAllLang = FALSE;
+		if (($contentUid > 0) && ($targetUid > 0)) {
+			$contentElement = $this->sharedHelper->getContentElement($targetUid);
+
+			if ($this->useAllLangIfDefaultLangIsReferenced && !empty($contentElement)) {
+				$ceSysLanguageUid = (int)$contentElement['sys_language_uid'];
+				$languageParent = (int)$contentElement['l18n_parent'];
+				if ((($ceSysLanguageUid === -1) || ($ceSysLanguageUid === 0))
+					&& ($languageParent === 0)) {
+
+					$this->convertToAllLang($contentUid);
+					$this->deleteTranslations($contentUid);
+					$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
+					$convertedToAllLang = TRUE;
+				}
+			}
+		}
+
+
+		return $convertedToAllLang;
 	}
 
 	/**
@@ -246,6 +287,36 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				'CType'   => 'shortcut',
 				'records' => 'tt_content_' . $targetUid,
 			)
+		);
+	}
+
+	/**
+	 * converts content element to all language content element
+	 *
+	 * @param int $contentUid
+	 */
+	protected function convertToAllLang($contentUid) {
+		$contentUid = (int)$contentUid;
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			'tt_content',
+			'uid = ' . $contentUid,
+			array(
+				'sys_language_uid'   => -1,
+			)
+		);
+	}
+
+	/**
+	 * deletes translation of content element
+	 *
+	 * @param int $contentUid
+	 */
+	protected function deleteTranslations($contentUid) {
+		$contentUid = (int)$contentUid;
+		$GLOBALS['TYPO3_DB']->exec_DELETEquery(
+			'tt_content',
+			'(l18n_parent =' . $contentUid . ')' .
+			t3lib_BEfunc::deleteClause('tt_content')
 		);
 	}
 

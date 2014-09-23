@@ -194,11 +194,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	public function convertReferenceElementsAction($formdata = NULL) {
 		$this->sharedHelper->setUnlimitedTimeout();
 
-		$useParentUidForTranslations = FALSE;
-		if (intval($formdata['useparentuidfortranslations']) === 1) {
-			$useParentUidForTranslations = TRUE;
-		}
-		$numRecords = $this->referenceElementHelper->convertReferenceElements($useParentUidForTranslations);
+		$this->referenceElementHelper->initFormData($formdata);
+		$numRecords = $this->referenceElementHelper->convertReferenceElements();
 		$this->view->assign('numRecords', $numRecords);
 	}
 
