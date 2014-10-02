@@ -117,37 +117,16 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				$contentElement = $this->sharedHelper->getContentElement($contentUid);
 				$contentElementPid = (int)$contentElement['pid'];
 				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
-					$numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid);
+					if ($contentElementPid !== $pid) {
+						$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid);
+					} else if ($contentElement['CType'] == 'templavoila_pi1') {
+						$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid);
+					}
 					++$position;
 				}
 			}
 		}
 
-		return $numRecords;
-	}
-
-	/**
-	 * converts reference content elements, either current content element or sub content elements (FCE)
-	 * including translations to a insert record element
-	 *
-	 * @param int $contentUid
-	 * @param int $contentElementPid
-	 * @param int $pid
-	 * @param string $field
-	 * @param int $position
-	 * @param int $fceUid
-	 * @return int
-	 */
-	protected function convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid = 0) {
-		$numRecords = 0;
-		$contentElementPid = (int)$contentElementPid;
-		$pid = (int)$pid;
-		$fceUid = (int)$fceUid;
-		if ($contentElementPid !== $pid) {
-			$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid);
-		} else {
-			$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid);
-		}
 		return $numRecords;
 	}
 
