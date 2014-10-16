@@ -118,7 +118,13 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 				$contentElementPid = (int)$contentElement['pid'];
 				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
 					if ($contentElementPid !== $pid) {
-						$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid);
+						$pageContentUids = $this->sharedHelper->getFlatTvContentArrayForPage($contentElementPid);
+						if (in_array($contentUid, $pageContentUids)) {
+							$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid);
+						}
+						else {
+							$numRecords += $this->moveReferenceToPage($contentUid, $pid);
+						}
 					} else if ($contentElement['CType'] == 'templavoila_pi1') {
 						$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid);
 					}
@@ -162,6 +168,23 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			++$numRecords;
 		}
 		return $numRecords;
+	}
+
+	/**
+	 * moves a reference content element to the given page
+	 *
+	 * @param int $contentUid
+	 * @param int $pid
+	 * @return int
+	 */
+	protected function moveReferenceToPage($contentUid, $pid) {
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
+			'tt_content',
+			'uid = ' . (int)$contentUid,
+			array(
+				'pid' => (int)$pid,
+			)
+		);
 	}
 
 	protected function convertShortcutToAllLangShortCut($contentUid, $targetUid) {
