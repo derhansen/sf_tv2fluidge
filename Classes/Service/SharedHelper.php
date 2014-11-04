@@ -349,22 +349,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns an flat array (ce uids only) of TV FlexForm content fields for the page with the given UID.
-	 * The content elements are seperated by comma
-	 *
-	 * @param int $pageUid
-	 * @return array
-	 */
-	public function getFlatTvContentArrayForPage($pageUid) {
-		$contentUids = array();
-		$tvContentArray = $this->getTvContentArrayForPage($pageUid);
-		foreach ($tvContentArray as $field => $contentUidString) {
-			$contentUids = array_merge($contentUids, t3lib_div::trimExplode(',', $contentUidString, TRUE));
-		}
-		return $contentUids;
-	}
-
-	/**
 	 * Returns an array of TV FlexForm content fields for the tt_content element with the given uid.
 	 * The content elements are seperated by comma
 	 *
