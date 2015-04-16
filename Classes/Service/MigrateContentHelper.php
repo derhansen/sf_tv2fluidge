@@ -279,6 +279,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 		$count = 0;
 		if ($pageRecord['tx_templavoila_to'] > 0 && $pageRecord['tx_templavoila_to'] == $UidTvTemplate) {
 			$updateFields['backend_layout'] = $uidBeLayout;
+			$updateFields['backend_layout_next_level'] = $uidBeLayout;
 		}
 		if ($pageRecord['tx_templavoila_next_to'] > 0 && $pageRecord['tx_templavoila_next_to'] == $UidTvTemplate) {
 			$updateFields['backend_layout_next_level'] = $uidBeLayout;
