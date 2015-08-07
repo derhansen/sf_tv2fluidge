@@ -791,9 +791,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 
 		$contentCols = array();
 		$contentCols[''] = Tx_Extbase_Utility_Localization::translate('label_select', 'sf_tv2fluidge');
-		foreach($data['rows.'] as $row) {
-			foreach($row['columns.'] as $column) {
-				$contentCols[$column['colPos']] = $column['name'];
+		if ($data) {
+			foreach($data['rows.'] as $row) {
+				foreach($row['columns.'] as $column) {
+					$contentCols[$column['colPos']] = $column['name'];
+				}
 			}
 		}
 		return $contentCols;
