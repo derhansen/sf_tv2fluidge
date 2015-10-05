@@ -618,7 +618,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			}
 
 			$flexformArray = t3lib_div::xml2array($flexformString);
-			if (is_array($flexformArray['data'])) {
+			if (isset($flexformArray['data']) && is_array($flexformArray['data'])) {
 				foreach ($flexformArray['data'] as &$sheetData) {
 					if (is_array($sheetData)) {
 						if ($cleanLanguage) {
