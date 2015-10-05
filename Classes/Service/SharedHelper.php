@@ -506,7 +506,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			$contentCols = $this->getTvContentCols($tvTemplateUid, false);
 			if (($result['tx_templavoila_flex'] != '') && is_array($contentCols) && !empty($contentCols)) {
 				$flexFormArray = t3lib_div::xml2array($result['tx_templavoila_flex']);
-				if (is_array($flexFormArray['data'])) {
+				if (isset($flexFormArray['data']) && is_array($flexFormArray['data'])) {
 					foreach ($flexFormArray['data'] as $flexFormSheet) {
 						if (is_array($flexFormSheet)) {
 							$languageSheets = array('lDEF' => $flexFormSheet['lDEF']);
@@ -618,7 +618,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 			}
 
 			$flexformArray = t3lib_div::xml2array($flexformString);
-			if (is_array($flexformArray['data'])) {
+			if (isset($flexformArray['data']) && is_array($flexformArray['data'])) {
 				foreach ($flexformArray['data'] as &$sheetData) {
 					if (is_array($sheetData)) {
 						if ($cleanLanguage) {
