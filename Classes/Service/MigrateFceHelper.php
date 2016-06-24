@@ -26,7 +26,8 @@
 /**
  * Helper class for handling TV FCE to Grid Element content migration
  */
-class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\SingletonInterface
+{
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -34,7 +35,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	protected $sharedHelper;
 
 	/**
-	 * @var t3lib_refindex
+	 * @var \TYPO3\CMS\Core\Database\ReferenceIndex
 	 */
 	protected $refIndex;
 
@@ -44,17 +45,19 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
 	 * @return void
 	 */
-	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
+	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper)
+	{
 		$this->sharedHelper = $sharedHelper;
 	}
 
 	/**
-	 * DI for t3lib_refindex
+	 * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
 	 *
-	 * @param t3lib_refindex t3lib_refindex
+	 * @param \TYPO3\CMS\Core\Database\ReferenceIndex \TYPO3\CMS\Core\Database\ReferenceIndex
 	 * @return void
 	 */
-	public function injectRefIndex(t3lib_refindex $refIndex) {
+	public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex)
+	{
 		$this->refIndex = $refIndex;
 	}
 
@@ -63,26 +66,30 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 *
 	 * @return array
 	 */
-	public function getAllFileFce() {
+	public function getAllFileFce()
+	{
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['templavoila']);
 		tx_templavoila_staticds_tools::readStaticDsFilesIntoArray($extConf);
 		$staticDsFiles = array();
-		foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['templavoila']['staticDataStructures'] as $staticDataStructure) {
-			if ($staticDataStructure['scope'] == tx_templavoila_datastructure::SCOPE_FCE) {
+		foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['templavoila']['staticDataStructures'] as $staticDataStructure)
+		{
+			if ($staticDataStructure['scope'] == tx_templavoila_datastructure::SCOPE_FCE)
+			{
 				$staticDsFiles[] = $staticDataStructure['path'];
 			}
 		}
 		$quotedStaticDsFiles = $GLOBALS['TYPO3_DB']->fullQuoteArray($staticDsFiles, 'tx_templavoila_tmplobj');
 
 		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
-		$table = 'tx_templavoila_tmplobj';
-		$where = 'tx_templavoila_tmplobj.datastructure IN(' . implode(',', $quotedStaticDsFiles) . ')
+		$table  = 'tx_templavoila_tmplobj';
+		$where  = 'tx_templavoila_tmplobj.datastructure IN('.implode(',', $quotedStaticDsFiles).')
 			AND tx_templavoila_tmplobj.deleted=0';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
 		$fces = array();
-		foreach($res as $fce) {
+		foreach ($res as $fce)
+		{
 			$fces[$fce['uid']] = $fce['title'];
 		}
 
@@ -94,16 +101,18 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 *
 	 * @return array
 	 */
-	public function getAllDbFce() {
+	public function getAllDbFce()
+	{
 		$fields = 'tx_templavoila_tmplobj.uid, tx_templavoila_tmplobj.title';
-		$table = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
-		$where = 'tx_templavoila_datastructure.scope=2 AND tx_templavoila_datastructure.uid = tx_templavoila_tmplobj.datastructure
+		$table  = 'tx_templavoila_datastructure, tx_templavoila_tmplobj';
+		$where  = 'tx_templavoila_datastructure.scope=2 AND tx_templavoila_datastructure.uid = tx_templavoila_tmplobj.datastructure
 			AND tx_templavoila_datastructure.deleted=0 AND tx_templavoila_tmplobj.deleted=0';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
 		$fces = array();
-		foreach($res as $fce) {
+		foreach ($res as $fce)
+		{
 			$fces[$fce['uid']] = $fce['title'];
 		}
 
@@ -115,18 +124,21 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 *
 	 * @return array
 	 */
-	public function getAllGe() {
+	public function getAllGe()
+	{
 		/* Select all, because field "alias" is not available in older versions of GE */
 		$fields = '*';
-		$table = 'tx_gridelements_backend_layout';
-		$where = 'deleted=0';
+		$table  = 'tx_gridelements_backend_layout';
+		$where  = 'deleted=0';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
 		$gridElements = array();
-		foreach($res as $ge) {
+		foreach ($res as $ge)
+		{
 			$geKey = $ge['uid'];
-			if (!empty($ge['alias'])) {
+			if (!empty($ge['alias']))
+			{
 				$geKey = $ge['alias'];
 			}
 
@@ -142,10 +154,11 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param int $uid
 	 * @return mixed
 	 */
-	public function getContentElementByUid($uid) {
+	public function getContentElementByUid($uid)
+	{
 		$fields = '*';
-		$table = 'tt_content';
-		$where = 'uid='  . intval($uid);
+		$table  = 'tt_content';
+		$where  = 'uid='.intval($uid);
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 
@@ -158,11 +171,12 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param int $uidFce
 	 * @return mixed
 	 */
-	public function getContentElementsByFce($uidFce) {
+	public function getContentElementsByFce($uidFce)
+	{
 		$fields = '*';
-		$table = 'tt_content';
-		$where = 'CType = "templavoila_pi1" AND tx_templavoila_to=' . intval($uidFce) .
-					t3lib_BEfunc::deleteClause('tt_content');
+		$table  = 'tt_content';
+		$where  = 'CType = "templavoila_pi1" AND tx_templavoila_to='.intval($uidFce).
+			\TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content');
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
@@ -176,13 +190,14 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param string|int $geKey
 	 * @return void
 	 */
-	public function migrateFceFlexformContentToGe($contentElement, $geKey) {
+	public function migrateFceFlexformContentToGe($contentElement, $geKey)
+	{
 		$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
-		$flexform = $this->sharedHelper->cleanFlexform($contentElement['tx_templavoila_flex'], $tvTemplateUid, false);
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
+		$flexform      = $this->sharedHelper->cleanFlexform($contentElement['tx_templavoila_flex'], $tvTemplateUid, false);
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.intval($contentElement['uid']),
 			array(
-				'CType' => 'gridelements_pi1',
-				'pi_flexform' => $flexform,
+				'CType'                          => 'gridelements_pi1',
+				'pi_flexform'                    => $flexform,
 				'tx_gridelements_backend_layout' => $geKey
 			)
 		);
@@ -194,8 +209,9 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param int $uidFce
 	 * @return void
 	 */
-	public function markFceDeleted($uidFce) {
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidFce),
+	public function markFceDeleted($uidFce)
+	{
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid='.intval($uidFce),
 			array('deleted' => 1)
 		);
 	}
@@ -207,42 +223,56 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @param array $formdata
 	 * @return int Number of Content elements updated
 	 */
-	public function migrateContentElementsForFce($contentElement, $formdata) {
-		$fieldMapping = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'ge_col_');
-		$tvContentArray = $this->sharedHelper->getTvContentArrayForContent($contentElement['uid']);
+	public function migrateContentElementsForFce($contentElement, $formdata)
+	{
+		$fieldMapping         = $this->sharedHelper->getFieldMappingArray($formdata, 'tv_col_', 'ge_col_');
+		$tvContentArray       = $this->sharedHelper->getTvContentArrayForContent($contentElement['uid']);
 		$translationParentUid = (int)$contentElement['l18n_parent'];
-		$sysLanguageUid = (int)$contentElement['sys_language_uid'];
-		$pageUid = (int)$contentElement['pid'];
+		$sysLanguageUid       = (int)$contentElement['sys_language_uid'];
+		$pageUid              = (int)$contentElement['pid'];
 
-		$count = 0;
+		$count   = 0;
 		$sorting = 0;
-		foreach ($tvContentArray as $key => $contentUidString) {
-			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
+		foreach ($tvContentArray as $key => $contentUidString)
+		{
+			if (array_key_exists($key, $fieldMapping) && $contentUidString != '')
+			{
 				$contentUids = explode(',', $contentUidString);
-				foreach ($contentUids as $contentUid) {
-					$contentUid = (int)$contentUid;
-					$myContentElement = NULL;
+				foreach ($contentUids as $contentUid)
+				{
+					$contentUid       = (int)$contentUid;
+					$myContentElement = null;
 					$myContentElement = $this->sharedHelper->getContentElement($contentUid);
-					$containerUid = (int)$contentElement['uid'];
-					if (($translationParentUid > 0) && ($sysLanguageUid > 0)) {
+					$containerUid     = (int)$contentElement['uid'];
+					if (($translationParentUid > 0) && ($sysLanguageUid > 0))
+					{
 						$myCeTranslationParentUid = (int)$myContentElement['uid'];
-						if ($myCeTranslationParentUid > 0) {
+						if ($myCeTranslationParentUid > 0)
+						{
 							$tmpMyContentElement = $this->sharedHelper->getTranslationForContentElementAndLanguage($myCeTranslationParentUid, $sysLanguageUid);
-							$tmpMyContentUid = (int)$tmpMyContentElement['uid'];
-							if ($tmpMyContentUid > 0) {
-								$contentUid = $tmpMyContentUid;
+							$tmpMyContentUid     = (int)$tmpMyContentElement['uid'];
+							if ($tmpMyContentUid > 0)
+							{
+								$contentUid       = $tmpMyContentUid;
 								$myContentElement = $tmpMyContentElement;
-							} else {
+							}
+							else
+							{
 								$containerUid = $translationParentUid;
 							}
-						} else {
+						}
+						else
+						{
 							$containerUid = $translationParentUid;
 						}
-					} else {
+					}
+					else
+					{
 						$myContentElement = $this->sharedHelper->getContentElement($contentUid);
 					}
 
-					if (intval($myContentElement['pid']) === $pageUid) {
+					if (intval($myContentElement['pid']) === $pageUid)
+					{
 						$this->sharedHelper->updateContentElementForGe($contentUid, $containerUid, $fieldMapping[$key], $sorting);
 					}
 					$sorting += 25;

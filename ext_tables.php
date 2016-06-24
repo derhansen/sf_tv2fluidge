@@ -3,14 +3,14 @@ if (!defined('TYPO3_MODE')) {
 	die ('Access denied.');
 }
 
-t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'TemplaVoila Toolbox');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile($_EXTKEY, 'Configuration/TypoScript', 'TemplaVoila Toolbox');
 
 if (TYPO3_MODE === 'BE') {
 
 	/**
 	 * Registers a Backend Module
 	 */
-	Tx_Extbase_Utility_Extension::registerModule(
+	\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerModule(
 		$_EXTKEY,
 		'web', // Make module a submodule of 'web'
 		'sf_tv2fluidge', // Submodule key

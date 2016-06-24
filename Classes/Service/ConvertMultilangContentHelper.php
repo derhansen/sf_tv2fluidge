@@ -26,7 +26,8 @@
 /**
  * Class with methods used for mulitlingual content conversion
  */
-class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements \TYPO3\CMS\Core\SingletonInterface
+{
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -34,7 +35,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	protected $sharedHelper;
 
 	/**
-	 * @var t3lib_refindex
+	 * @var \TYPO3\CMS\Core\Database\ReferenceIndex
 	 */
 	protected $refIndex;
 
@@ -64,26 +65,29 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
 	 * @return void
 	 */
-	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
+	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper)
+	{
 		$this->sharedHelper = $sharedHelper;
 	}
 
 	/**
-	 * DI for t3lib_refindex
+	 * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
 	 *
-	 * @param t3lib_refindex t3lib_refindex
+	 * @param \TYPO3\CMS\Core\Database\ReferenceIndex \TYPO3\CMS\Core\Database\ReferenceIndex
 	 * @return void
 	 */
-	public function injectRefIndex(t3lib_refindex $refIndex) {
+	public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex)
+	{
 		$this->refIndex = $refIndex;
 	}
 
 	/**
 	 * @param array $formdata
 	 */
-	public function initFormData($formdata) {
-		$this->flexformConversionOption = $formdata['convertflexformoption'];
-		$this->insertRecordsConversionOption = $formdata['convertinsertrecords'];
+	public function initFormData($formdata)
+	{
+		$this->flexformConversionOption         = $formdata['convertflexformoption'];
+		$this->insertRecordsConversionOption    = $formdata['convertinsertrecords'];
 		$this->allLanguageRecordsInGeToShortcut = (intval($formdata['alllanguagerecordsingetoshortcut']) === 1);
 	}
 
@@ -94,42 +98,49 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $pageUid
 	 * @return int Amount of cloned GridElements
 	 */
-	public function cloneLangAllGEs($pageUid) {
+	public function cloneLangAllGEs($pageUid)
+	{
 		$cloned = 0;
 
-		$pageLanguages = $this->sharedHelper->getAvailablePageTranslations($pageUid);
-		$allLanguages = $this->sharedHelper->getAllLanguages();
+		$pageLanguages    = $this->sharedHelper->getAvailablePageTranslations($pageUid);
+		$allLanguages     = $this->sharedHelper->getAllLanguages();
 		$nonPageLanguages = array_diff($allLanguages, $pageLanguages);
 
-		$gridElements = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
+		$gridElements       = $this->getCeGridElements($pageUid, -1); // All GridElements with language = all
 		$this->langIsoCodes = $this->sharedHelper->getLanguagesIsoCodes();
 
-		foreach ($gridElements as $contentElementUid) {
+		foreach ($gridElements as $contentElementUid)
+		{
 			$origContentElement = $this->sharedHelper->getContentElement($contentElementUid);
-			foreach ($pageLanguages as $langUid) {
+			foreach ($pageLanguages as $langUid)
+			{
 				$translationContentUid = $this->addTranslationContentElement($origContentElement, $langUid, $origContentElement['uid']);
 				$this->updateShortcutElements($contentElementUid, $langUid, $translationContentUid);
 				$cloned += 1;
 			}
 
 			// modify shortcuts for non non page translations (could be other languages available)
-			if (!empty($nonPageLanguages)) {
-				foreach ($nonPageLanguages as $pageLanguageUid) {
+			if (!empty($nonPageLanguages))
+			{
+				foreach ($nonPageLanguages as $pageLanguageUid)
+				{
 					$this->updateShortcutElements($contentElementUid, $pageLanguageUid, $contentElementUid);
 				}
 			}
 
 			$origContentElement['sys_language_uid'] = 0;
-			$origUid = $origContentElement['uid'];
+			$origUid                                = $origContentElement['uid'];
 			unset ($origContentElement['uid']);
 			$tvTemplateUid = (int)$origContentElement['tx_templavoila_to'];
-			if (!empty($origContentElement['tx_templavoila_flex'])) {
+			if (!empty($origContentElement['tx_templavoila_flex']))
+			{
 				$origContentElement['pi_flexform'] = $origContentElement['tx_templavoila_flex'];
 			}
 			$origContentElement['pi_flexform'] = $this->sharedHelper->cleanFlexform($origContentElement['pi_flexform'], $tvTemplateUid);
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $origContentElement);
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.$origUid, $origContentElement);
 			$this->updateSysLanguageOfAllLanguageShortcuts($contentElementUid);
 		}
+
 		return $cloned;
 	}
 
@@ -138,38 +149,51 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $contentElementUid
 	 * @param int $langUid
 	 */
-	protected function updateShortcutElements($contentElementUid, $langUid, $translationContentUid = 0) {
-		$shortcutElements = $this->getShortcutElements($contentElementUid, $langUid);
+	protected function updateShortcutElements($contentElementUid, $langUid, $translationContentUid = 0)
+	{
+		$shortcutElements      = $this->getShortcutElements($contentElementUid, $langUid);
 		$translationContentUid = (int)$translationContentUid;
-		if ($this->insertRecordsConversionOption !== 'keep') {
-			foreach ($shortcutElements as $shortcutElement) {
-				if (!empty($shortcutElement['records']) && ($shortcutElement['CType'] === 'shortcut')) {
-					$records = t3lib_div::trimExplode(',', $shortcutElement['records'], TRUE);
-					$recordShortcutString = 'tt_content_' . (int)$contentElementUid;
-					$isShortcutRecord = FALSE;
-					foreach ($records as &$record) {
-						if ($record === $recordShortcutString) {
-							if (($this->insertRecordsConversionOption === 'convertAndTranslate') && ($translationContentUid > 0)) {
-								$record = 'tt_content_' . $translationContentUid;
+		if ($this->insertRecordsConversionOption !== 'keep')
+		{
+			foreach ($shortcutElements as $shortcutElement)
+			{
+				if (!empty($shortcutElement['records']) && ($shortcutElement['CType'] === 'shortcut'))
+				{
+					$records              = TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $shortcutElement['records'], true);
+					$recordShortcutString = 'tt_content_'.(int)$contentElementUid;
+					$isShortcutRecord     = false;
+					foreach ($records as &$record)
+					{
+						if ($record === $recordShortcutString)
+						{
+							if (($this->insertRecordsConversionOption === 'convertAndTranslate') && ($translationContentUid > 0))
+							{
+								$record = 'tt_content_'.$translationContentUid;
 							}
-							$isShortcutRecord = TRUE;
+							$isShortcutRecord = true;
 							break;
 						}
 					}
 
-					if ($isShortcutRecord) {
-						if (!empty($records)) {
+					if ($isShortcutRecord)
+					{
+						if (!empty($records))
+						{
 							$shortcutElement['records'] = implode(',', $records);
 						}
 						$languageUid = (int)$shortcutElement['sys_language_uid'];
-						$origUid = NULL;
-						if ($languageUid > 0) {
+						$origUid     = null;
+						if ($languageUid > 0)
+						{
 							$origUid = (int)$shortcutElement['l18n_parent'];
-						} else {
+						}
+						else
+						{
 							$origUid = (int)$shortcutElement['uid'];
 						}
 						$newUid = (int)$this->addTranslationContentElement($shortcutElement, $langUid, $origUid);
-						if ($newUid > 0) {
+						if ($newUid > 0)
+						{
 							$this->refIndex->updateRefIndexTable('tt_content', $newUid);
 						}
 					}
@@ -181,15 +205,19 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	/**
 	 * @param int $contentElementUid
 	 */
-	protected function updateSysLanguageOfAllLanguageShortcuts($contentElementUid) {
-		if ($this->insertRecordsConversionOption !== 'keep') {
+	protected function updateSysLanguageOfAllLanguageShortcuts($contentElementUid)
+	{
+		if ($this->insertRecordsConversionOption !== 'keep')
+		{
 			$contentElementUid = (int)$contentElementUid;
-			$shortcutElements = $this->getShortcutElements($contentElementUid);
-			foreach ($shortcutElements as $shortcutElement) {
-				$shortcutElementUid = (int)$shortcutElement['uid'];
+			$shortcutElements  = $this->getShortcutElements($contentElementUid);
+			foreach ($shortcutElements as $shortcutElement)
+			{
+				$shortcutElementUid      = (int)$shortcutElement['uid'];
 				$shortcutElementLanguage = (int)$shortcutElement['sys_language_uid'];
-				if (($shortcutElementUid > 0) && ($shortcutElementLanguage < 0)) {
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $shortcutElementUid, array('sys_language_uid' => 0));
+				if (($shortcutElementUid > 0) && ($shortcutElementLanguage < 0))
+				{
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.$shortcutElementUid, array('sys_language_uid' => 0));
 				}
 			}
 		}
@@ -200,28 +228,35 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $langUid
 	 * @return int
 	 */
-	protected function addTranslationContentElement($contentElement, $langUid, $origUid) {
+	protected function addTranslationContentElement($contentElement, $langUid, $origUid)
+	{
 		$langUid = (int)$langUid;
 		$origUid = (int)$origUid;
 		unset ($contentElement['uid']);
 		$contentElement['sys_language_uid'] = $langUid;
-		$contentElement['t3_origuid'] = (int)$origUid;
-		$contentElement['l18n_parent'] = (int)$origUid;
+		$contentElement['t3_origuid']       = (int)$origUid;
+		$contentElement['l18n_parent']      = (int)$origUid;
 
 		$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
-		if (!empty($contentElement['tx_templavoila_flex'])) {
+		if (!empty($contentElement['tx_templavoila_flex']))
+		{
 			$contentElement['pi_flexform'] = $contentElement['tx_templavoila_flex'];
 		}
-		if (($this->flexformConversionOption !== 'exclude')) {
-			if (t3lib_extMgm::isLoaded('static_info_tables')) {
+		if (($this->flexformConversionOption !== 'exclude'))
+		{
+			if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables'))
+			{
 				$langUid = (int)$contentElement['sys_language_uid'];
-				if ($langUid > 0) {
+				if ($langUid > 0)
+				{
 					$forceLanguage = ($this->flexformConversionOption === 'forceLanguage');
-					if ($origUid <= 0) {
-						$forceLanguage = FALSE;
+					if ($origUid <= 0)
+					{
+						$forceLanguage = false;
 					}
 
-					if (!$this->sharedHelper->isTvDataLangDisabled($tvTemplateUid)) {
+					if (!$this->sharedHelper->isTvDataLangDisabled($tvTemplateUid))
+					{
 						$contentElement['pi_flexform'] = $this->sharedHelper->convertFlexformForTranslation($contentElement['pi_flexform'], $this->langIsoCodes[$langUid], $forceLanguage);
 					}
 				}
@@ -230,17 +265,21 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 
 		$contentElement['pi_flexform'] = $this->sharedHelper->cleanFlexform($contentElement['pi_flexform'], $tvTemplateUid);
 
-		$existingTranslation = $this->sharedHelper->getTranslationForContentElementAndLanguage($origUid, $langUid);
+		$existingTranslation    = $this->sharedHelper->getTranslationForContentElementAndLanguage($origUid, $langUid);
 		$existingTranslationUid = 0;
-		if (!empty($existingTranslation) && is_array($existingTranslation)) {
+		if (!empty($existingTranslation) && is_array($existingTranslation))
+		{
 			$existingTranslationUid = (int)$existingTranslation['uid'];
 		}
 
-		$contentElementUid = NULL;
-		if ($existingTranslationUid > 0) {
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $existingTranslationUid, $contentElement);
+		$contentElementUid = null;
+		if ($existingTranslationUid > 0)
+		{
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.$existingTranslationUid, $contentElement);
 			$contentElementUid = $existingTranslationUid;
-		} else {
+		}
+		else
+		{
 			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tt_content', $contentElement);
 			$contentElementUid = (int)$GLOBALS['TYPO3_DB']->sql_insert_id();
 		}
@@ -254,38 +293,45 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $pageUid
 	 * @return int Amount of updated content elements
 	 */
-	public function rearrangeContentElementsForGridelementsOnPage($pageUid) {
-		$updated = 0;
+	public function rearrangeContentElementsForGridelementsOnPage($pageUid)
+	{
+		$updated      = 0;
 		$gridElements = $this->getCeGridElements($pageUid, 0);
-		foreach ($gridElements as $contentElementUid) {
+		foreach ($gridElements as $contentElementUid)
+		{
 			$contentElements = $this->getChildContentElements($contentElementUid);
-			foreach ($contentElements as $contentElement) {
+			foreach ($contentElements as $contentElement)
+			{
 				$childElementUid = (int)$contentElement['uid'];
-				$translations = $this->sharedHelper->getTranslationsForContentElement($childElementUid);
-				if (!empty($translations)) {
-					foreach($translations as $translatedContentElement) {
+				$translations    = $this->sharedHelper->getTranslationsForContentElement($childElementUid);
+				if (!empty($translations))
+				{
+					foreach ($translations as $translatedContentElement)
+					{
 						$localizedGridElement = $this->getLocalizedGridElement($contentElementUid,
-														$translatedContentElement['sys_language_uid']);
-						if ($localizedGridElement) {
+							$translatedContentElement['sys_language_uid']);
+						if ($localizedGridElement)
+						{
 							$origUid = $translatedContentElement['uid'];
 							unset($translatedContentElement['uid']);
-							$translatedContentElement['colPos'] = -1;
+							$translatedContentElement['colPos']                    = -1;
 							$translatedContentElement['tx_gridelements_container'] = $localizedGridElement['uid'];
-							$translatedContentElement['tx_gridelements_columns'] = $contentElement['tx_gridelements_columns'];
-							$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $translatedContentElement);
+							$translatedContentElement['tx_gridelements_columns']   = $contentElement['tx_gridelements_columns'];
+							$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.$origUid, $translatedContentElement);
 							$updated += 1;
 						}
 					}
 				}
 
-				if ($contentElement['sys_language_uid'] > 0) {
+				if ($contentElement['sys_language_uid'] > 0)
+				{
 					// Rearrage CE to new localized GEs
 					$localizedGridElement = $this->getLocalizedGridElement($contentElementUid,
-																				$contentElement['sys_language_uid']);
-					$origUid = $contentElement['uid'];
+						$contentElement['sys_language_uid']);
+					$origUid              = $contentElement['uid'];
 					unset($contentElement['uid']);
 					$contentElement['tx_gridelements_container'] = $localizedGridElement['uid'];
-					$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $origUid, $contentElement);
+					$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.$origUid, $contentElement);
 					$updated += 1;
 				}
 				$this->updateInGeAllLangElements($pageUid, $contentElementUid, $contentElement);
@@ -294,6 +340,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 
 			$this->sharedHelper->fixContentElementLocalizationDiffSources($contentElementUid);
 		}
+
 		return $updated;
 	}
 
@@ -302,25 +349,31 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $geElementUid
 	 * @param array $childElement
 	 */
-	protected function updateInGeAllLangElements($pageUid, $geElementUid, $childElement) {
-		$pageUid = (int)$pageUid;
-		$geElementUid = (int)$geElementUid;
+	protected function updateInGeAllLangElements($pageUid, $geElementUid, $childElement)
+	{
+		$pageUid         = (int)$pageUid;
+		$geElementUid    = (int)$geElementUid;
 		$childElementUid = (int)$childElement['uid'];
-		if (($childElement['sys_language_uid'] < 0) && $this->allLanguageRecordsInGeToShortcut) {
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . $childElementUid, array('sys_language_uid' => 0));
+		if (($childElement['sys_language_uid'] < 0) && $this->allLanguageRecordsInGeToShortcut)
+		{
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid='.$childElementUid, array('sys_language_uid' => 0));
 			$pageLanguages = $this->sharedHelper->getAvailablePageTranslations($pageUid);
-			foreach ($pageLanguages as $langUid) {
+			foreach ($pageLanguages as $langUid)
+			{
 				$langUid = (int)$langUid;
-				if ($langUid > 0) {
-					$localizedGridElement = $this->getLocalizedGridElement($geElementUid, $langUid);
+				if ($langUid > 0)
+				{
+					$localizedGridElement    = $this->getLocalizedGridElement($geElementUid, $langUid);
 					$localizedGridElementUid = (int)$localizedGridElement['uid'];
-					if ($localizedGridElementUid > 0) {
-						$translationContentElement = $childElement;
+					if ($localizedGridElementUid > 0)
+					{
+						$translationContentElement                              = $childElement;
 						$translationContentElement['tx_gridelements_container'] = $localizedGridElementUid;
-						$translationContentElement['CType'] = 'shortcut';
-						$translationContentElement['records'] = 'tt_content_' . $childElementUid;
-						$newUid = (int)$this->addTranslationContentElement($translationContentElement, $langUid, $childElementUid);
-						if ($newUid > 0) {
+						$translationContentElement['CType']                     = 'shortcut';
+						$translationContentElement['records']                   = 'tt_content_'.$childElementUid;
+						$newUid                                                 = (int)$this->addTranslationContentElement($translationContentElement, $langUid, $childElementUid);
+						if ($newUid > 0)
+						{
 							$this->refIndex->updateRefIndexTable('tt_content', $newUid);
 						}
 					}
@@ -336,19 +389,23 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $langUid
 	 * @return array
 	 */
-	public function getCeGridElements($pageUid, $langUid) {
+	public function getCeGridElements($pageUid, $langUid)
+	{
 		$fields = 'uid';
-		$table = 'tt_content';
-		$where = 'pid=' . (int)$pageUid . ' AND CType = "gridelements_pi1" AND sys_language_uid = ' . (int)$langUid;
+		$table  = 'tt_content';
+		$where  = 'pid='.(int)$pageUid.' AND CType = "gridelements_pi1" AND sys_language_uid = '.(int)$langUid;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
 		$gridElements = array();
-		if ($res) {
-			foreach($res as $ge) {
+		if ($res)
+		{
+			foreach ($res as $ge)
+			{
 				$gridElements[] = $ge['uid'];
 			}
 		}
+
 		return $gridElements;
 	}
 
@@ -356,24 +413,27 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $uidContentElement
 	 * @return array
 	 */
-	public function getShortcutElements($uidContentElement, $langUid = 0) {
-		$fields = 'tt_content.*';
-		$table = 'sys_refindex, tt_content';
-		$langUid = (int)$langUid;
+	public function getShortcutElements($uidContentElement, $langUid = 0)
+	{
+		$fields    = 'tt_content.*';
+		$table     = 'sys_refindex, tt_content';
+		$langUid   = (int)$langUid;
 		$langWhere = '';
-		if ($langUid > 0) {
-			$langWhere = ' OR ((tt_content.sys_language_uid = ' . $langUid . ')  AND (tt_content.l18n_parent = 0))';
+		if ($langUid > 0)
+		{
+			$langWhere = ' OR ((tt_content.sys_language_uid = '.$langUid.')  AND (tt_content.l18n_parent = 0))';
 		}
-		$where = '(tt_content.CType = \'shortcut\')' .
-					' AND (tt_content.uid = sys_refindex.recuid)' .
-					' AND ('.
-						'(tt_content.sys_language_uid IN (0,-1) AND (tt_content.l18n_parent = 0))' .
-						$langWhere .
-					')' .
-					' AND (sys_refindex.ref_uid = ' . (int)$uidContentElement . ')';
+		$where = '(tt_content.CType = \'shortcut\')'.
+			' AND (tt_content.uid = sys_refindex.recuid)'.
+			' AND ('.
+			'(tt_content.sys_language_uid IN (0,-1) AND (tt_content.l18n_parent = 0))'.
+			$langWhere.
+			')'.
+			' AND (sys_refindex.ref_uid = '.(int)$uidContentElement.')';
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
-		if (empty($res)) {
+		if (empty($res))
+		{
 			$res = array();
 		}
 
@@ -387,10 +447,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $langUid
 	 * @return array
 	 */
-	public function getLocalizedGridElement($uidContentElement, $langUid) {
+	public function getLocalizedGridElement($uidContentElement, $langUid)
+	{
 		$fields = 'uid';
-		$table = 'tt_content';
-		$where = 'l18n_parent=' . (int)$uidContentElement . ' AND CType = "gridelements_pi1" AND sys_language_uid = ' . (int)$langUid;
+		$table  = 'tt_content';
+		$where  = 'l18n_parent='.(int)$uidContentElement.' AND CType = "gridelements_pi1" AND sys_language_uid = '.(int)$langUid;
 
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 	}
@@ -401,10 +462,11 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	 * @param int $uidContent
 	 * @return array
 	 */
-	public function getChildContentElements($uidContent) {
+	public function getChildContentElements($uidContent)
+	{
 		$fields = '*';
-		$table = 'tt_content';
-		$where = 'tx_gridelements_container=' . (int)$uidContent . ' AND l18n_parent=0';
+		$table  = 'tt_content';
+		$where  = 'tx_gridelements_container='.(int)$uidContent.' AND l18n_parent=0';
 
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 	}

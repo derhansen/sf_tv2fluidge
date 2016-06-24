@@ -26,7 +26,8 @@
 /**
  * Helper class for handling unreferenced elements
  */
-class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements \TYPO3\CMS\Core\SingletonInterface
+{
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -39,7 +40,8 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
 	 * @return void
 	 */
-	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
+	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper)
+	{
 		$this->sharedHelper = $sharedHelper;
 	}
 
@@ -48,27 +50,34 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 *
 	 * @return int Number of records deleted
 	 */
-	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE) {
-		$pids = $this->sharedHelper->getPageIds();
+	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = false)
+	{
+		$pids                     = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
-		foreach ($pids as $pid) {
+		foreach ($pids as $pid)
+		{
 			$pageRecord = $this->sharedHelper->getPage($pid);
-			if (!empty($pageRecord)) {
-				$contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
+			if (!empty($pageRecord))
+			{
+				$contentTree                 = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, false);
 				$referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
-				if (!empty($referencedElementsArrAsKeys)) {
-					$referencedElementsArr = array_keys($referencedElementsArrAsKeys);
+				if (!empty($referencedElementsArrAsKeys))
+				{
+					$referencedElementsArr    = array_keys($referencedElementsArrAsKeys);
 					$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
 				}
 			}
 		}
 		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
-		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
-		$countRecords = count($allRecordUids);
+		$allRecordUids            = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
+		$countRecords             = count($allRecordUids);
 
-		if ($markAsNegativeColPos) {
+		if ($markAsNegativeColPos)
+		{
 			$this->markNegativeColPos($allRecordUids);
-		} else {
+		}
+		else
+		{
 			$this->markDeleted($allRecordUids);
 		}
 
@@ -79,31 +88,35 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * Returns an array of UIDs which are not referenced on
 	 * the page with the given uid (= parent id).
 	 *
-	 * @param	array		$allReferencedElementsArr: Array with UIDs of referenced elements
-	 * @return	array		Array with UIDs of tt_content records
-	 * @access	protected
+	 * @param        array $allReferencedElementsArr : Array with UIDs of referenced elements
+	 * @return        array                Array with UIDs of tt_content records
+	 * @access        protected
 	 */
-	function getUnreferencedElementsRecords($allReferencedElementsArr) {
+	function getUnreferencedElementsRecords($allReferencedElementsArr)
+	{
 		global $TYPO3_DB, $BE_USER;
 
 		$elementRecordsArr = array();
 
-		$res = $TYPO3_DB->exec_SELECTquery (
+		$res = $TYPO3_DB->exec_SELECTquery(
 			'uid',
 			'tt_content',
-			'uid NOT IN ('.implode(',',$allReferencedElementsArr).')'.
+			'uid NOT IN ('.implode(',', $allReferencedElementsArr).')'.
 			' AND t3ver_wsid='.intval($BE_USER->workspace).
-			t3lib_BEfunc::deleteClause('tt_content').
-			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),
+			\TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content').
+			\TYPO3\CMS\Backend\Utility\BackendUtility::versioningPlaceholderClause('tt_content'),
 			'',
 			'sorting'
 		);
 
-		if ($res) {
-			while(($elementRecordArr = $TYPO3_DB->sql_fetch_assoc($res)) !== FALSE) {
+		if ($res)
+		{
+			while (($elementRecordArr = $TYPO3_DB->sql_fetch_assoc($res)) !== false)
+			{
 				$elementRecordsArr[] = $elementRecordArr['uid'];
 			}
 		}
+
 		return $elementRecordsArr;
 	}
 
@@ -113,8 +126,9 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @param $uids
 	 * @return void
 	 */
-	private function markDeleted($uids) {
-		$where = 'uid IN (' . implode(',', $uids) . ')';
+	private function markDeleted($uids)
+	{
+		$where = 'uid IN ('.implode(',', $uids).')';
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
 	}
 
@@ -124,8 +138,9 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @param $uids
 	 * @return void
 	 */
-	private function markNegativeColPos($uids) {
-		$where = 'uid IN (' . implode(',', $uids) . ')';
+	private function markNegativeColPos($uids)
+	{
+		$where = 'uid IN ('.implode(',', $uids).')';
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1));
 	}
 }
