@@ -44,8 +44,9 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	}
 
 	/**
-	 * Marks all unreferenced element records as deleted with a recursion level of 99
+	 * Marks all unreferenced element records as deleted with the recursion level set in the extension setting
 	 *
+	 * @param bool $markAsNegativeColPos
 	 * @return int Number of records deleted
 	 */
 	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE) {

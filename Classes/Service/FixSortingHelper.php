@@ -164,10 +164,10 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * Returns all content elements for the given page, where the language is set to $langUid
+	 * Returns all content elements for the given page
 	 *
 	 * @param int $pageUid
-	 * @param int $langUid
+	 * @param array $sortedContentElements
 	 * @return mixed
 	 */
 	public function getRemainingPageContentElements($pageUid, $sortedContentElements) {

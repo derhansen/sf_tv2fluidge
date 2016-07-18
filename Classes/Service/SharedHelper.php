@@ -100,6 +100,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 
 	/**
 	 * sets PHP timeout to unlimited for execution
+	 *
+	 * @return void
 	 */
 	public function setUnlimitedTimeout() {
 		if (function_exists('set_time_limit')) {
@@ -237,6 +239,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Returns, if langDisable ist set for the given TV DS UID
+	 *
 	 * @param int $uidTvDs
 	 * @return bool
 	 */
@@ -261,6 +265,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Returns the TV Datastructure as a simplexml object
+	 *
 	 * @param int $uidTvDs
 	 * @return SimpleXMLElement
 	 */
@@ -536,6 +542,13 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		return $contentArray;
 	}
 
+	/**
+	 * Moves the default language to the first position of the Flexform array
+	 *
+	 * @param $flexformArray
+	 * @param $firstElementKey
+	 * @return array
+	 */
 	private function moveDefLanguageToFirstPositionOfFlexformArray($flexformArray, $firstElementKey) {
 		$defLanguageFirstFlexformArray = array();
 		if (!empty($firstElementKey) && isset($flexformArray[$firstElementKey])) {
@@ -550,6 +563,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Adds the given values to the given content array
+	 *
 	 * @param array $contentArray
 	 * @param string $fieldName
 	 * @param array $values
@@ -600,7 +615,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * cleans templavoila flexform of unnecessary elements and languages, e.g. remove not default languages during
+	 * Cleans templavoila flexform of unnecessary elements and languages, e.g. remove not default languages during
 	 * convert all languages gridelements or remove content element references
 	 *
 	 * @param string $flexformString
@@ -676,10 +691,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * converts flexform for a translation, to use translated values instead of default values
+	 * Converts flexform for a translation, to use translated values instead of default values
 	 *
-	 * @param $flexformArray
+	 * @param $flexformString
 	 * @param $langIsoCode
+	 * @param $forceLanguage
 	 * @return string
 	 */
 	public function convertFlexformForTranslation($flexformString, $langIsoCode, $forceLanguage = FALSE) {
@@ -884,6 +900,8 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * Returns the translation for a given content element and the given language
+	 *
 	 * @param int $uidContent
 	 * @param int $langUid
 	 * @return array
@@ -929,7 +947,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * Fixes localization diff source field for translations of shortcut conversions
 	 *
 	 * @param integer $pageUid
-	 * @param array $fields
+	 * @param array $additionalFields
 	 * @return void
 	 */
 	public function fixPageLocalizationDiffSources($pageUid, $additionalFields = array()) {
@@ -958,6 +976,14 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		}
 	}
 
+	/**
+	 * Fixes l18n diffsource fields
+	 *
+	 * @param $origRecord
+	 * @param $table
+	 * @param $translations
+	 * @param $fields
+	 */
 	public function fixDiffSourcesForTranslationRecords($origRecord, $table, $translations, $fields) {
 		if (!empty($origRecord) && !empty($table) && !empty($translations) && !empty($fields) &&
 			is_array($origRecord) && is_string($table) && is_array($translations) && is_array($fields)) {
@@ -1014,7 +1040,6 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	/**
 	 * Returns an array with UIDs of all available languages (default language not included)
 	 *
-	 * @param int $pageUid
 	 * @return array
 	 */
 	public function getAllLanguages() {
@@ -1051,6 +1076,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		return $res;
 	}
 
+	/**
+	 * Returns an array with UIDs of first level pages
+	 *
+	 * @return mixed
+	 */
 	private function getFirstLevelPages() {
 		$fields = 'uid';
 		$table = 'pages';

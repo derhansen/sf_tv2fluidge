@@ -77,9 +77,8 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * Converts all reference elements to 'insert records' elements with a recursion level of 99
+	 * Converts all reference elements to 'insert records' elements with the recursion level set in the extension settings
 	 *
-	 * @param bool $useParentUidForTranslations
 	 * @return int Number of records deleted
 	 */
 	public function convertReferenceElements() {
@@ -97,7 +96,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * converts an array of content elements to references, if they are references
+	 * Converts an array of content elements to references, if they are references
 	 * also handles references inside fce
 	 *
 	 * @param array $tvContentArray
@@ -127,7 +126,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * converts reference content elements, either current content element or sub content elements (FCE)
+	 * Converts reference content elements, either current content element or sub content elements (FCE)
 	 * including translations to a insert record element
 	 *
 	 * @param int $contentUid
@@ -152,7 +151,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * converts a reference content element - either current content element or sub content elements (FCE)
+	 * Converts a reference content element - either current content element or sub content elements (FCE)
 	 * including translations to a insert record element
 	 *
 	 * @param int $contentUid
@@ -185,6 +184,13 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		return $numRecords;
 	}
 
+    /**
+     * Converts a shortcut element to an all language shortcut
+     *
+     * @param $contentUid
+     * @param $targetUid
+     * @return bool
+     */
 	protected function convertShortcutToAllLangShortCut($contentUid, $targetUid) {
 		$contentUid = (int)$contentUid;
 		$targetUid = (int)$targetUid;
@@ -242,7 +248,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	/**
 	 * Converts fce reference to local copy
 	 *
-	 * @param integer $pageUid
+	 * @param integer $contentUid
 	 * @param string $field
 	 * @param integer $position
 	 * @return integer
@@ -253,7 +259,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * converts flexform pointer string to local copy
+	 * Converts flexform pointer string to local copy
 	 *
 	 * @param string $flexformPointerString
 	 * @return mixed
@@ -291,7 +297,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * converts content element to all language content element
+	 * Converts content element to all language content element
 	 *
 	 * @param int $contentUid
 	 */
@@ -307,7 +313,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * deletes translation of content element
+	 * Deletes translation of content element
 	 *
 	 * @param int $contentUid
 	 */
@@ -392,7 +398,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * updates sys_refindex for translation content elements
+	 * Updates sys_refindex for translation content elements
 	 *
 	 * @param $contentUid
 	 */

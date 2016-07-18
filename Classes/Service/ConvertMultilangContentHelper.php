@@ -133,11 +133,13 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		return $cloned;
 	}
 
-	/**
-	 * @param array $shortcutElements
-	 * @param int $contentElementUid
-	 * @param int $langUid
-	 */
+    /**
+     * Updates shortcut elements
+     *
+     * @param $contentElementUid
+     * @param $langUid
+     * @param int $translationContentUid
+     */
 	protected function updateShortcutElements($contentElementUid, $langUid, $translationContentUid = 0) {
 		$shortcutElements = $this->getShortcutElements($contentElementUid, $langUid);
 		$translationContentUid = (int)$translationContentUid;
@@ -179,6 +181,8 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	}
 
 	/**
+     * Updates the sys_language_uid of all shortcut content elements
+     *
 	 * @param int $contentElementUid
 	 */
 	protected function updateSysLanguageOfAllLanguageShortcuts($contentElementUid) {
@@ -195,11 +199,14 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 		}
 	}
 
-	/**
-	 * @param array $origContentElement
-	 * @param int $langUid
-	 * @return int
-	 */
+    /**
+     * Adds/Updates a translation content element
+     *
+     * @param $contentElement
+     * @param $langUid
+     * @param $origUid
+     * @return int|null
+     */
 	protected function addTranslationContentElement($contentElement, $langUid, $origUid) {
 		$langUid = (int)$langUid;
 		$origUid = (int)$origUid;
@@ -353,7 +360,10 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements t3lib_Sin
 	}
 
 	/**
+     * Returns all shortcut elements for the given content element uid
+     *
 	 * @param int $uidContentElement
+     * @param int $langUid
 	 * @return array
 	 */
 	public function getShortcutElements($uidContentElement, $langUid = 0) {
