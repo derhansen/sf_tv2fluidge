@@ -99,6 +99,19 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	}
 
 	/**
+	 * If set, returns the root page UID from where the conversion starts
+	 *
+	 * @return int|null
+	 */
+	public function getConversionRootPid() {
+		if ($this->extConf['rootPid'] !== '' && $this->canBeInterpretedAsInteger($this->extConf['rootPid'])) {
+			return intval($this->extConf['rootPid']);
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * sets PHP timeout to unlimited for execution
 	 *
 	 * @return void
@@ -130,7 +143,11 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 
 		$startPages = array();
 
-		if ($this->getIncludeNonRootPagesIsEnabled()) {
+		if ($this->getConversionRootPid() !== null) {
+			$startPages = array(
+				array('uid' => $this->getConversionRootPid())
+			);
+		} elseif ($this->getIncludeNonRootPagesIsEnabled()) {
 			$startPages = $this->getFirstLevelPages();
 		} else {
 			$startPages = $this->getRootPages();

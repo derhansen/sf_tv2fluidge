@@ -64,7 +64,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 			}
 		}
 		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
-		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr);
+		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr, $pids);
 		$countRecords = count($allRecordUids);
 
 		if ($markAsNegativeColPos) {
@@ -77,14 +77,15 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	}
 
 	/**
-	 * Returns an array of UIDs which are not referenced on
-	 * the page with the given uid (= parent id).
+	 * Returns an array of content UIDs which are not referenced on
+	 * the any of the given pages in $pageIds
 	 *
 	 * @param	array		$allReferencedElementsArr: Array with UIDs of referenced elements
+     * @param   array       $pageIds Array of pages where to search for unreferenced elements
 	 * @return	array		Array with UIDs of tt_content records
 	 * @access	protected
 	 */
-	function getUnreferencedElementsRecords($allReferencedElementsArr) {
+	function getUnreferencedElementsRecords($allReferencedElementsArr, $pageIds) {
 		global $TYPO3_DB, $BE_USER;
 
 		$elementRecordsArr = array();
@@ -92,7 +93,8 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		$res = $TYPO3_DB->exec_SELECTquery (
 			'uid',
 			'tt_content',
-			'uid NOT IN ('.implode(',',$allReferencedElementsArr).')'.
+			'uid NOT IN (' . implode(',', $allReferencedElementsArr) . ')'.
+            ' AND pid IN (' . implode(',', $pageIds) . ')' .
 			' AND t3ver_wsid='.intval($BE_USER->workspace).
 			t3lib_BEfunc::deleteClause('tt_content').
 			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),

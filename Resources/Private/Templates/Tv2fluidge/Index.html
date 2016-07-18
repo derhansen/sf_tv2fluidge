@@ -7,14 +7,34 @@
 <f:section name="content">
     <h2><f:translate key="mod_index_title" /></h2>
     <p><f:translate key="mod_index_description" /></>
+
+    <h3><f:translate key="label_index_migration_settings" /></h3>
+    <ul>
+        <f:if condition="{rootPid}">
+            <li><f:translate key="label_index_root_pid" /> <strong>{rootPid}</strong></li>
+        </f:if>
+        <li>
+            <f:translate key="label_index_include_non_root_pages" />
+            <f:if condition="{includeNonRootPages}">
+                <f:then>
+                    <f:translate key="label_yes" />
+                </f:then>
+                <f:else>
+                    <f:translate key="label_yes" />
+                </f:else>
+            </f:if>
+        </li>
+        <li><f:translate key="label_index_pages_depth_limit" /> {pagesDepthLimit}</li>
+    </ul>
+
     <h3><f:translate key="label_index" /></h3>
     <ul>
-        <li>- <f:link.action action="indexDeleteUnreferencedElements"><f:translate key="mod_deleteunref_title" /></f:link.action></li>
-	    <li>- <f:link.action action="indexConvertReferenceElements"><f:translate key="mod_convertref_title" /></f:link.action></li>
-        <li>- <f:link.action action="indexMigrateFce"><f:translate key="mod_migratefce_title" /></f:link.action></li>
-        <li>- <f:link.action action="indexMigrateContent"><f:translate key="mod_migratecontent_title" /></f:link.action></li>
-        <li>- <f:link.action action="indexConvertMultilangContent"><f:translate key="mod_convertmultilangcontent_title" /></f:link.action></li>
-        <li>- <f:link.action action="indexFixSorting"><f:translate key="mod_fixsorting_title" /></f:link.action></li>
+        <li><f:link.action action="indexDeleteUnreferencedElements"><f:translate key="mod_deleteunref_title" /></f:link.action></li>
+	    <li><f:link.action action="indexConvertReferenceElements"><f:translate key="mod_convertref_title" /></f:link.action></li>
+        <li><f:link.action action="indexMigrateFce"><f:translate key="mod_migratefce_title" /></f:link.action></li>
+        <li><f:link.action action="indexMigrateContent"><f:translate key="mod_migratecontent_title" /></f:link.action></li>
+        <li><f:link.action action="indexConvertMultilangContent"><f:translate key="mod_convertmultilangcontent_title" /></f:link.action></li>
+        <li><f:link.action action="indexFixSorting"><f:translate key="mod_fixsorting_title" /></f:link.action></li>
     </ul>
 
     <br>

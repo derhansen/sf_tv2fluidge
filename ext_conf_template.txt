@@ -1,3 +1,6 @@
+# cat=basic; type=# cat=basic; type=int; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_root_pid
+rootPid =
+
   # cat=basic; type=# cat=basic; type=boolean; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_include_non_root_pages
 includeNonRootPages = 0
 

@@ -27,6 +27,31 @@ and TypoScript.
 * ExtBase and Fluid installed
 * Grid Elements installed (please ignore conflict with TemplaVoila!)
 
+## Extension settings
+
+The following settings are available in the extension settings.
+
+**rootPid**
+
+If this field is set to a valid PID from the page tree, only this page and all subpages will be included during all
+migration steps.
+
+Default value: empty
+
+**includeNonRootPages**
+
+Only respected, when ```rootPid``` is empty. If set, also non root pages are selected from the pagetree
+when the extension selects TYPO3 pages to be included in the migration.
+ 
+Default value: off
+
+**pagesDepthLimit**
+
+The page depth limit for fetching subpages from the pagetree when the extension selects TYPO3 pages to
+be included in the migration process.
+
+Default value: 99
+
 ## Migration steps in short
 
 1. Create Grid Elements for all Flexible Content Elements you wish to migrate

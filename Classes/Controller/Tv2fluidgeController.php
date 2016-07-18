@@ -148,7 +148,13 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	 * @return void
 	 */
 	public function indexAction() {
-
+        $this->view->assignMultiple(
+            array(
+                'rootPid' => $this->sharedHelper->getConversionRootPid(),
+                'includeNonRootPages' => $this->sharedHelper->getIncludeNonRootPagesIsEnabled(),
+                'pagesDepthLimit' => $this->sharedHelper->getPagesDepthLimit()
+            )
+        );
 	}
 
 	/**
@@ -281,7 +287,8 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$contentElementsUpdated = 0;
 
 		if ($fce > 0 && !empty($ge)) {
-			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce);
+            $pageUids = $this->sharedHelper->getPageIds();
+			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce, $pageUids);
 			foreach($contentElements as $contentElement) {
 				$fcesConverted++;
 				$this->migrateFceHelper->migrateFceFlexformContentToGe($contentElement, $ge);

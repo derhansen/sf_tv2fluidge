@@ -156,13 +156,15 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * Returns all tt_content elements which contains a TemplaVoila FCE with the given uid
 	 *
 	 * @param int $uidFce
+     * @param array $pageUids
 	 * @return mixed
 	 */
-	public function getContentElementsByFce($uidFce) {
+	public function getContentElementsByFce($uidFce, $pageUids) {
 		$fields = '*';
 		$table = 'tt_content';
 		$where = 'CType = "templavoila_pi1" AND tx_templavoila_to=' . intval($uidFce) .
-					t3lib_BEfunc::deleteClause('tt_content');
+            ' AND pid IN (' . implode(',', $pageUids) . ')' .
+            t3lib_BEfunc::deleteClause('tt_content');
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 

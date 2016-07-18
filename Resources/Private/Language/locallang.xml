@@ -10,11 +10,18 @@
             <label index="mlang_labels_tabdescr">TemplaVoila to Fluid/GE</label>
             <label index="mlang_labels_tablabel">TemplaVoila to Fluid/GE</label>
 
+            <label index="label_yes">yes</label>
+            <label index="label_no">no</label>
             <label index="label_result">Result</label>
             <label index="label_select">Select</label>
             <label index="label_start">Do it!</label>
             <label index="label_result">Result</label>
             <label index="label_index">Index</label>
+            <label index="label_index_migration_settings">Migration settings</label>
+            <label index="label_index_root_pid">Migration Root PID:</label>
+            <label index="label_index_include_non_root_pages">Include non root pages:</label>
+            <label index="label_index_pages_depth_limit">Pages depth limit:</label>
+            <label index="label_index_root_pid">Migration Root PID:</label>
             <label index="label_docs">Documentation and support</label>
             <label index="label_what_does_it_do">What does it do?</label>
             <label index="label_warning">Warning</label>
@@ -46,6 +53,7 @@
             <label index="label_be_layout">Backend Layout</label>
             <label index="label_fix_options">Options</label>
             <label index="label_page_uid">Page UID</label>
+			<label index="label_ext_conf_root_pid">Root PID (if set, only the page and its subpages will be migrated)</label>
 			<label index="label_ext_conf_migration_pages_depth_limit">Pages depth limit for migration</label>
 			<label index="label_ext_conf_include_non_root_pages">Include non root pages in migration</label>
 
