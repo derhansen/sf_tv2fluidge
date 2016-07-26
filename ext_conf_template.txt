@@ -1,8 +1,14 @@
 # cat=basic; type=# cat=basic; type=int; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_root_pid
 rootPid =
 
-  # cat=basic; type=# cat=basic; type=boolean; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_include_non_root_pages
+# cat=basic; type=# cat=basic; type=boolean; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_include_non_root_pages
 includeNonRootPages = 0
 
-  # cat=basic; type=# cat=basic; type=int; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_migration_pages_depth_limit
+# cat=basic; type=# cat=basic; type=int; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_migration_pages_depth_limit
 pagesDepthLimit = 99
+
+# cat=basic; type=# cat=basic; type=boolean; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_enable_logging
+enableLogging = 0
+
+# cat=basic; type=# cat=basic; type=string; label=LLL:EXT:sf_tv2fluidge/Resources/Private/Language/locallang.xml:label_ext_conf_logfile_path
+logfilePath =

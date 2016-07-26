@@ -43,6 +43,21 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		$this->sharedHelper = $sharedHelper;
 	}
 
+    /**
+     * @var Tx_SfTv2fluidge_Service_LogHelper
+     */
+    protected $logHelper;
+
+    /**
+     * DI for shared helper
+     *
+     * @param Tx_SfTv2fluidge_Service_LogHelper $logHelper
+     * @return void
+     */
+    public function injectLogHelper(Tx_SfTv2fluidge_Service_LogHelper $logHelper) {
+        $this->logHelper = $logHelper;
+    }
+
 	/**
 	 * Marks all unreferenced element records as deleted with the recursion level set in the extension setting
 	 *
@@ -50,7 +65,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @return int Number of records deleted
 	 */
 	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE) {
-		$pids = $this->sharedHelper->getPageIds();
+        $pids = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
 		foreach ($pids as $pid) {
 			$pageRecord = $this->sharedHelper->getPage($pid);
@@ -119,6 +134,9 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	private function markDeleted($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
+
+		$this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
+		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
 	}
 
 	/**
@@ -130,6 +148,9 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	private function markNegativeColPos($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1));
+
+		$this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
+		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
 	}
 }
 

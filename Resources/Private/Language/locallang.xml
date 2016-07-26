@@ -56,6 +56,8 @@
 			<label index="label_ext_conf_root_pid">Root PID (if set, only the page and its subpages will be migrated)</label>
 			<label index="label_ext_conf_migration_pages_depth_limit">Pages depth limit for migration</label>
 			<label index="label_ext_conf_include_non_root_pages">Include non root pages in migration</label>
+			<label index="label_ext_conf_enable_logging">Enable logging</label>
+			<label index="label_ext_conf_logfile_path">Absolute path to logfile</label>
 
             <label index="desc_backup_warning">Before executing an action, make sure you create a full backup of your TYPO3 database!</label>
             <label index="desc_docs_and_help">This extension is hosted on GitHub. Feel free to submit feedback, bugs and changerequest directly at</label>
