@@ -178,7 +178,11 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		if (intval($formdata['markasnegativecolpos']) === 1) {
 			$markAsNegativeColPos = TRUE;
 		}
-		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords($markAsNegativeColPos);
+        $ignoreshortcutpages = FALSE;
+        if (intval($formdata['ignoreshortcutpages']) === 1) {
+            $ignoreshortcutpages = TRUE;
+        }
+		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords($markAsNegativeColPos, $ignoreshortcutpages);
 		$this->view->assign('numRecords', $numRecords);
 	}
 

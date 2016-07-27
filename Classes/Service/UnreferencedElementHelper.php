@@ -62,31 +62,48 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * Marks all unreferenced element records as deleted with the recursion level set in the extension setting
 	 *
 	 * @param bool $markAsNegativeColPos
+     * @param bool $ignoreShortcutPages
 	 * @return int Number of records deleted
 	 */
-	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE) {
+	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE, $ignoreShortcutPages = FALSE) {
         $pids = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
+
+        // Handle page types, that can be ignored
+        $ignorePageTypes = array();
+        if ($ignoreShortcutPages) {
+            // doktype 4 (Shortcut) - Add more doktypes if required
+            $ignorePageTypes = array(4);
+        }
+
+        // Array which holds all PIDs to be processed when processing unreferenced content elements
+        $processPids = array();
+
 		foreach ($pids as $pid) {
 			$pageRecord = $this->sharedHelper->getPage($pid);
-			if (!empty($pageRecord)) {
-				$contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
-				$referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
-				if (!empty($referencedElementsArrAsKeys)) {
-					$referencedElementsArr = array_keys($referencedElementsArrAsKeys);
-					$allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
-				}
-			}
+			if (!empty($pageRecord) && !in_array(intval($pageRecord['doktype']), $ignorePageTypes)) {
+                // Add the PID to the array of PIDs to be processed
+                array_push($processPids, $pid);
+                $contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
+                $referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
+                if (!empty($referencedElementsArrAsKeys)) {
+                    $referencedElementsArr = array_keys($referencedElementsArrAsKeys);
+                    $allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
+                }
+            }
 		}
 		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
-		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr, $pids);
+		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr, $processPids);
 		$countRecords = count($allRecordUids);
 
-		if ($markAsNegativeColPos) {
-			$this->markNegativeColPos($allRecordUids);
-		} else {
-			$this->markDeleted($allRecordUids);
-		}
+        // Only process when we have records to be deleted
+        if ($countRecords > 0) {
+            if ($markAsNegativeColPos) {
+                $this->markNegativeColPos($allRecordUids);
+            } else {
+                $this->markDeleted($allRecordUids);
+            }
+        }
 
 		return $countRecords;
 	}
