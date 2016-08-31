@@ -38,6 +38,7 @@ a.btn_migrate_content {
 	background: url(../Icons/tv-template.gif) no-repeat;
 }
 
+a.btn_fix_ce_lang,
 a.btn_convertmultilang_content {
 	background: url(../Icons/multilang.png) no-repeat;
 }

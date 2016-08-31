@@ -142,6 +142,21 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->convertMultilangContentHelper = $convertMultilangContentHelper;
 	}
 
+    /**
+     * @var Tx_SfTv2fluidge_Service_FixContentLanguageHelper $fixContentLangHelper
+     */
+    protected $fixContentLangHelper;
+
+    /**
+     * DI for fixContentLangHelper
+     *
+     * @param Tx_SfTv2fluidge_Service_FixContentLanguageHelper $fixContentLangHelper
+     * @return void
+     */
+    public function injectFixContentLangHelper(Tx_SfTv2fluidge_Service_FixContentLanguageHelper $fixContentLangHelper) {
+        $this->fixContentLangHelper = $fixContentLangHelper;
+    }
+
 	/**
 	 * Default index action for module
 	 *
@@ -185,6 +200,54 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords($markAsNegativeColPos, $ignoreshortcutpages);
 		$this->view->assign('numRecords', $numRecords);
 	}
+
+    /**
+     * Index action for fix content language
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function indexFixContentLanguageAction($formdata = NULL) {
+        $cancel = FALSE;
+
+        if ($formdata['fixOptions'] == 'singlePage' && $formdata['pageUid'] == '' && isset($formdata['startAction'])) {
+            $cancel = TRUE;
+            $this->view->assign('pageUidMissing', TRUE);
+        }
+
+        $this->view->assign('formdata', $formdata);
+
+        // Redirect to fixContentLanguageAction when submit button pressed
+        if (isset($formdata['startAction']) && $cancel == FALSE) {
+            $this->redirect('fixContentLanguage', null, null, array('formdata' => $formdata));
+        }
+    }
+
+    /**
+     * Action for fix content language (assign correct sys_language_uid to content element)
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function fixContentLanguageAction($formdata) {
+        $this->sharedHelper->setUnlimitedTimeout();
+
+        $numUpdated = 0;
+        $numCreated = 0;
+
+        if ($formdata['fixOptions'] == 'singlePage') {
+            $numUpdated = $this->fixContentLangHelper->fixContentLanguageForPage($formdata['pageUid']);
+            $numCreated = $this->fixContentLangHelper->replaceLocalReferencesWithShortcuts($formdata['pageUid']);
+        } else {
+            $pageUids = $this->sharedHelper->getPageIds();
+            foreach($pageUids as $pageUid) {
+                $numUpdated += $this->fixContentLangHelper->fixContentLanguageForPage($pageUid);
+                $numCreated += $this->fixContentLangHelper->replaceLocalReferencesWithShortcuts($pageUid);
+            }
+        }
+        $this->view->assign('numUpdated', $numUpdated);
+        $this->view->assign('numCreated', $numCreated);
+    }
 
 	/**
 	 * Index action for migrate reference elements
