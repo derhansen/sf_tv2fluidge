@@ -150,7 +150,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 */
 	private function markDeleted($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1));
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1, 'tstamp' => time()));
 
 		$this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
 		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
@@ -164,7 +164,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 */
 	private function markNegativeColPos($uids) {
 		$where = 'uid IN (' . implode(',', $uids) . ')';
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1));
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1, 'tstamp' => time()));
 
 		$this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
 		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
