@@ -63,17 +63,22 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 *
 	 * @param bool $markAsNegativeColPos
      * @param bool $ignoreShortcutPages
+     * @param bool $ignoreSysfolders
 	 * @return int Number of records deleted
 	 */
-	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE, $ignoreShortcutPages = FALSE) {
+	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE, $ignoreShortcutPages = FALSE, $ignoreSysfolders = FALSE) {
         $pids = $this->sharedHelper->getPageIds();
 		$allReferencedElementsArr = array();
 
         // Handle page types, that can be ignored
         $ignorePageTypes = array();
         if ($ignoreShortcutPages) {
-            // doktype 4 (Shortcut) - Add more doktypes if required
-            $ignorePageTypes = array(4);
+            // doktype 4 (Shortcut)
+            $ignorePageTypes[] = 4;
+        }
+        if ($ignoreSysfolders) {
+            // doktype 254 (Sysfolder)
+            $ignorePageTypes[] = 254;
         }
 
         // Array which holds all PIDs to be processed when processing unreferenced content elements

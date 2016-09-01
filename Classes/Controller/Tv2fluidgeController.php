@@ -182,7 +182,15 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
         if (intval($formdata['ignoreshortcutpages']) === 1) {
             $ignoreshortcutpages = TRUE;
         }
-		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords($markAsNegativeColPos, $ignoreshortcutpages);
+        $ignoresysfolders = FALSE;
+        if (intval($formdata['ignoresysfolders']) === 1) {
+            $ignoresysfolders = TRUE;
+        }
+		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords(
+		    $markAsNegativeColPos,
+            $ignoreshortcutpages,
+            $ignoresysfolders
+        );
 		$this->view->assign('numRecords', $numRecords);
 	}
 

@@ -35,6 +35,7 @@
             <label index="label_create_reference">Create shortcut content element for TV references</label>
 			<label index="label_delete_unref">Delete unused Elements</label>
             <label index="label_ignore_shortcut_pages">Ignore unreferenced elements on shortcut pages</label>
+            <label index="label_ignore_sysfolders">Ignore unreferenced elements in sysfolders</label>
             <label index="label_convert_ref">Convert references</label>
             <label index="label_migrate_fce">Migrate FCE</label>
             <label index="label_migrate_content">Migrate content</label>
