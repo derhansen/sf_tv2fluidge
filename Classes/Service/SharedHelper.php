@@ -141,9 +141,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		 */
 		$tree = t3lib_div::makeInstance('t3lib_queryGenerator');
 
-		$startPages = array();
-
-		if ($this->getConversionRootPid() !== null) {
+		if ($this->getConversionRootPid() !== null && $this->getConversionRootPid() > 0) {
 			$startPages = array(
 				array('uid' => $this->getConversionRootPid())
 			);
