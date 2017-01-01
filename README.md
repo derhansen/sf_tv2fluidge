@@ -274,3 +274,9 @@ This module should only be used when the following steps are processed:
 
 The extension is hosted on GitHub. Please report feedback, bugs and changerequests directly at
 https://github.com/derhansen/sf_tv2fluidge
+
+## TYPO3 7.6 LTS support
+
+At the time of writing, there is no fully working version of TemplaVoila available for TYPO3 7.6 LTS. If you plan
+to migrate to Fluidtemplate and Gridelements using sf_tv2fluidge, I recommend to do the migration before the 
+TYPO3 6.2 -> 7.6 core update.  
