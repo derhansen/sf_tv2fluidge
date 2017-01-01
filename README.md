@@ -23,7 +23,7 @@ and TypoScript.
 ## Prerequisites
 
 * A full backup of your TYPO3 website (database and files)!
-* TemplaVoila version 1.8 installed and with old page module enabled
+* TemplaVoila version 1.8+ installed and with old page module enabled
 * ExtBase and Fluid installed
 * Grid Elements installed (please ignore conflict with TemplaVoila!)
 
@@ -254,6 +254,9 @@ styles.content.getBorder.select.includeRecordsWithoutDefaultTranslation = 1
 ## Fix sorting of translated content elements
 
 ![Fix sorting module](Documentation/Images/fix-sorting.png)
+
+You should only use this module, if the sorting of content elements after the migration is different to the original
+state.
 
 This module sets the sorting to all translated content elements, so it will be the same as for the original content
 element.
