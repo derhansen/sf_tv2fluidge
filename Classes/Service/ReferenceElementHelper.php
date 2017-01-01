@@ -48,7 +48,15 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 */
 	protected $useAllLangIfDefaultLangIsReferenced = FALSE;
 
-	/**
+    /**
+     * Array to count the amount of conversions for a content element on the current page
+     * Structure: $pid => $count
+     *
+     * @var array
+     */
+    protected $conversionCount = array();
+
+    /**
 	 * DI for shared helper
 	 *
 	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
@@ -88,7 +96,9 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$pids = $this->sharedHelper->getPageIds();
 		$numRecords = 0;
 		foreach ($pids as $pid) {
-			$tvContentArray = $this->sharedHelper->getTvContentArrayForPage($pid);
+            // Reset conversionCount
+            $this->conversionCount = array();
+            $tvContentArray = $this->sharedHelper->getTvContentArrayByLanguageAndFieldForPage($pid);
 			$numRecords += $this->convertTvContentArrayToReferenceElements($tvContentArray, $pid);
 		}
 
@@ -108,20 +118,34 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$numRecords = 0;
 		$pid = (int)$pid;
 		$fceUid = (int)$fceUid;
-		foreach ($tvContentArray as $field => $contentUidString) {
-			$contentUids = t3lib_div::trimExplode(',', $contentUidString);
-			$position = 1;
-			foreach ($contentUids as $contentUid) {
-				$contentUid = (int)$contentUid;
-				$contentElement = $this->sharedHelper->getContentElement($contentUid);
-				$contentElementPid = (int)$contentElement['pid'];
-				if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
-					$numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid);
-					++$position;
-				}
-			}
-		}
 
+        // Respect language
+        foreach ($tvContentArray as $lang => $fields) {
+
+            // Cycle through each field
+            foreach ($fields as $field => $contentUidString) {
+                $contentUids = t3lib_div::trimExplode(',', $contentUidString);
+                $position = 1;
+                foreach ($contentUids as $contentUid) {
+                    $contentUid = (int)$contentUid;
+                    $contentElement = $this->sharedHelper->getContentElement($contentUid);
+                    $contentElementPid = (int)$contentElement['pid'];
+                    if ($this->sharedHelper->isContentElementAvailable($contentUid)) {
+                        // If content element is included in conversionCount array, we have several references to the
+                        // content element on the same page
+                        if (isset($this->conversionCount[$contentUid])) {
+                            $this->conversionCount[$contentUid] = $this->conversionCount[$contentUid] + 1;
+                            $numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid, $lang, true);
+                        } else {
+                            $this->conversionCount[$contentUid] = 1;
+                            $numRecords += $this->convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid, $lang);
+                        }
+                        ++$position;
+                    }
+                }
+            }
+
+        }
 		return $numRecords;
 	}
 
@@ -135,15 +159,18 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param string $field
 	 * @param int $position
 	 * @param int $fceUid
+     * @param string $lang
+     * @param bool $force Force conversion using convertReferenceToShortcut()
 	 * @return int
 	 */
-	protected function convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid = 0) {
+	protected function convertReferencesToShortcut($contentUid, $contentElementPid, $pid, $field, $position, $fceUid = 0, $lang = 'lDEF', $force = false) {
 		$numRecords = 0;
 		$contentElementPid = (int)$contentElementPid;
 		$pid = (int)$pid;
 		$fceUid = (int)$fceUid;
-		if ($contentElementPid !== $pid) {
-			$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid);
+        // Only create a shortcut, when content element is not on given PID or if conversion is forced
+		if ($contentElementPid !== $pid || $force) {
+			$numRecords += $this->convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid, $lang);
 		} else {
 			$numRecords += $this->convertReferencesInsideFceToShortcut($contentUid, $pid);
 		}
@@ -159,15 +186,16 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param string $field
 	 * @param int $position
 	 * @param int $fceUid
+     * @param string $lang
 	 * @return int
 	 */
-	protected function convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid = 0) {
+	protected function convertReferenceToShortcut($contentUid, $pid, $field, $position, $fceUid = 0, $lang = 'lDEF') {
 		$numRecords = 0;
 		$newContentUid = NULL;
 		if ($fceUid > 0) {
-			$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position);
+			$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position, $lang);
 		} else {
-			$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position);
+			$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position, $lang);
 		}
 
 		$newContentUid = (int)$newContentUid;
@@ -238,10 +266,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param integer $pageUid
 	 * @param string $field
 	 * @param integer $position
+     * @param string $lang
 	 * @return integer
 	 */
-	protected function convertPageCeToLocalCopy($pageUid, $field, $position) {
-		$flexformPointerString = 'pages:' . (int)$pageUid . ':sDEF:lDEF:' . $field . ':vDEF:' . (int)$position;
+	protected function convertPageCeToLocalCopy($pageUid, $field, $position, $lang) {
+		$flexformPointerString = 'pages:' . (int)$pageUid . ':sDEF:' . $lang . ':' . $field . ':vDEF:' . (int)$position;
 		return $this->convertFlexformPointerStringToLocalCopy($flexformPointerString);
 	}
 
@@ -251,10 +280,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param integer $contentUid
 	 * @param string $field
 	 * @param integer $position
+     * @param string $lang
 	 * @return integer
 	 */
-	protected function convertFceToLocalCopy($contentUid, $field, $position) {
-		$flexformPointerString = 'tt_content:' . (int)$contentUid . ':sDEF:lDEF:' . $field . ':vDEF:' . (int)$position;
+	protected function convertFceToLocalCopy($contentUid, $field, $position, $lang) {
+		$flexformPointerString = 'tt_content:' . (int)$contentUid . ':sDEF:' . $lang . ':' . $field . ':vDEF:' . (int)$position;
 		return $this->convertFlexformPointerStringToLocalCopy($flexformPointerString);
 	}
 

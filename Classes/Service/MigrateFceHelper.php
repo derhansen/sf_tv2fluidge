@@ -218,43 +218,48 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 
 		$count = 0;
 		$sorting = 0;
-		foreach ($tvContentArray as $key => $contentUidString) {
-			if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
-				$contentUids = explode(',', $contentUidString);
-				foreach ($contentUids as $contentUid) {
-					$contentUid = (int)$contentUid;
-					$myContentElement = NULL;
-					$myContentElement = $this->sharedHelper->getContentElement($contentUid);
-					$containerUid = (int)$contentElement['uid'];
-					if (($translationParentUid > 0) && ($sysLanguageUid > 0)) {
-						$myCeTranslationParentUid = (int)$myContentElement['uid'];
-						if ($myCeTranslationParentUid > 0) {
-							$tmpMyContentElement = $this->sharedHelper->getTranslationForContentElementAndLanguage($myCeTranslationParentUid, $sysLanguageUid);
-							$tmpMyContentUid = (int)$tmpMyContentElement['uid'];
-							if ($tmpMyContentUid > 0) {
-								$contentUid = $tmpMyContentUid;
-								$myContentElement = $tmpMyContentElement;
-							} else {
-								$containerUid = $translationParentUid;
-							}
-						} else {
-							$containerUid = $translationParentUid;
-						}
-					} else {
-						$myContentElement = $this->sharedHelper->getContentElement($contentUid);
-					}
 
-					if (intval($myContentElement['pid']) === $pageUid) {
-						$this->sharedHelper->updateContentElementForGe($contentUid, $containerUid, $fieldMapping[$key], $sorting);
-					}
-					$sorting += 25;
-					$count++;
+        // Respect language
+        foreach ($tvContentArray as $lang => $fields) {
 
-					$this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
-					$this->refIndex->updateRefIndexTable('tt_content', $contentUid);
-				}
-			}
-		}
+            foreach ($fields as $key => $contentUidString) {
+                if (array_key_exists($key, $fieldMapping) && $contentUidString != '') {
+                    $contentUids = explode(',', $contentUidString);
+                    foreach ($contentUids as $contentUid) {
+                        $contentUid = (int)$contentUid;
+                        $myContentElement = NULL;
+                        $myContentElement = $this->sharedHelper->getContentElement($contentUid);
+                        $containerUid = (int)$contentElement['uid'];
+                        if (($translationParentUid > 0) && ($sysLanguageUid > 0)) {
+                            $myCeTranslationParentUid = (int)$myContentElement['uid'];
+                            if ($myCeTranslationParentUid > 0) {
+                                $tmpMyContentElement = $this->sharedHelper->getTranslationForContentElementAndLanguage($myCeTranslationParentUid, $sysLanguageUid);
+                                $tmpMyContentUid = (int)$tmpMyContentElement['uid'];
+                                if ($tmpMyContentUid > 0) {
+                                    $contentUid = $tmpMyContentUid;
+                                    $myContentElement = $tmpMyContentElement;
+                                } else {
+                                    $containerUid = $translationParentUid;
+                                }
+                            } else {
+                                $containerUid = $translationParentUid;
+                            }
+                        } else {
+                            $myContentElement = $this->sharedHelper->getContentElement($contentUid);
+                        }
+
+                        if (intval($myContentElement['pid']) === $pageUid) {
+                            $this->sharedHelper->updateContentElementForGe($contentUid, $containerUid, $fieldMapping[$key], $sorting);
+                        }
+                        $sorting += 25;
+                        $count++;
+
+                        $this->sharedHelper->fixContentElementLocalizationDiffSources($contentUid);
+                        $this->refIndex->updateRefIndexTable('tt_content', $contentUid);
+                    }
+                }
+            }
+        }
 
 		return $count;
 	}

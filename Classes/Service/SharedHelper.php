@@ -383,7 +383,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 		$tvTemplateUid = (int)$res['tx_templavoila_to'];
-		return $this->getContentArrayFromFlexform($res, $tvTemplateUid);
+		return $this->getContentArrayByLanguageAndFieldFromFlexform($res, $tvTemplateUid);
 	}
 
 	/**
@@ -1104,6 +1104,70 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 		return $res;
 	}
+
+    /**
+     * Returns an array of TV FlexForm content fields for the page with the given UID.
+     * The content elements are seperated by comma
+     *
+     * @param int $pageUid
+     * @return array
+     */
+    public function getTvContentArrayByLanguageAndFieldForPage($pageUid) {
+        $fields = 'tx_templavoila_flex';
+        $table = 'pages';
+        $where = 'uid=' . (int)$pageUid;
+
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
+        $tvTemplateUid = (int)$this->getTvPageTemplateUid($pageUid);
+        return $this->getContentArrayByLanguageAndFieldFromFlexform($res, $tvTemplateUid);
+    }
+
+    /**
+     * Returns an array of TV FlexForm content fields for the given flexform ordered by language
+     *
+     * @param array $result
+     * @param int $tvTemplateUid
+     * @return array
+     */
+    protected function getContentArrayByLanguageAndFieldFromFlexform($result, $tvTemplateUid) {
+        $contentArray = array();
+        $tvTemplateUid = (int)$tvTemplateUid;
+        if ($tvTemplateUid > 0) {
+            $contentCols = $this->getTvContentCols($tvTemplateUid, false);
+            if (($result['tx_templavoila_flex'] != '') && is_array($contentCols) && !empty($contentCols)) {
+                $flexFormArray = t3lib_div::xml2array($result['tx_templavoila_flex']);
+                if (isset($flexFormArray['data']) && is_array($flexFormArray['data'])) {
+                    foreach ($flexFormArray['data'] as $flexFormSheet) {
+                        if (is_array($flexFormSheet)) {
+                            $languageSheets = array('lDEF' => $flexFormSheet['lDEF']);
+                            if (!$this->isTvDataLangDisabled($tvTemplateUid)) {
+                                $languageSheets = $this->moveDefLanguageToFirstPositionOfFlexformArray($flexFormSheet, 'lDEF');
+                            }
+
+                            foreach ($languageSheets as $languageKey => $languageSheet) {
+                                $contentElementArray = array();
+                                foreach ($languageSheet as $fieldName => $values) {
+                                    if (!empty($fieldName) && isset($contentCols[$fieldName])) {
+                                        if ($this->isTvDataLangDisabled($tvTemplateUid)) {
+                                            $values = array('vDEF' => $values['vDEF']);
+                                        }
+                                        $values = $this->moveDefLanguageToFirstPositionOfFlexformArray($values, 'vDEF');
+                                        if ($values['vDEF'] !== '') {
+                                            $contentElementArray[$fieldName] = $values['vDEF'];
+                                        }
+                                    }
+                                }
+                                $contentArray[$languageKey] = $contentElementArray;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $contentArray;
+    }
+
 }
 
 ?>
