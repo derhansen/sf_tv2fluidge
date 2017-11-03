@@ -26,7 +26,7 @@
 /**
  * Helper class for handling TV FCE to Grid Element content migration
  */
-class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -49,12 +49,12 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * DI for t3lib_refindex
+	 * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
 	 *
-	 * @param t3lib_refindex t3lib_refindex
+	 * @param \TYPO3\CMS\Core\Database\ReferenceIndex t3lib_refindex
 	 * @return void
 	 */
-	public function injectRefIndex(t3lib_refindex $refIndex) {
+	public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex) {
 		$this->refIndex = $refIndex;
 	}
 
@@ -145,7 +145,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	public function getContentElementByUid($uid) {
 		$fields = '*';
 		$table = 'tt_content';
-		$where = 'uid='  . intval($uid);
+		$where = 'uid='  . (int)$uid;
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fields, $table, $where, '', '', '');
 
@@ -162,9 +162,9 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	public function getContentElementsByFce($uidFce, $pageUids) {
 		$fields = '*';
 		$table = 'tt_content';
-		$where = 'CType = "templavoila_pi1" AND tx_templavoila_to=' . intval($uidFce) .
+		$where = 'CType = "templavoila_pi1" AND tx_templavoila_to=' . (int)$uidFce .
             ' AND pid IN (' . implode(',', $pageUids) . ')' .
-            t3lib_BEfunc::deleteClause('tt_content');
+            \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content');
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
@@ -181,7 +181,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	public function migrateFceFlexformContentToGe($contentElement, $geKey) {
 		$tvTemplateUid = (int)$contentElement['tx_templavoila_to'];
 		$flexform = $this->sharedHelper->cleanFlexform($contentElement['tx_templavoila_flex'], $tvTemplateUid, false);
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . intval($contentElement['uid']),
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', 'uid=' . (int)$contentElement['uid'],
 			array(
 				'CType' => 'gridelements_pi1',
 				'pi_flexform' => $flexform,
@@ -197,7 +197,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function markFceDeleted($uidFce) {
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidFce),
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . (int)$uidFce,
 			array('deleted' => 1)
 		);
 	}
@@ -227,7 +227,6 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
                     $contentUids = explode(',', $contentUidString);
                     foreach ($contentUids as $contentUid) {
                         $contentUid = (int)$contentUid;
-                        $myContentElement = NULL;
                         $myContentElement = $this->sharedHelper->getContentElement($contentUid);
                         $containerUid = (int)$contentElement['uid'];
                         if (($translationParentUid > 0) && ($sysLanguageUid > 0)) {
@@ -248,7 +247,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
                             $myContentElement = $this->sharedHelper->getContentElement($contentUid);
                         }
 
-                        if (intval($myContentElement['pid']) === $pageUid) {
+                        if ((int)$myContentElement['pid'] === $pageUid) {
                             $this->sharedHelper->updateContentElementForGe($contentUid, $containerUid, $fieldMapping[$key], $sorting);
                         }
                         $sorting += 25;
@@ -264,5 +263,3 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 		return $count;
 	}
 }
-
-?>

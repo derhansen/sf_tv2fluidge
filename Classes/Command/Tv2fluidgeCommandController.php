@@ -105,25 +105,27 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
      * Action for fix sorting
      *
      * @param int $pageUid
-     * @param string $fixOptions
      * @return void
-     * @internal param array $formdata
      */
-    public function fixSortingCommand($fixOptions, $pageUid)
+    public function fixSortingCommand($pageUid = null)
     {
         $this->sharedHelper->setUnlimitedTimeout();
+        $numUpdated = $this->fixSortingHelper->fixSortingForPage($pageUid);
+        $this->outputLine($numUpdated . ' sortings fixed');
+    }
+
+    /**
+     * Action for fix sorting
+     *
+     * @return void
+     */
+    public function fixSortingAutoCommand() {
         $numUpdated = 0;
-        if ($fixOptions == 'singlePage')
+        $this->sharedHelper->setUnlimitedTimeout();
+        $pageUids = $this->sharedHelper->getPageIds();
+        foreach ($pageUids as $pageUidToFix)
         {
-            $numUpdated = $this->fixSortingHelper->fixSortingForPage($pageUid);
-        }
-        else
-        {
-            $pageUids = $this->sharedHelper->getPageIds();
-            foreach ($pageUids as $pageUid)
-            {
-                $numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUid);
-            }
+            $numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUidToFix);
         }
         $this->outputLine($numUpdated . ' sortings fixed');
     }

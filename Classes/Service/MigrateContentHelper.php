@@ -26,7 +26,7 @@
 /**
  * Helper class for handling TV content column migration to Fluid backend layouts
  */
-class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_MigrateContentHelper implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -130,13 +130,13 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 		return $res['datastructure'];
 	}
 
-	/**
-	 * Migrates templavoila flexform of page to db fields with the given pageUid to the selected column positions
-	 *
-	 * @param array $formdata
-	 * @param int $pageUid
-	 * @return int Number of Content elements updated
-	 */
+    /**
+     * Migrates templavoila flexform of page to db fields with the given pageUid to the selected column positions
+     *
+     * @param array $formdata
+     * @param int $pageUid
+     * @return void Number of Content elements updated
+     */
 	public function migrateTvFlexformForPage($formdata, $pageUid) {
 		$pageUid = (int)$pageUid;
 		$localizationDiffSourceFields = array();
@@ -159,7 +159,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 				$flexformString = $pageFlexformString;
 				$langUid = (int)$langUid;
 				if (($flexformConversionOption !== 'exclude')) {
-					if (t3lib_extMgm::isLoaded('static_info_tables')) {
+					if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('static_info_tables')) {
 						if ($langUid > 0) {
 							$forceLanguage = ($flexformConversionOption === 'forceLanguage');
 							if (!$isTvDataLangDisabled) {
@@ -172,7 +172,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 				$flexformString = $this->sharedHelper->cleanFlexform($flexformString, $tvTemplateUid);
 
 				if (!empty($flexformString)) {
-					$flexformArray = t3lib_div::xml2array($flexformString);
+					$flexformArray = \TYPO3\CMS\Core\Utility\GeneralUtility::xml2array($flexformString);
 					if (is_array($flexformArray['data'])) {
 						foreach ($flexformArray['data'] as $sheetData) {
 							if (is_array($sheetData['lDEF'])) {
@@ -186,7 +186,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 												if ($GLOBALS['TYPO3_DB']->quoteStr($fullFieldName, 'pages') === $fullFieldName) {
 													$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 														'pages',
-														'uid=' . intval($pageUid),
+														'uid=' . (int)$pageUid,
 														array(
 															$fullFieldName => $fieldValue
 														)
@@ -199,9 +199,9 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 												if ($GLOBALS['TYPO3_DB']->quoteStr($fullFieldName, 'pages_language_overlay') === $fullFieldName) {
 													$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 														'pages_language_overlay',
-														'(pid=' . intval($pageUid) . ')'
+														'(pid=' . (int)$pageUid . ')'
 														. ' AND (sys_language_uid = ' . $langUid . ')' .
-														t3lib_BEfunc::deleteClause('pages_language_overlay'),
+                                                        \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('pages_language_overlay'),
 
 														array(
 															$fullFieldName => $fieldValue
@@ -259,7 +259,7 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 	 * @return void
 	 */
 	public function markTvTemplateDeleted($uidTvTemplate) {
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . intval($uidTvTemplate),
+		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_templavoila_tmplobj', 'uid=' . (int)$uidTvTemplate,
 			array('deleted' => 1)
 		);
 	}
@@ -284,12 +284,10 @@ class Tx_SfTv2fluidge_Service_MigrateContentHelper implements t3lib_Singleton {
 			$updateFields['backend_layout_next_level'] = $uidBeLayout;
 		}
 		if (count($updateFields) > 0) {
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid=' . intval($pageUid), $updateFields);
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('pages', 'uid=' . (int)$pageUid, $updateFields);
 			$count++;
 		}
 		return $count;
 	}
 
 }
-
-?>

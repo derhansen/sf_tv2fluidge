@@ -27,7 +27,7 @@
 /**
  * TV Tv2fluidge Backend Controller
  */
-class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Controller_ActionController {
+class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController {
 
 	/**
 	 * UnreferencedElementHelper
@@ -175,15 +175,15 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 	public function deleteUnreferencedElementsAction($formdata = NULL) {
 		$this->sharedHelper->setUnlimitedTimeout();
 		$markAsNegativeColPos = FALSE;
-		if (intval($formdata['markasnegativecolpos']) === 1) {
+		if ((int)$formdata['markasnegativecolpos'] === 1) {
 			$markAsNegativeColPos = TRUE;
 		}
         $ignoreshortcutpages = FALSE;
-        if (intval($formdata['ignoreshortcutpages']) === 1) {
+        if ((int)$formdata['ignoreshortcutpages'] === 1) {
             $ignoreshortcutpages = TRUE;
         }
         $ignoresysfolders = FALSE;
-        if (intval($formdata['ignoresysfolders']) === 1) {
+        if ((int)$formdata['ignoresysfolders'] === 1) {
             $ignoresysfolders = TRUE;
         }
 		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords(
@@ -217,12 +217,15 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('numRecords', $numRecords);
 	}
 
-	/**
-	 * Index action for migrateFce
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
+    /**
+     * Index action for migrateFce
+     *
+     * @param array $formdata
+     * @return void
+     *
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
+     */
 	public function indexMigrateFceAction($formdata = NULL) {
 		if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
 			$allFce = $this->migrateFceHelper->getAllFileFce();
@@ -233,7 +236,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$allGe = $this->migrateFceHelper->getAllGe();
 
 		if (isset($formdata['fce'])) {
-			$uidFce = intval($formdata['fce']);
+			$uidFce = (int)$formdata['fce'];
 		} else {
 			$uidFce = current(array_keys($allFce));
 		}
@@ -245,10 +248,9 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		}
 
 		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
-		if ($uidFce > 0) {
+        $fceContentCols = NULL;
+        if ($uidFce > 0) {
 			$fceContentCols = $this->sharedHelper->getTvContentCols($uidFce);
-		} else {
-			$fceContentCols = NULL;
 		}
 
 		if ($this->sharedHelper->canBeInterpretedAsInteger($geKey)) {
@@ -258,10 +260,9 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 			}
 		}
 
+        $geContentCols = NULL;
 		if (!empty($geKey)) {
 			$geContentCols = $this->sharedHelper->getGeContentCols($geKey);
-		} else {
-			$geContentCols = NULL;
 		}
 
 		$this->view->assign('fceContentCols', $fceContentCols);
@@ -272,7 +273,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 
 		// Redirect to migrateContentAction when submit button pressed
 		if (isset($formdata['startAction'])) {
-			$this->redirect('migrateFce',NULL,NULL,array('formdata' => $formdata));
+            $this->redirect('migrateFce',NULL,NULL,array('formdata' => $formdata));
 		}
 	}
 
@@ -317,12 +318,14 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('fcesConverted', $fcesConverted);
 	}
 
-	/**
-	 * Index action for migrate content
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
+    /**
+     * Index action for migrate content
+     *
+     * @param array $formdata
+     * @return void
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
+     */
 	public function indexMigrateContentAction($formdata = NULL) {
 		if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
 			$tvtemplates = $this->migrateContentHelper->getAllFileTvTemplates();
@@ -333,7 +336,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
 
 		if (isset($formdata['tvtemplate'])) {
-			$uidTvTemplate = intval($formdata['tvtemplate']);
+			$uidTvTemplate = (int)$formdata['tvtemplate'];
 		} else {
 			$uidTvTemplate = current(array_keys($tvtemplates));
 		}
@@ -439,12 +442,14 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('numCEs', $numCEs);
 	}
 
-	/**
-	 * Index action for fix sorting
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
+    /**
+     * Index action for fix sorting
+     *
+     * @param array $formdata
+     * @return void
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
+     * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
+     */
 	public function indexFixSortingAction($formdata = NULL) {
 		$cancel = FALSE;
 
@@ -456,7 +461,7 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('formdata', $formdata);
 
 		// Redirect to fixSortingAction when submit button pressed
-		if (isset($formdata['startAction']) && $cancel == FALSE) {
+		if (($cancel === false) && (isset($formdata['startAction']))) {
 			$this->redirect('fixSorting',NULL,NULL,array('formdata' => $formdata));
 		}
 	}
@@ -482,4 +487,3 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends Tx_Extbase_MVC_Con
 		$this->view->assign('numUpdated', $numUpdated);
 	}
 }
-?>

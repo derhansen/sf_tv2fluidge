@@ -26,7 +26,7 @@
 /**
  * Class with methods for fixing the sorting of translated elements
  */
-class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_FixSortingHelper implements \TYPO3\CMS\Core\SingletonInterface {
 
 	const SORTING_OFFSET = 25;
 
@@ -51,12 +51,12 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 	}
 
 	/**
-	 * DI for t3lib_refindex
+	 * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
 	 *
-	 * @param t3lib_refindex t3lib_refindex
+	 * @param \TYPO3\CMS\Core\Database\ReferenceIndex t3lib_refindex
 	 * @return void
 	 */
-	public function injectRefIndex(t3lib_refindex $refIndex) {
+	public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex) {
 		$this->refIndex = $refIndex;
 	}
 
@@ -150,7 +150,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 	protected function getContentElementUids($contentArray) {
 		$contentElementUidValues = array();
 		foreach ($contentArray as $contentElementList) {
-			$fieldContentUidValues = t3lib_div::trimExplode(',', $contentElementList, TRUE);
+			$fieldContentUidValues = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $contentElementList, TRUE);
 			if (is_array($fieldContentUidValues)) {
 				foreach ($fieldContentUidValues as $fieldContentUid) {
 					$fieldContentUid = (int)$fieldContentUid;
@@ -175,7 +175,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 		$contentElements = array();
 		if (is_array($sortedContentElements)) {
 			$notInWhere = '';
-			if (!empty($sortedContentElements) && is_array($sortedContentElements)) {
+			if (!empty($sortedContentElements)) {
 				$notInWhere = ' AND (uid NOT IN (' . implode(',', $sortedContentElements) . '))';
 			}
 
@@ -183,7 +183,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 			$table = 'tt_content';
 			$where = '(pid=' . (int)$pageUid . ')' .
 				$notInWhere .
-				t3lib_BEfunc::deleteClause('tt_content');
+                \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content');
 
 			$contentElements = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', 'sorting ASC, sys_language_uid ASC, uid ASC', '');
 		}
@@ -191,4 +191,3 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements t3lib_Singleton {
 	}
 
 }
-?>

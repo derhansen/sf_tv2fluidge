@@ -26,7 +26,7 @@
 /**
  * Helper class for handling unreferenced elements
  */
-class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -67,12 +67,12 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	}
 
 	/**
-	 * DI for t3lib_refindex
+	 * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
 	 *
-	 * @param t3lib_refindex t3lib_refindex
+	 * @param \TYPO3\CMS\Core\Database\ReferenceIndex t3lib_refindex
 	 * @return void
 	 */
-	public function injectRefIndex(t3lib_refindex $refIndex) {
+	public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex) {
 		$this->refIndex = $refIndex;
 	}
 
@@ -80,8 +80,8 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 	 * @param array $formdata
 	 */
 	public function initFormData($formdata) {
-		$this->useParentUidForTranslations = (intval($formdata['useparentuidfortranslations']) === 1);
-		$this->useAllLangIfDefaultLangIsReferenced = (intval($formdata['usealllangifdefaultlangisreferenced']) === 1);
+		$this->useParentUidForTranslations = ((int)$formdata['useparentuidfortranslations'] === 1);
+		$this->useAllLangIfDefaultLangIsReferenced = ((int)$formdata['usealllangifdefaultlangisreferenced'] === 1);
 	}
 
 	/**
@@ -124,7 +124,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 
             // Cycle through each field
             foreach ($fields as $field => $contentUidString) {
-                $contentUids = t3lib_div::trimExplode(',', $contentUidString);
+                $contentUids = \TYPO3\Beautyofcode\Utility\GeneralUtility::trimExplode(',', $contentUidString);
                 $position = 1;
                 foreach ($contentUids as $contentUid) {
                     $contentUid = (int)$contentUid;
@@ -193,12 +193,11 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$numRecords = 0;
 		$newContentUid = NULL;
 		if ($fceUid > 0) {
-			$newContentUid = $this->convertFceToLocalCopy($fceUid, $field, $position, $lang);
+			$newContentUid = (int)$this->convertFceToLocalCopy($fceUid, $field, $position, $lang);
 		} else {
-			$newContentUid = $this->convertPageCeToLocalCopy($pid, $field, $position, $lang);
+			$newContentUid = (int)$this->convertPageCeToLocalCopy($pid, $field, $position, $lang);
 		}
 
-		$newContentUid = (int)$newContentUid;
 		if ($newContentUid > 0) {
 			$this->convertToShortcut($newContentUid, $contentUid);
 
@@ -352,7 +351,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$GLOBALS['TYPO3_DB']->exec_DELETEquery(
 			'tt_content',
 			'(l18n_parent =' . $contentUid . ')' .
-			t3lib_BEfunc::deleteClause('tt_content')
+            \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content')
 		);
 	}
 
@@ -386,7 +385,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 		$GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 			'tt_content',
 			'(l18n_parent =' . $contentUid . ')' .
-			t3lib_BEfunc::deleteClause('tt_content'),
+            \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content'),
 			array(
 				'CType'   => 'shortcut',
 				'records' => 'tt_content_' . $targetUid,
@@ -414,7 +413,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 						'tt_content',
 						'(l18n_parent = ' . $contentUid . ')' .
 						' AND (sys_language_uid = '  . $translationTargetSysLanguageUid . ')' .
-						t3lib_BEfunc::deleteClause('tt_content'),
+                        \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content'),
 						array(
 							'CType'   => 'shortcut',
 							'records' => 'tt_content_' . $translationTargetUid,

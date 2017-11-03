@@ -26,7 +26,7 @@
 /**
  * Helper class for handling unreferenced elements
  */
-class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements \TYPO3\CMS\Core\SingletonInterface {
 
 	/**
 	 * @var Tx_SfTv2fluidge_Service_SharedHelper
@@ -88,7 +88,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 			$pageRecord = $this->sharedHelper->getPage($pid);
 			if (!empty($pageRecord) && !in_array(intval($pageRecord['doktype']), $ignorePageTypes)) {
                 // Add the PID to the array of PIDs to be processed
-                array_push($processPids, $pid);
+                $processPids[] = $pid;
                 $contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
                 $referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
                 if (!empty($referencedElementsArrAsKeys)) {
@@ -122,25 +122,23 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 	 * @return	array		Array with UIDs of tt_content records
 	 * @access	protected
 	 */
-	function getUnreferencedElementsRecords($allReferencedElementsArr, $pageIds) {
-		global $TYPO3_DB, $BE_USER;
-
+	public function getUnreferencedElementsRecords($allReferencedElementsArr, $pageIds) {
 		$elementRecordsArr = array();
 
-		$res = $TYPO3_DB->exec_SELECTquery (
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery (
 			'uid',
 			'tt_content',
 			'uid NOT IN (' . implode(',', $allReferencedElementsArr) . ')'.
             ' AND pid IN (' . implode(',', $pageIds) . ')' .
-			' AND t3ver_wsid='.intval($BE_USER->workspace).
-			t3lib_BEfunc::deleteClause('tt_content').
-			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),
+			' AND t3ver_wsid='.(int)$GLOBALS['BE_USER']->workspace.
+            \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content').
+            \TYPO3\CMS\Backend\Utility\BackendUtility::versioningPlaceholderClause('tt_content'),
 			'',
 			'sorting'
 		);
 
 		if ($res) {
-			while(($elementRecordArr = $TYPO3_DB->sql_fetch_assoc($res)) !== FALSE) {
+			while(($elementRecordArr = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) !== FALSE) {
 				$elementRecordsArr[] = $elementRecordArr['uid'];
 			}
 		}
@@ -175,5 +173,3 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
 		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
 	}
 }
-
-?>
