@@ -299,7 +299,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements t3lib_Singleton 
 			flexform_getPointerFromString($flexformPointerString);
 
 		$contentUid = $this->sharedHelper->getTemplavoilaAPIObj()->
-			copyElement($sourcePointer, $sourcePointer);
+			copyElement($sourcePointer, $sourcePointer, true);
 		$this->sharedHelper->getTemplavoilaAPIObj()->
 			unlinkElement($sourcePointer);
 
