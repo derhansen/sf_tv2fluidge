@@ -1,4 +1,5 @@
 <?php
+
 class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\CommandController
 {
     /**
@@ -32,19 +33,23 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
      * @inject
      */
     protected $fixSortingHelper;
+
     /**
      * @param bool $markAsNegativeColPos
      */
-    public function deleteUnreferencedElementsCommand($markAsNegativeColPos = false) {
+    public function deleteUnreferencedElementsCommand($markAsNegativeColPos = false)
+    {
         $this->sharedHelper->setUnlimitedTimeout();
         $numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords((bool)$markAsNegativeColPos);
         $this->outputLine($numRecords . ' records deleted');
     }
+
     /**
      * @param bool $useParentUidForTranslations
      * @param bool $useAllLangIfDefaultLangIsReferenced
      */
-    public function convertReferenceElementsCommand($useParentUidForTranslations = false, $useAllLangIfDefaultLangIsReferenced = false) {
+    public function convertReferenceElementsCommand($useParentUidForTranslations = false, $useAllLangIfDefaultLangIsReferenced = false)
+    {
         $formdata = array(
             'useparentuidfortranslations' => (int)$useParentUidForTranslations,
             'usealllangifdefaultlangisreferenced' => (int)$useAllLangIfDefaultLangIsReferenced
@@ -54,6 +59,7 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
         $numRecords = $this->referenceElementHelper->convertReferenceElements();
         $this->outputLine($numRecords . ' records converted');
     }
+
     /**
      * @param int $uidTvTemplate
      * @param int $uidBeLayout
@@ -75,32 +81,29 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
         $i = 1;
         foreach ($data as $columns) {
             $colsArr = explode('=', $columns);
-            $formdata['tv_col_'.$i] = $colsArr[0];
-            $formdata['be_col_'.$i] = $colsArr[1];
+            $formdata['tv_col_' . $i] = $colsArr[0];
+            $formdata['be_col_' . $i] = $colsArr[1];
             $i++;
         }
         $this->sharedHelper->setUnlimitedTimeout();
         $contentElementsUpdated = 0;
-        $pageTemplatesUpdated   = 0;
-        if ($uidTvTemplate > 0 && $uidBeLayout > 0)
-        {
+        $pageTemplatesUpdated = 0;
+        if ($uidTvTemplate > 0 && $uidBeLayout > 0) {
             $pageUids = $this->sharedHelper->getPageIds();
-            foreach ($pageUids as $pageUid)
-            {
-                if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate)
-                {
+            foreach ($pageUids as $pageUid) {
+                if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
                     $contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
                     $this->migrateContentHelper->migrateTvFlexformForPage($formdata, $pageUid);
                 }
                 // Update page template (must be called for every page, since to and next_to must be checked
                 $pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
             }
-            if ($markDeleted)
-            {
+            if ($markDeleted) {
                 $this->migrateContentHelper->markTvTemplateDeleted($uidTvTemplate);
             }
         }
     }
+
     /**
      * Action for fix sorting
      *
@@ -119,12 +122,12 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
      *
      * @return void
      */
-    public function fixSortingAutoCommand() {
+    public function fixSortingAutoCommand()
+    {
         $numUpdated = 0;
         $this->sharedHelper->setUnlimitedTimeout();
         $pageUids = $this->sharedHelper->getPageIds();
-        foreach ($pageUids as $pageUidToFix)
-        {
+        foreach ($pageUids as $pageUidToFix) {
             $numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUidToFix);
         }
         $this->outputLine($numUpdated . ' sortings fixed');

@@ -27,127 +27,136 @@
 /**
  * TV Tv2fluidge Backend Controller
  */
-class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController {
+class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+{
 
-	/**
-	 * UnreferencedElementHelper
-	 *
-	 * @var Tx_SfTv2fluidge_Service_UnreferencedElementHelper
-	 */
-	protected $unreferencedElementHelper;
+    /**
+     * UnreferencedElementHelper
+     *
+     * @var Tx_SfTv2fluidge_Service_UnreferencedElementHelper
+     */
+    protected $unreferencedElementHelper;
 
-	/**
-	 * DI for UnreferencedElementHelper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_UnreferencedElementHelper $unreferencedElementHelper
-	 * @return void
-	 */
-	public function injectUnreferencedElementHelper(Tx_SfTv2fluidge_Service_UnreferencedElementHelper $unreferencedElementHelper) {
-		$this->unreferencedElementHelper = $unreferencedElementHelper;
-	}
+    /**
+     * DI for UnreferencedElementHelper
+     *
+     * @param Tx_SfTv2fluidge_Service_UnreferencedElementHelper $unreferencedElementHelper
+     * @return void
+     */
+    public function injectUnreferencedElementHelper(Tx_SfTv2fluidge_Service_UnreferencedElementHelper $unreferencedElementHelper)
+    {
+        $this->unreferencedElementHelper = $unreferencedElementHelper;
+    }
 
-	/**
-	 * ReferenceElementHelper
-	 *
-	 * @var Tx_SfTv2fluidge_Service_ReferenceElementHelper
-	 */
-	protected $referenceElementHelper;
+    /**
+     * ReferenceElementHelper
+     *
+     * @var Tx_SfTv2fluidge_Service_ReferenceElementHelper
+     */
+    protected $referenceElementHelper;
 
-	/**
-	 * DI for ReferenceElementHelper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_ReferenceElementHelper $referenceElementHelper
-	 * @return void
-	 */
-	public function injectReferenceElementHelper(Tx_SfTv2fluidge_Service_ReferenceElementHelper $referenceElementHelper) {
-		$this->referenceElementHelper = $referenceElementHelper;
-	}
+    /**
+     * DI for ReferenceElementHelper
+     *
+     * @param Tx_SfTv2fluidge_Service_ReferenceElementHelper $referenceElementHelper
+     * @return void
+     */
+    public function injectReferenceElementHelper(Tx_SfTv2fluidge_Service_ReferenceElementHelper $referenceElementHelper)
+    {
+        $this->referenceElementHelper = $referenceElementHelper;
+    }
 
-	/**
-	 * MigrateFceHelper
-	 *
-	 * @var Tx_SfTv2fluidge_Service_MigrateFceHelper
-	 */
-	protected $migrateFceHelper;
+    /**
+     * MigrateFceHelper
+     *
+     * @var Tx_SfTv2fluidge_Service_MigrateFceHelper
+     */
+    protected $migrateFceHelper;
 
-	/**
-	 * DI for MigrateFceHelper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_MigrateFceHelper $migrateFceHelper
-	 * @return void
-	 */
-	public function injectUpdateFceHelper(Tx_SfTv2fluidge_Service_MigrateFceHelper $migrateFceHelper) {
-		$this->migrateFceHelper = $migrateFceHelper;
-	}
+    /**
+     * DI for MigrateFceHelper
+     *
+     * @param Tx_SfTv2fluidge_Service_MigrateFceHelper $migrateFceHelper
+     * @return void
+     */
+    public function injectUpdateFceHelper(Tx_SfTv2fluidge_Service_MigrateFceHelper $migrateFceHelper)
+    {
+        $this->migrateFceHelper = $migrateFceHelper;
+    }
 
-	/**
-	 * MigrateContentHelper
-	 *
-	 * @var Tx_SfTv2fluidge_Service_MigrateContentHelper
-	 */
-	protected $migrateContentHelper;
+    /**
+     * MigrateContentHelper
+     *
+     * @var Tx_SfTv2fluidge_Service_MigrateContentHelper
+     */
+    protected $migrateContentHelper;
 
-	/**
-	 * DI for MigrateContentHelper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_MigrateContentHelper $migrateContentHelper
-	 * @return void
-	 */
-	public function injectContentFceHelper(Tx_SfTv2fluidge_Service_MigrateContentHelper $migrateContentHelper) {
-		$this->migrateContentHelper = $migrateContentHelper;
-	}
+    /**
+     * DI for MigrateContentHelper
+     *
+     * @param Tx_SfTv2fluidge_Service_MigrateContentHelper $migrateContentHelper
+     * @return void
+     */
+    public function injectContentFceHelper(Tx_SfTv2fluidge_Service_MigrateContentHelper $migrateContentHelper)
+    {
+        $this->migrateContentHelper = $migrateContentHelper;
+    }
 
-	/**
-	 * @var Tx_SfTv2fluidge_Service_FixSortingHelper
-	 */
-	protected $fixSortingHelper;
+    /**
+     * @var Tx_SfTv2fluidge_Service_FixSortingHelper
+     */
+    protected $fixSortingHelper;
 
-	/**
-	 * DI for fix sorting helper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_FixSortingHelper $fixSortingHelper
-	 * @return void
-	 */
-	public function injectFixSortingHelper(Tx_SfTv2fluidge_Service_FixSortingHelper $fixSortingHelper) {
-		$this->fixSortingHelper = $fixSortingHelper;
-	}
+    /**
+     * DI for fix sorting helper
+     *
+     * @param Tx_SfTv2fluidge_Service_FixSortingHelper $fixSortingHelper
+     * @return void
+     */
+    public function injectFixSortingHelper(Tx_SfTv2fluidge_Service_FixSortingHelper $fixSortingHelper)
+    {
+        $this->fixSortingHelper = $fixSortingHelper;
+    }
 
-	/**
-	 * @var Tx_SfTv2fluidge_Service_SharedHelper
-	 */
-	protected $sharedHelper;
+    /**
+     * @var Tx_SfTv2fluidge_Service_SharedHelper
+     */
+    protected $sharedHelper;
 
-	/**
-	 * DI for shared helper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
-	 * @return void
-	 */
-	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
-		$this->sharedHelper = $sharedHelper;
-	}
+    /**
+     * DI for shared helper
+     *
+     * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
+     * @return void
+     */
+    public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper)
+    {
+        $this->sharedHelper = $sharedHelper;
+    }
 
-	/**
-	 * @var Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper
-	 */
-	protected $convertMultilangContentHelper;
+    /**
+     * @var Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper
+     */
+    protected $convertMultilangContentHelper;
 
-	/**
-	 * DI for shared helper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper
-	 * @return void
-	 */
-	public function injectConvertMultilangContentHelper(Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper) {
-		$this->convertMultilangContentHelper = $convertMultilangContentHelper;
-	}
+    /**
+     * DI for shared helper
+     *
+     * @param Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper
+     * @return void
+     */
+    public function injectConvertMultilangContentHelper(Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper $convertMultilangContentHelper)
+    {
+        $this->convertMultilangContentHelper = $convertMultilangContentHelper;
+    }
 
-	/**
-	 * Default index action for module
-	 *
-	 * @return void
-	 */
-	public function indexAction() {
+    /**
+     * Default index action for module
+     *
+     * @return void
+     */
+    public function indexAction()
+    {
         $this->view->assignMultiple(
             array(
                 'rootPid' => $this->sharedHelper->getConversionRootPid(),
@@ -155,29 +164,31 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase
                 'pagesDepthLimit' => $this->sharedHelper->getPagesDepthLimit()
             )
         );
-	}
+    }
 
-	/**
-	 * Index action for unreferenced Elements module
-	 *
-	 * @return void
-	 */
-	public function IndexDeleteUnreferencedElementsAction() {
+    /**
+     * Index action for unreferenced Elements module
+     *
+     * @return void
+     */
+    public function IndexDeleteUnreferencedElementsAction()
+    {
 
-	}
+    }
 
-	/**
-	 * Sets all unreferenced Elements to deleted
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
-	public function deleteUnreferencedElementsAction($formdata = NULL) {
-		$this->sharedHelper->setUnlimitedTimeout();
-		$markAsNegativeColPos = FALSE;
-		if ((int)$formdata['markasnegativecolpos'] === 1) {
-			$markAsNegativeColPos = TRUE;
-		}
+    /**
+     * Sets all unreferenced Elements to deleted
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function deleteUnreferencedElementsAction($formdata = NULL)
+    {
+        $this->sharedHelper->setUnlimitedTimeout();
+        $markAsNegativeColPos = FALSE;
+        if ((int)$formdata['markasnegativecolpos'] === 1) {
+            $markAsNegativeColPos = TRUE;
+        }
         $ignoreshortcutpages = FALSE;
         if ((int)$formdata['ignoreshortcutpages'] === 1) {
             $ignoreshortcutpages = TRUE;
@@ -186,36 +197,38 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase
         if ((int)$formdata['ignoresysfolders'] === 1) {
             $ignoresysfolders = TRUE;
         }
-		$numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords(
-		    $markAsNegativeColPos,
+        $numRecords = $this->unreferencedElementHelper->markDeletedUnreferencedElementsRecords(
+            $markAsNegativeColPos,
             $ignoreshortcutpages,
             $ignoresysfolders
         );
-		$this->view->assign('numRecords', $numRecords);
-	}
+        $this->view->assign('numRecords', $numRecords);
+    }
 
-	/**
-	 * Index action for migrate reference elements
-	 *
-	 * @return void
-	 */
-	public function indexConvertReferenceElementsAction() {
+    /**
+     * Index action for migrate reference elements
+     *
+     * @return void
+     */
+    public function indexConvertReferenceElementsAction()
+    {
 
-	}
+    }
 
-	/**
-	 * Migrates all reference elements to 'insert records' elements
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
-	public function convertReferenceElementsAction($formdata = NULL) {
-		$this->sharedHelper->setUnlimitedTimeout();
+    /**
+     * Migrates all reference elements to 'insert records' elements
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function convertReferenceElementsAction($formdata = NULL)
+    {
+        $this->sharedHelper->setUnlimitedTimeout();
 
-		$this->referenceElementHelper->initFormData($formdata);
-		$numRecords = $this->referenceElementHelper->convertReferenceElements();
-		$this->view->assign('numRecords', $numRecords);
-	}
+        $this->referenceElementHelper->initFormData($formdata);
+        $numRecords = $this->referenceElementHelper->convertReferenceElements();
+        $this->view->assign('numRecords', $numRecords);
+    }
 
     /**
      * Index action for migrateFce
@@ -226,97 +239,98 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
      */
-	public function indexMigrateFceAction($formdata = NULL) {
-		if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
-			$allFce = $this->migrateFceHelper->getAllFileFce();
-		}
-		else {
-			$allFce = $this->migrateFceHelper->getAllDbFce();
-		}
-		$allGe = $this->migrateFceHelper->getAllGe();
+    public function indexMigrateFceAction($formdata = NULL)
+    {
+        if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
+            $allFce = $this->migrateFceHelper->getAllFileFce();
+        } else {
+            $allFce = $this->migrateFceHelper->getAllDbFce();
+        }
+        $allGe = $this->migrateFceHelper->getAllGe();
 
-		if (isset($formdata['fce'])) {
-			$uidFce = (int)$formdata['fce'];
-		} else {
-			$uidFce = current(array_keys($allFce));
-		}
+        if (isset($formdata['fce'])) {
+            $uidFce = (int)$formdata['fce'];
+        } else {
+            $uidFce = current(array_keys($allFce));
+        }
 
-		if (isset($formdata['ge'])) {
-			$geKey = $formdata['ge'];
-		} else {
-			$geKey = current(array_keys($allGe));
-		}
+        if (isset($formdata['ge'])) {
+            $geKey = $formdata['ge'];
+        } else {
+            $geKey = current(array_keys($allGe));
+        }
 
-		// Fetch content columns from FCE and GE depending on selection (first entry if empty)
+        // Fetch content columns from FCE and GE depending on selection (first entry if empty)
         $fceContentCols = NULL;
         if ($uidFce > 0) {
-			$fceContentCols = $this->sharedHelper->getTvContentCols($uidFce);
-		}
+            $fceContentCols = $this->sharedHelper->getTvContentCols($uidFce);
+        }
 
-		if ($this->sharedHelper->canBeInterpretedAsInteger($geKey)) {
-			$geKey = (int)$geKey;
-			if ($geKey <= 0) {
-				$geKey = 0;
-			}
-		}
+        if ($this->sharedHelper->canBeInterpretedAsInteger($geKey)) {
+            $geKey = (int)$geKey;
+            if ($geKey <= 0) {
+                $geKey = 0;
+            }
+        }
 
         $geContentCols = NULL;
-		if (!empty($geKey)) {
-			$geContentCols = $this->sharedHelper->getGeContentCols($geKey);
-		}
+        if (!empty($geKey)) {
+            $geContentCols = $this->sharedHelper->getGeContentCols($geKey);
+        }
 
-		$this->view->assign('fceContentCols', $fceContentCols);
-		$this->view->assign('geContentCols', $geContentCols);
-		$this->view->assign('allFce', $allFce);
-		$this->view->assign('allGe', $allGe);
-		$this->view->assign('formdata', $formdata);
+        $this->view->assign('fceContentCols', $fceContentCols);
+        $this->view->assign('geContentCols', $geContentCols);
+        $this->view->assign('allFce', $allFce);
+        $this->view->assign('allGe', $allGe);
+        $this->view->assign('formdata', $formdata);
 
-		// Redirect to migrateContentAction when submit button pressed
-		if (isset($formdata['startAction'])) {
-            $this->redirect('migrateFce',NULL,NULL,array('formdata' => $formdata));
-		}
-	}
+        // Redirect to migrateContentAction when submit button pressed
+        if (isset($formdata['startAction'])) {
+            $this->redirect('migrateFce', NULL, NULL, array('formdata' => $formdata));
+        }
+    }
 
 
-	/**
-	 * Migrates content from FCE to Grid Element
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
-	public function migrateFceAction($formdata) {
-		$this->sharedHelper->setUnlimitedTimeout();
+    /**
+     * Migrates content from FCE to Grid Element
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function migrateFceAction($formdata)
+    {
+        $this->sharedHelper->setUnlimitedTimeout();
 
-		$fce = $formdata['fce'];
-		$ge = $formdata['ge'];
-		if ($this->sharedHelper->canBeInterpretedAsInteger($ge)) {
-			$ge = (int)$ge;
-			if ($ge <= 0) {
-				$ge = 0;
-			}
-		}
+        $fce = $formdata['fce'];
+        $ge = $formdata['ge'];
+        if ($this->sharedHelper->canBeInterpretedAsInteger($ge)) {
+            $ge = (int)$ge;
+            if ($ge <= 0) {
+                $ge = 0;
+            }
+        }
 
-		$fcesConverted = 0;
-		$contentElementsUpdated = 0;
+        $fcesConverted = 0;
+        $contentElementsUpdated = 0;
 
-		if ($fce > 0 && !empty($ge)) {
+        if ($fce > 0 && !empty($ge)) {
             $pageUids = $this->sharedHelper->getPageIds();
-			$contentElements = $this->migrateFceHelper->getContentElementsByFce($fce, $pageUids);
-			foreach($contentElements as $contentElement) {
-				$fcesConverted++;
-				$this->migrateFceHelper->migrateFceFlexformContentToGe($contentElement, $ge);
+            $contentElements = $this->migrateFceHelper->getContentElementsByFce($fce, $pageUids);
+            foreach ($contentElements as $contentElement) {
+                $fcesConverted++;
+                $this->migrateFceHelper->migrateFceFlexformContentToGe($contentElement, $ge);
 
-				// Migrate content to GridElement columns (if available)
-				$contentElementsUpdated += $this->migrateFceHelper->migrateContentElementsForFce($contentElement, $formdata);
-			}
-			if ($formdata['markdeleted']) {
-				$this->migrateFceHelper->markFceDeleted($fce);
-			}
-		}
+                // Migrate content to GridElement columns (if available)
+                $contentElementsUpdated += $this->migrateFceHelper->migrateContentElementsForFce($contentElement, $formdata);
+            }
+            if ($formdata['markdeleted']) {
+                $this->migrateFceHelper->markFceDeleted($fce);
+            }
+        }
 
-		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
-		$this->view->assign('fcesConverted', $fcesConverted);
-	}
+        $this->view->assign('contentElementsUpdated', $contentElementsUpdated);
+        $this->view->assign('fcesConverted', $fcesConverted);
+    }
 
     /**
      * Index action for migrate content
@@ -326,121 +340,124 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
      */
-	public function indexMigrateContentAction($formdata = NULL) {
-		if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
-			$tvtemplates = $this->migrateContentHelper->getAllFileTvTemplates();
-		}
-		else {
-			$tvtemplates = $this->migrateContentHelper->getAllDbTvTemplates();
-		}
-		$beLayouts = $this->migrateContentHelper->getAllBeLayouts();
+    public function indexMigrateContentAction($formdata = NULL)
+    {
+        if ($this->sharedHelper->getTemplavoilaStaticDsIsEnabled()) {
+            $tvtemplates = $this->migrateContentHelper->getAllFileTvTemplates();
+        } else {
+            $tvtemplates = $this->migrateContentHelper->getAllDbTvTemplates();
+        }
+        $beLayouts = $this->migrateContentHelper->getAllBeLayouts();
 
-		if (isset($formdata['tvtemplate'])) {
-			$uidTvTemplate = (int)$formdata['tvtemplate'];
-		} else {
-			$uidTvTemplate = current(array_keys($tvtemplates));
-		}
+        if (isset($formdata['tvtemplate'])) {
+            $uidTvTemplate = (int)$formdata['tvtemplate'];
+        } else {
+            $uidTvTemplate = current(array_keys($tvtemplates));
+        }
 
-		if (isset($formdata['belayout'])) {
-			$uidBeLayout = $formdata['belayout'];
-		} else {
-			$uidBeLayout = current(array_keys($beLayouts));
-		}
+        if (isset($formdata['belayout'])) {
+            $uidBeLayout = $formdata['belayout'];
+        } else {
+            $uidBeLayout = current(array_keys($beLayouts));
+        }
 
-		if (!isset($formdata['flexformfieldprefix'])) {
-			$formdata['flexformfieldprefix'] = 'tx_';
-		}
+        if (!isset($formdata['flexformfieldprefix'])) {
+            $formdata['flexformfieldprefix'] = 'tx_';
+        }
 
-		if (!isset($formdata['convertflexformoption'])) {
-			$formdata['convertflexformoption'] = 'merge';
-		}
+        if (!isset($formdata['convertflexformoption'])) {
+            $formdata['convertflexformoption'] = 'merge';
+        }
 
-		// Fetch content columns from TV and BE layouts depending on selection (first entry if empty)
-		$tvContentCols = $this->sharedHelper->getTvContentCols($uidTvTemplate);
-		$beContentCols = $this->sharedHelper->getBeLayoutContentCols($uidBeLayout);
+        // Fetch content columns from TV and BE layouts depending on selection (first entry if empty)
+        $tvContentCols = $this->sharedHelper->getTvContentCols($uidTvTemplate);
+        $beContentCols = $this->sharedHelper->getBeLayoutContentCols($uidBeLayout);
 
-		$this->view->assign('tvContentCols', $tvContentCols);
-		$this->view->assign('beContentCols', $beContentCols);
-		$this->view->assign('tvtemplates', $tvtemplates);
-		$this->view->assign('belayouts', $beLayouts);
-		$this->view->assign('formdata', $formdata);
+        $this->view->assign('tvContentCols', $tvContentCols);
+        $this->view->assign('beContentCols', $beContentCols);
+        $this->view->assign('tvtemplates', $tvtemplates);
+        $this->view->assign('belayouts', $beLayouts);
+        $this->view->assign('formdata', $formdata);
 
-		// Redirect to migrateContentAction when submit button pressed
-		if (isset($formdata['startAction'])) {
-			$this->redirect('migrateContent',NULL,NULL,array('formdata' => $formdata));
-		}
-	}
+        // Redirect to migrateContentAction when submit button pressed
+        if (isset($formdata['startAction'])) {
+            $this->redirect('migrateContent', NULL, NULL, array('formdata' => $formdata));
+        }
+    }
 
-	/**
-	 * Does the content migration recursive for all pages
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
-	public function migrateContentAction($formdata) {
-		$this->sharedHelper->setUnlimitedTimeout();
+    /**
+     * Does the content migration recursive for all pages
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function migrateContentAction($formdata)
+    {
+        $this->sharedHelper->setUnlimitedTimeout();
 
-		$uidTvTemplate = (int)$formdata['tvtemplate'];
-		$uidBeLayout = (int)$formdata['belayout'];
+        $uidTvTemplate = (int)$formdata['tvtemplate'];
+        $uidBeLayout = (int)$formdata['belayout'];
 
-		$contentElementsUpdated = 0;
-		$pageTemplatesUpdated = 0;
+        $contentElementsUpdated = 0;
+        $pageTemplatesUpdated = 0;
 
-		if ($uidTvTemplate > 0 && $uidBeLayout > 0) {
-			$pageUids = $this->sharedHelper->getPageIds();
+        if ($uidTvTemplate > 0 && $uidBeLayout > 0) {
+            $pageUids = $this->sharedHelper->getPageIds();
 
-			foreach($pageUids as $pageUid) {
-				if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
-					$contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
-					$this->migrateContentHelper->migrateTvFlexformForPage($formdata, $pageUid);
-				}
+            foreach ($pageUids as $pageUid) {
+                if ($this->sharedHelper->getTvPageTemplateUid($pageUid) == $uidTvTemplate) {
+                    $contentElementsUpdated += $this->migrateContentHelper->migrateContentForPage($formdata, $pageUid);
+                    $this->migrateContentHelper->migrateTvFlexformForPage($formdata, $pageUid);
+                }
 
-				// Update page template (must be called for every page, since to and next_to must be checked
-				$pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
-			}
+                // Update page template (must be called for every page, since to and next_to must be checked
+                $pageTemplatesUpdated += $this->migrateContentHelper->updatePageTemplate($pageUid, $uidTvTemplate, $uidBeLayout);
+            }
 
-			if ($formdata['markdeleted']) {
-				$this->migrateContentHelper->markTvTemplateDeleted($uidTvTemplate);
-			}
-		}
+            if ($formdata['markdeleted']) {
+                $this->migrateContentHelper->markTvTemplateDeleted($uidTvTemplate);
+            }
+        }
 
-		$this->view->assign('contentElementsUpdated', $contentElementsUpdated);
-		$this->view->assign('pageTemplatesUpdated', $pageTemplatesUpdated);
-	}
+        $this->view->assign('contentElementsUpdated', $contentElementsUpdated);
+        $this->view->assign('pageTemplatesUpdated', $pageTemplatesUpdated);
+    }
 
-	/**
-	 * Index action for convert multilingual content
-	 *
-	 * @return void
-	 */
-	public function indexConvertMultilangContentAction() {
+    /**
+     * Index action for convert multilingual content
+     *
+     * @return void
+     */
+    public function indexConvertMultilangContentAction()
+    {
 
-	}
+    }
 
-	/**
-	 * Does the content conversion for all GridElements on all pages
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
-	public function convertMultilangContentAction($formdata = NULL) {
-		$this->sharedHelper->setUnlimitedTimeout();
+    /**
+     * Does the content conversion for all GridElements on all pages
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function convertMultilangContentAction($formdata = NULL)
+    {
+        $this->sharedHelper->setUnlimitedTimeout();
 
-		$pageUids = $this->sharedHelper->getPageIds();
+        $pageUids = $this->sharedHelper->getPageIds();
 
-		$numGEs = 0;
-		$numCEs = 0;
+        $numGEs = 0;
+        $numCEs = 0;
 
-		$this->convertMultilangContentHelper->initFormData($formdata);
+        $this->convertMultilangContentHelper->initFormData($formdata);
 
-		foreach($pageUids as $pageUid) {
-			$numGEs += $this->convertMultilangContentHelper->cloneLangAllGEs($pageUid);
-			$numCEs += $this->convertMultilangContentHelper->rearrangeContentElementsForGridelementsOnPage($pageUid);
-		}
+        foreach ($pageUids as $pageUid) {
+            $numGEs += $this->convertMultilangContentHelper->cloneLangAllGEs($pageUid);
+            $numCEs += $this->convertMultilangContentHelper->rearrangeContentElementsForGridelementsOnPage($pageUid);
+        }
 
-		$this->view->assign('numGEs', $numGEs);
-		$this->view->assign('numCEs', $numCEs);
-	}
+        $this->view->assign('numGEs', $numGEs);
+        $this->view->assign('numCEs', $numCEs);
+    }
 
     /**
      * Index action for fix sorting
@@ -450,40 +467,42 @@ class Tx_SfTv2fluidge_Controller_Tv2fluidgeController extends \TYPO3\CMS\Extbase
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\StopActionException
      * @throws \TYPO3\CMS\Extbase\Mvc\Exception\UnsupportedRequestTypeException
      */
-	public function indexFixSortingAction($formdata = NULL) {
-		$cancel = FALSE;
+    public function indexFixSortingAction($formdata = NULL)
+    {
+        $cancel = FALSE;
 
-		if ($formdata['fixOptions'] == 'singlePage' && $formdata['pageUid'] == '' && isset($formdata['startAction'])) {
-			$cancel = TRUE;
-			$this->view->assign('pageUidMissing', TRUE);
-		}
+        if ($formdata['fixOptions'] == 'singlePage' && $formdata['pageUid'] == '' && isset($formdata['startAction'])) {
+            $cancel = TRUE;
+            $this->view->assign('pageUidMissing', TRUE);
+        }
 
-		$this->view->assign('formdata', $formdata);
+        $this->view->assign('formdata', $formdata);
 
-		// Redirect to fixSortingAction when submit button pressed
-		if (($cancel === false) && (isset($formdata['startAction']))) {
-			$this->redirect('fixSorting',NULL,NULL,array('formdata' => $formdata));
-		}
-	}
+        // Redirect to fixSortingAction when submit button pressed
+        if (($cancel === false) && (isset($formdata['startAction']))) {
+            $this->redirect('fixSorting', NULL, NULL, array('formdata' => $formdata));
+        }
+    }
 
-	/**
-	 * Action for fix sorting
-	 *
-	 * @param array $formdata
-	 * @return void
-	 */
-	public function fixSortingAction($formdata) {
-		$this->sharedHelper->setUnlimitedTimeout();
+    /**
+     * Action for fix sorting
+     *
+     * @param array $formdata
+     * @return void
+     */
+    public function fixSortingAction($formdata)
+    {
+        $this->sharedHelper->setUnlimitedTimeout();
 
-		$numUpdated = 0;
-		if ($formdata['fixOptions'] == 'singlePage') {
-			$numUpdated = $this->fixSortingHelper->fixSortingForPage($formdata['pageUid']);
-		} else {
-			$pageUids = $this->sharedHelper->getPageIds();
-			foreach($pageUids as $pageUid) {
-				$numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUid);
-			}
-		}
-		$this->view->assign('numUpdated', $numUpdated);
-	}
+        $numUpdated = 0;
+        if ($formdata['fixOptions'] == 'singlePage') {
+            $numUpdated = $this->fixSortingHelper->fixSortingForPage($formdata['pageUid']);
+        } else {
+            $pageUids = $this->sharedHelper->getPageIds();
+            foreach ($pageUids as $pageUid) {
+                $numUpdated += $this->fixSortingHelper->fixSortingForPage($pageUid);
+            }
+        }
+        $this->view->assign('numUpdated', $numUpdated);
+    }
 }

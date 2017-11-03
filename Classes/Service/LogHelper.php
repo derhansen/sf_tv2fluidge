@@ -26,7 +26,8 @@
 /**
  * Helper class for handling logs
  */
-class Tx_SfTv2fluidge_Service_LogHelper implements \TYPO3\CMS\Core\SingletonInterface {
+class Tx_SfTv2fluidge_Service_LogHelper implements \TYPO3\CMS\Core\SingletonInterface
+{
 
     /**
      * @var array
@@ -36,7 +37,8 @@ class Tx_SfTv2fluidge_Service_LogHelper implements \TYPO3\CMS\Core\SingletonInte
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge'])) {
             $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge']);
         }
