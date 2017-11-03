@@ -127,17 +127,21 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\Single
         $table = 'tx_gridelements_backend_layout';
         $where = 'deleted=0';
 
+        /* @todo use gridelements api call */
         $res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
 
-        $gridElements = array();
-        foreach ($res as $ge) {
-            $geKey = $ge['uid'];
-            if (!empty($ge['alias'])) {
-                $geKey = $ge['alias'];
-            }
+        $gridElements = [];
+        if (is_array($res)) {
+            foreach ($res as $ge) {
+                $geKey = $ge['uid'];
+                if (!empty($ge['alias'])) {
+                    $geKey = $ge['alias'];
+                }
 
-            $gridElements[$geKey] = $ge['title'];
+                $gridElements[$geKey] = $ge['title'];
+            }
         }
+
 
         return $gridElements;
     }
