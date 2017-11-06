@@ -242,7 +242,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
 
         $contentCols = array();
 
-        if (null !== $flexform) {
+        if (false !== (boolean)$flexform) {
             $elements = $flexform->xpath('ROOT/el/*');
             if ($addSelectLabel) {
                 $contentCols[''] = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate('label_select', 'sf_tv2fluidge');
