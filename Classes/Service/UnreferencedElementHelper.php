@@ -90,7 +90,7 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements \TYPO3\CMS\Co
 
         foreach ($pids as $pid) {
             $pageRecord = $this->sharedHelper->getPage($pid);
-            if (!empty($pageRecord) && !in_array(intval($pageRecord['doktype']), $ignorePageTypes)) {
+            if (!empty($pageRecord) && !in_array((int)$pageRecord['doktype'], $ignorePageTypes)) {
                 // Add the PID to the array of PIDs to be processed
                 $processPids[] = $pid;
                 $contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);

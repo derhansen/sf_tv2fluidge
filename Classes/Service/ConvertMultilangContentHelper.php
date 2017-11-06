@@ -88,7 +88,7 @@ class Tx_SfTv2fluidge_Service_ConvertMultilangContentHelper implements \TYPO3\CM
     {
         $this->flexformConversionOption = $formdata['convertflexformoption'];
         $this->insertRecordsConversionOption = $formdata['convertinsertrecords'];
-        $this->allLanguageRecordsInGeToShortcut = (intval($formdata['alllanguagerecordsingetoshortcut']) === 1);
+        $this->allLanguageRecordsInGeToShortcut = (((int)$formdata['alllanguagerecordsingetoshortcut']) === 1);
     }
 
     /**
