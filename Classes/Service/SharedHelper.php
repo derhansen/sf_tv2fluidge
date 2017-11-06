@@ -146,7 +146,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
         /**
          * @var t3lib_queryGenerator $tree
          */
-        $tree = \TYPO3\Beautyofcode\Utility\GeneralUtility::makeInstance('t3lib_queryGenerator');
+        $tree = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_queryGenerator');
 
         $conversionRootPid = $this->getConversionRootPid();
         if (($conversionRootPid !== null) && ($conversionRootPid > 0)) {
