@@ -26,7 +26,8 @@
 /**
  * Helper class for handling logs
  */
-class Tx_SfTv2fluidge_Service_LogHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_LogHelper implements \TYPO3\CMS\Core\SingletonInterface
+{
 
     /**
      * @var array
@@ -36,7 +37,8 @@ class Tx_SfTv2fluidge_Service_LogHelper implements t3lib_Singleton {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge'])) {
             $this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge']);
         }
@@ -51,14 +53,12 @@ class Tx_SfTv2fluidge_Service_LogHelper implements t3lib_Singleton {
     public function logMessage($message)
     {
         if ((bool)$this->extConf['enableLogging']) {
-            $logfile = fopen($this->extConf['logfilePath'], 'a');
-            fputs($logfile,
-                date('d.m.Y H:i:s', time()) . ': ' . $message . PHP_EOL
+            $logfile = fopen($this->extConf['logfilePath'], 'ab');
+            fwrite($logfile,
+                date('d.m.Y H:i:s') . ': ' . $message . PHP_EOL
             );
             fclose($logfile);
         }
     }
 
 }
-
-?>

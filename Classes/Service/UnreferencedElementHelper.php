@@ -26,22 +26,24 @@
 /**
  * Helper class for handling unreferenced elements
  */
-class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singleton {
+class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements \TYPO3\CMS\Core\SingletonInterface
+{
 
-	/**
-	 * @var Tx_SfTv2fluidge_Service_SharedHelper
-	 */
-	protected $sharedHelper;
+    /**
+     * @var Tx_SfTv2fluidge_Service_SharedHelper
+     */
+    protected $sharedHelper;
 
-	/**
-	 * DI for shared helper
-	 *
-	 * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
-	 * @return void
-	 */
-	public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper) {
-		$this->sharedHelper = $sharedHelper;
-	}
+    /**
+     * DI for shared helper
+     *
+     * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
+     * @return void
+     */
+    public function injectSharedHelper(Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper)
+    {
+        $this->sharedHelper = $sharedHelper;
+    }
 
     /**
      * @var Tx_SfTv2fluidge_Service_LogHelper
@@ -54,21 +56,23 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
      * @param Tx_SfTv2fluidge_Service_LogHelper $logHelper
      * @return void
      */
-    public function injectLogHelper(Tx_SfTv2fluidge_Service_LogHelper $logHelper) {
+    public function injectLogHelper(Tx_SfTv2fluidge_Service_LogHelper $logHelper)
+    {
         $this->logHelper = $logHelper;
     }
 
-	/**
-	 * Marks all unreferenced element records as deleted with the recursion level set in the extension setting
-	 *
-	 * @param bool $markAsNegativeColPos
+    /**
+     * Marks all unreferenced element records as deleted with the recursion level set in the extension setting
+     *
+     * @param bool $markAsNegativeColPos
      * @param bool $ignoreShortcutPages
      * @param bool $ignoreSysfolders
-	 * @return int Number of records deleted
-	 */
-	public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE, $ignoreShortcutPages = FALSE, $ignoreSysfolders = FALSE) {
+     * @return int Number of records deleted
+     */
+    public function markDeletedUnreferencedElementsRecords($markAsNegativeColPos = FALSE, $ignoreShortcutPages = FALSE, $ignoreSysfolders = FALSE)
+    {
         $pids = $this->sharedHelper->getPageIds();
-		$allReferencedElementsArr = array();
+        $allReferencedElementsArr = array();
 
         // Handle page types, that can be ignored
         $ignorePageTypes = array();
@@ -84,11 +88,11 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
         // Array which holds all PIDs to be processed when processing unreferenced content elements
         $processPids = array();
 
-		foreach ($pids as $pid) {
-			$pageRecord = $this->sharedHelper->getPage($pid);
-			if (!empty($pageRecord) && !in_array(intval($pageRecord['doktype']), $ignorePageTypes)) {
+        foreach ($pids as $pid) {
+            $pageRecord = $this->sharedHelper->getPage($pid);
+            if (!empty($pageRecord) && !in_array((int)$pageRecord['doktype'], $ignorePageTypes)) {
                 // Add the PID to the array of PIDs to be processed
-                array_push($processPids, $pid);
+                $processPids[] = $pid;
                 $contentTree = $this->sharedHelper->getTemplavoilaAPIObj()->getContentTree('pages', $pageRecord, FALSE);
                 $referencedElementsArrAsKeys = $contentTree['contentElementUsage'];
                 if (!empty($referencedElementsArrAsKeys)) {
@@ -96,10 +100,10 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
                     $allReferencedElementsArr = array_merge($allReferencedElementsArr, $referencedElementsArr);
                 }
             }
-		}
-		$allReferencedElementsArr = array_unique($allReferencedElementsArr);
-		$allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr, $processPids);
-		$countRecords = count($allRecordUids);
+        }
+        $allReferencedElementsArr = array_unique($allReferencedElementsArr);
+        $allRecordUids = $this->getUnreferencedElementsRecords($allReferencedElementsArr, $processPids);
+        $countRecords = count($allRecordUids);
 
         // Only process when we have records to be deleted
         if ($countRecords > 0) {
@@ -110,70 +114,69 @@ class Tx_SfTv2fluidge_Service_UnreferencedElementHelper implements t3lib_Singlet
             }
         }
 
-		return $countRecords;
-	}
+        return $countRecords;
+    }
 
-	/**
-	 * Returns an array of content UIDs which are not referenced on
-	 * the any of the given pages in $pageIds
-	 *
-	 * @param	array		$allReferencedElementsArr: Array with UIDs of referenced elements
-     * @param   array       $pageIds Array of pages where to search for unreferenced elements
-	 * @return	array		Array with UIDs of tt_content records
-	 * @access	protected
-	 */
-	function getUnreferencedElementsRecords($allReferencedElementsArr, $pageIds) {
-		global $TYPO3_DB, $BE_USER;
+    /**
+     * Returns an array of content UIDs which are not referenced on
+     * the any of the given pages in $pageIds
+     *
+     * @param    array $allReferencedElementsArr : Array with UIDs of referenced elements
+     * @param   array $pageIds Array of pages where to search for unreferenced elements
+     * @return    array        Array with UIDs of tt_content records
+     * @access    protected
+     */
+    public function getUnreferencedElementsRecords($allReferencedElementsArr, $pageIds)
+    {
+        $elementRecordsArr = array();
 
-		$elementRecordsArr = array();
-
-		$res = $TYPO3_DB->exec_SELECTquery (
-			'uid',
-			'tt_content',
-			'uid NOT IN (' . implode(',', $allReferencedElementsArr) . ')'.
+        $res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
+            'uid',
+            'tt_content',
+            'uid NOT IN (' . implode(',', $allReferencedElementsArr) . ')' .
             ' AND pid IN (' . implode(',', $pageIds) . ')' .
-			' AND t3ver_wsid='.intval($BE_USER->workspace).
-			t3lib_BEfunc::deleteClause('tt_content').
-			t3lib_BEfunc::versioningPlaceholderClause('tt_content'),
-			'',
-			'sorting'
-		);
+            ' AND t3ver_wsid=' . (int)$GLOBALS['BE_USER']->workspace .
+            \TYPO3\CMS\Backend\Utility\BackendUtility::deleteClause('tt_content') .
+            \TYPO3\CMS\Backend\Utility\BackendUtility::versioningPlaceholderClause('tt_content'),
+            '',
+            'sorting'
+        );
 
-		if ($res) {
-			while(($elementRecordArr = $TYPO3_DB->sql_fetch_assoc($res)) !== FALSE) {
-				$elementRecordsArr[] = $elementRecordArr['uid'];
-			}
-		}
-		return $elementRecordsArr;
-	}
+        if ($res) {
+            while (($elementRecordArr = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) !== FALSE) {
+                $elementRecordsArr[] = $elementRecordArr['uid'];
+            }
+        }
+        return $elementRecordsArr;
+    }
 
-	/**
-	 * Marks the records with the given UIDs as deleted
-	 *
-	 * @param $uids
-	 * @return void
-	 */
-	private function markDeleted($uids) {
-		$where = 'uid IN (' . implode(',', $uids) . ')';
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1, 'tstamp' => time()));
+    /**
+     * Marks the records with the given UIDs as deleted
+     *
+     * @param $uids
+     * @return void
+     */
+    private function markDeleted($uids)
+    {
+        $where = 'uid IN (' . implode(',', $uids) . ')';
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('deleted' => 1, 'tstamp' => time()));
 
-		$this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
-		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
-	}
+        $this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
+        $this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
+    }
 
-	/**
-	 * Marks the records with the given UIDs as using negative colPos
-	 *
-	 * @param $uids
-	 * @return void
-	 */
-	private function markNegativeColPos($uids) {
-		$where = 'uid IN (' . implode(',', $uids) . ')';
-		$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1, 'tstamp' => time()));
+    /**
+     * Marks the records with the given UIDs as using negative colPos
+     *
+     * @param $uids
+     * @return void
+     */
+    private function markNegativeColPos($uids)
+    {
+        $where = 'uid IN (' . implode(',', $uids) . ')';
+        $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tt_content', $where, array('colPos' => -1, 'tstamp' => time()));
 
-		$this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
-		$this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
-	}
+        $this->logHelper->logMessage('===== ' . __CLASS__ . ' - ' . __FUNCTION__ . ' =====');
+        $this->logHelper->logMessage($GLOBALS['TYPO3_DB']->debug_lastBuiltQuery);
+    }
 }
-
-?>
