@@ -122,28 +122,23 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\Single
      */
     public function getAllGe()
     {
-        /* Select all, because field "alias" is not available in older versions of GE */
-        $fields = '*';
-        $table = 'tx_gridelements_backend_layout';
-        $where = 'deleted=0';
+        /** @var \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility $configurationUtility */
+        $configurationUtility = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+            \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility::class
+        );
+        $config = $configurationUtility->getCurrentConfiguration('sf_tv2fluidge');
 
-        /* @todo use gridelements api call */
-        $res = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows($fields, $table, $where, '', '', '');
+        $layoutSetup = new \GridElementsTeam\Gridelements\Backend\LayoutSetup();
 
-        $gridElements = [];
-        if (is_array($res)) {
-            foreach ($res as $ge) {
-                $geKey = $ge['uid'];
-                if (!empty($ge['alias'])) {
-                    $geKey = $ge['alias'];
-                }
+        $gridElements = $layoutSetup->init($config['rootPid']['value'] ? $config['rootPid']['value'] : 0)->getLayoutSetup();
 
-                $gridElements[$geKey] = $ge['title'];
-            }
+        $collectedGridElements = [];
+
+        foreach ($gridElements as $key => $gridElement) {
+            $collectedGridElements[$key] =  \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($gridElement['title'], '');
         }
 
-
-        return $gridElements;
+        return $collectedGridElements;
     }
 
     /**
