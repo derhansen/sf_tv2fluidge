@@ -37,7 +37,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements \TYPO3\CMS\Core\Single
     protected $sharedHelper;
 
     /**
-     * @var t3lib_refindex
+     * @var \TYPO3\CMS\Core\Database\ReferenceIndex
      */
     protected $refIndex;
 
@@ -55,7 +55,7 @@ class Tx_SfTv2fluidge_Service_FixSortingHelper implements \TYPO3\CMS\Core\Single
     /**
      * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
      *
-     * @param \TYPO3\CMS\Core\Database\ReferenceIndex t3lib_refindex
+     * @param \TYPO3\CMS\Core\Database\ReferenceIndex $refIndex
      * @return void
      */
     public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex)

@@ -144,9 +144,9 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
         }
 
         /**
-         * @var t3lib_queryGenerator $tree
+         * @var \TYPO3\CMS\Core\Database\QueryGenerator $tree
          */
-        $tree = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_queryGenerator');
+        $tree = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Database\QueryGenerator::class);
 
         $conversionRootPid = $this->getConversionRootPid();
         if (($conversionRootPid !== null) && ($conversionRootPid > 0)) {
@@ -717,9 +717,9 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
 
         if (!empty($flexformArray) && is_array($flexformArray)) {
             /**
-             * @var t3lib_flexformtools $flexformTools
+             * @var \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools $flexformTools
              */
-            $flexformTools = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_flexformtools');
+            $flexformTools = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools::class);
             $flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
         }
 
@@ -807,9 +807,9 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
 
         if (!empty($flexformArray) && is_array($flexformArray)) {
             /**
-             * @var t3lib_flexformtools $flexformTools
+             * @var \TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools $flexformTools
              */
-            $flexformTools = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_flexformtools');
+            $flexformTools = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Configuration\FlexForm\FlexFormTools::class);
             $flexformString = $flexformTools->flexArray2Xml($flexformArray, TRUE);
         }
 
@@ -840,7 +840,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
      */
     private function getContentColsFromTs($typoScript)
     {
-        $parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('t3lib_TSparser');
+        $parser = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser::class);
         $parser->parse($typoScript);
         $data = $parser->setup['backend_layout.'];
 

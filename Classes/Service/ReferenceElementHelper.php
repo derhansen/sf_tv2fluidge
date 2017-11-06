@@ -35,7 +35,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements \TYPO3\CMS\Core\
     protected $sharedHelper;
 
     /**
-     * @var t3lib_refindex
+     * @var \TYPO3\CMS\Core\Database\ReferenceIndex
      */
     protected $refIndex;
 
@@ -71,7 +71,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements \TYPO3\CMS\Core\
     /**
      * DI for \TYPO3\CMS\Core\Database\ReferenceIndex
      *
-     * @param \TYPO3\CMS\Core\Database\ReferenceIndex t3lib_refindex
+     * @param \TYPO3\CMS\Core\Database\ReferenceIndex $refIndex
      * @return void
      */
     public function injectRefIndex(\TYPO3\CMS\Core\Database\ReferenceIndex $refIndex)
