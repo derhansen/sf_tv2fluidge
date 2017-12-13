@@ -130,7 +130,7 @@ class Tx_SfTv2fluidge_Service_ReferenceElementHelper implements \TYPO3\CMS\Core\
 
             // Cycle through each field
             foreach ($fields as $field => $contentUidString) {
-                $contentUids = \TYPO3\Beautyofcode\Utility\GeneralUtility::trimExplode(',', $contentUidString);
+                $contentUids = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $contentUidString);
                 $position = 1;
                 foreach ($contentUids as $contentUid) {
                     $contentUid = (int)$contentUid;
