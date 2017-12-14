@@ -46,6 +46,12 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
     protected $extConf = array();
 
     /**
+     * @var \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility
+     * @inject
+     */
+    protected $configurationUtility;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -856,7 +862,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
         if ($data) {
             foreach ($data['rows.'] as $row) {
                 foreach ($row['columns.'] as $column) {
-                    $contentCols[$column['colPos']] = \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($column['name'], '');
+                    $contentCols[$column['colPos']] = $column['name'];
                 }
             }
         }
@@ -887,12 +893,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements \TYPO3\CMS\Core\SingletonI
      */
     private function getGridElement($key)
     {
-        /** @var \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility $configurationUtility */
-        $configurationUtility = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility::class
-        );
-        $config = $configurationUtility->getCurrentConfiguration('sf_tv2fluidge');
-
+        $config = $this->configurationUtility->getCurrentConfiguration('sf_tv2fluidge');
         $layoutSetup = new \GridElementsTeam\Gridelements\Backend\LayoutSetup();
 
         return $layoutSetup->init($config['rootPid']['value'] ? $config['rootPid']['value'] : 0)->getLayoutSetup($key);

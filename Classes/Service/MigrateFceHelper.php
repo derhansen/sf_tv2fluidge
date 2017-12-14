@@ -40,6 +40,12 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\Single
     protected $refIndex;
 
     /**
+     * @var \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility
+     * @inject
+     */
+    protected $configurationUtility;
+
+    /**
      * DI for shared helper
      *
      * @param Tx_SfTv2fluidge_Service_SharedHelper $sharedHelper
@@ -122,11 +128,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\Single
      */
     public function getAllGe()
     {
-        /** @var \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility $configurationUtility */
-        $configurationUtility = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
-            \TYPO3\CMS\Extensionmanager\Utility\ConfigurationUtility::class
-        );
-        $config = $configurationUtility->getCurrentConfiguration('sf_tv2fluidge');
+        $config = $this->configurationUtility->getCurrentConfiguration('sf_tv2fluidge');
 
         $layoutSetup = new \GridElementsTeam\Gridelements\Backend\LayoutSetup();
 
@@ -135,7 +137,7 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements \TYPO3\CMS\Core\Single
         $collectedGridElements = [];
 
         foreach ($gridElements as $key => $gridElement) {
-            $collectedGridElements[$key] =  \TYPO3\CMS\Extbase\Utility\LocalizationUtility::translate($gridElement['title'], '');
+            $collectedGridElements[$key] =  $gridElement['title'];
         }
 
         return $collectedGridElements;

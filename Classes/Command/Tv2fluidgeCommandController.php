@@ -35,6 +35,8 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
     protected $fixSortingHelper;
 
     /**
+     * Delete unreferenced elements
+     *
      * @param bool $markAsNegativeColPos
      */
     public function deleteUnreferencedElementsCommand($markAsNegativeColPos = false)
@@ -45,6 +47,8 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
     }
 
     /**
+     * Convert reference elements to 'insert records' elements
+     *
      * @param bool $useParentUidForTranslations
      * @param bool $useAllLangIfDefaultLangIsReferenced
      */
@@ -61,6 +65,8 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
     }
 
     /**
+     * Migrate content from TemplaVoila to Fluidtemplate
+     *
      * @param int $uidTvTemplate
      * @param int $uidBeLayout
      * @param string $data
@@ -105,7 +111,7 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
     }
 
     /**
-     * Action for fix sorting
+     * Fix sorting for a given pageUid
      *
      * @param int $pageUid
      * @return void
@@ -118,7 +124,7 @@ class Tx_SfTv2fluidge_Command_Tv2fluidgeCommandController extends \TYPO3\CMS\Ext
     }
 
     /**
-     * Action for fix sorting
+     * Automatically fix sorting for all pages
      *
      * @return void
      */
