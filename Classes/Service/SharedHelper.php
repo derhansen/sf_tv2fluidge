@@ -221,6 +221,10 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 					$tvTemplateObjectUid = $myPageRecord['tx_templavoila_next_to'];
 					break;
 				}
+				if ($myPageRecord['tx_templavoila_to']) {
+					$tvTemplateObjectUid = $myPageRecord['tx_templavoila_to'];
+					break;
+				}
 			}
 		}
 		return $tvTemplateObjectUid;
