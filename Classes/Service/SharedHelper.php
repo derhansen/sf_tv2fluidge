@@ -293,8 +293,13 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 		$flexform = NULL;
 		if ($this->getTemplavoilaStaticDsIsEnabled()) {
 			$toRecord = $this->getTvTemplateObject($uidTvDs);
-			$path = t3lib_div::getFileAbsFileName($toRecord['datastructure']);
-			$flexform = simplexml_load_file($path);
+			if (\TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($toRecord['datastructure'])) {
+				$dsRecord = $this->getTvDatastructure($uidTvDs);
+				$flexform = @simplexml_load_string($dsRecord['dataprot']);
+			} else {
+				$path = \TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName($toRecord['datastructure']);
+				$flexform = @simplexml_load_string(file_get_contents($path));
+			}
 		}
 		else {
 			$dsRecord = $this->getTvDatastructure($uidTvDs);
