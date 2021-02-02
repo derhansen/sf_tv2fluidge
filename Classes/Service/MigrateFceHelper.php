@@ -65,10 +65,10 @@ class Tx_SfTv2fluidge_Service_MigrateFceHelper implements t3lib_Singleton {
 	 */
 	public function getAllFileFce() {
 		$extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['templavoila']);
-		tx_templavoila_staticds_tools::readStaticDsFilesIntoArray($extConf);
+		Extension\Templavoila\Utility\StaticDataStructure\ToolsUtility::readStaticDsFilesIntoArray($extConf);
 		$staticDsFiles = array();
 		foreach ($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['templavoila']['staticDataStructures'] as $staticDataStructure) {
-			if ($staticDataStructure['scope'] == tx_templavoila_datastructure::SCOPE_FCE) {
+			if ($staticDataStructure['scope'] === 2) {
 				$staticDsFiles[] = $staticDataStructure['path'];
 			}
 		}

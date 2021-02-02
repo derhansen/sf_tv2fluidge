@@ -23,7 +23,7 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  ***************************************************************/
 
-require_once(t3lib_extMgm::extPath('templavoila').'class.tx_templavoila_api.php');
+require_once(t3lib_extMgm::extPath('templavoila').'Classes/Service/ApiService.php');
 
 /**
  * Class with methods used in other helpers/controllers
@@ -49,7 +49,7 @@ class Tx_SfTv2fluidge_Service_SharedHelper implements t3lib_Singleton {
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->templavoilaAPIObj = t3lib_div::makeInstance ('tx_templavoila_api');
+		$this->templavoilaAPIObj = t3lib_div::makeInstance ('Extension\Templavoila\Service\ApiService');
 		if (!empty($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge'])) {
 			$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['sf_tv2fluidge']);
 		}
